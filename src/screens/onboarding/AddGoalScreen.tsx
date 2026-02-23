@@ -16,7 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { BackButton, Button, AnimatedMascot, Header } from '../../components';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, ENDPOINTS } from '../../constants';
 import { api } from '../../services';
 import { formatCurrency } from '../../utils';
 import { formatNumberInput, formatNumber } from '../../utils/formatNumber';
@@ -171,7 +171,7 @@ export const AddGoalScreen: React.FC = () => {
             };
 
             console.log('Creating goal:', payload);
-            const response = await api.post('/api/goals', payload);
+            const response = await api.post(ENDPOINTS.GOALS.BASE, payload);
             console.log('Goal created:', response.data);
 
             // Update local user data if this was part of onboarding

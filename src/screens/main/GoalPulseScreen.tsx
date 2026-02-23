@@ -22,7 +22,7 @@ import {
     AnimatedMascot,
     MascotLoader,
 } from '../../components';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, ENDPOINTS } from '../../constants';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import Toast from 'react-native-toast-message';
 import { api } from '../../services';
@@ -189,7 +189,7 @@ export const GoalPulseScreen: React.FC = () => {
         console.log('hasData-->', hasData);
         if (!hasData) {
             try {
-                const response = await api.get('/api/user/financial-profile');
+                const response = await api.get(ENDPOINTS.USER.FINANCIAL_PROFILE);
                 if (response.data?.success) {
                     console.log('newProfileData tot-->', response.data);
 
@@ -220,7 +220,7 @@ export const GoalPulseScreen: React.FC = () => {
     const fetchGoals = async (showLoader = true) => {
         try {
             if (showLoader) setIsLoading(true);
-            const response = await api.get<GoalsResponse>('/api/goals');
+            const response = await api.get<GoalsResponse>(ENDPOINTS.GOALS.BASE);
             if (response.data.success) {
                 setGoals(response.data.goals);
                 setAverageAchievement(response.data.averageAchievement);
@@ -245,7 +245,7 @@ export const GoalPulseScreen: React.FC = () => {
                 emi_outstanding: profileData.emiOutstanding || 0,
                 monthly_investment: profileData.monthlyInvestment || 0,
             };
-            const res = await api.post('/api/insights', payload);
+            const res = await api.post(ENDPOINTS.INSIGHTS.BASE, payload);
             console.log('Insights response:', res.data);
             if (res.data.insights) {
                 setInsights(res.data.insights);

@@ -1,10 +1,10 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_BASE_URL } from '../constants';
+import { ENDPOINTS } from '../constants';
 
 // Create axios instance with base configuration
 const apiClient = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: ENDPOINTS.BASE_URL,
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',

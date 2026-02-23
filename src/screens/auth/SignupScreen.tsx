@@ -14,7 +14,7 @@ import axios from 'axios';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { Logo, Input, Button, FooterLinks, AnimatedMascot } from '../../components';
-import { colors, typography, spacing, API_BASE_URL } from '../../constants';
+import { colors, typography, spacing, ENDPOINTS } from '../../constants';
 import { AuthStackParamList } from '../../navigation/AuthNavigator';
 
 type SignupScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Signup'>;
@@ -132,7 +132,7 @@ export const SignupScreen: React.FC = () => {
         }
         setLoading(true);
         try {
-            const response = await axios.post(`${API_BASE_URL}/api/auth/send-otp`, {
+            const response = await axios.post(ENDPOINTS.AUTH.SEND_OTP, {
                 email: email,
                 name: fullName,
                 age: age,

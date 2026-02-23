@@ -17,7 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BackButton, AnimatedMascot, Header } from '../../components';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, ENDPOINTS } from '../../constants';
 import { api } from '../../services/api';
 import { formatNumberInput } from '../../utils/formatNumber';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -158,7 +158,7 @@ export const EditFinancialDetailsScreen: React.FC = () => {
                 monthly_savings: investment,
             };
 
-            await api.put('/api/user/financial-profile', payload);
+            await api.put(ENDPOINTS.USER.FINANCIAL_PROFILE, payload);
 
             dispatch(setFinancialData({
                 monthlyIncome: income,

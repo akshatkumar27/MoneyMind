@@ -17,7 +17,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Logo, Input, Button, FooterLinks, AnimatedMascot } from '../../components';
-import { colors, typography, spacing, API_BASE_URL } from '../../constants';
+import { colors, typography, spacing, ENDPOINTS } from '../../constants';
 
 type AuthStackParamList = {
     Login: undefined;
@@ -65,7 +65,7 @@ export const LoginScreen: React.FC = () => {
         }
         setLoading(true);
         try {
-            const response = await axios.post(`${API_BASE_URL}/api/auth/send-otp`, {
+            const response = await axios.post(ENDPOINTS.AUTH.SEND_OTP, {
                 email: email,
             });
             console.log('OTP sent successfully:', response.data);

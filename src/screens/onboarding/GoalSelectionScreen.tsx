@@ -12,7 +12,7 @@ import Toast from 'react-native-toast-message';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackButton, Button, GoalCard, AnimatedMascot, Header } from '../../components';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, ENDPOINTS } from '../../constants';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../../services';
@@ -79,7 +79,7 @@ export const GoalSelectionScreen: React.FC = () => {
                 monthly_investment: onboardingData.monthly_investment || 0,
             };
 
-            const res = await api.post('/api/insights', payload);
+            const res = await api.post(ENDPOINTS.INSIGHTS.BASE, payload);
             console.log('Insights response:', res.data);
             if (res.data.success && res.data.insights) {
                 setInsights(res.data.insights);
@@ -112,7 +112,7 @@ export const GoalSelectionScreen: React.FC = () => {
             };
 
             console.log('Creating goal from insight:', payload);
-            const response = await api.post('/api/goals', payload);
+            const response = await api.post(ENDPOINTS.GOALS.BASE, payload);
             console.log('Goal created:', response.data);
 
             // Update local user data to mark onboarding as completed

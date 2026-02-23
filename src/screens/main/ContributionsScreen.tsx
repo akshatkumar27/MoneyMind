@@ -15,7 +15,7 @@ import {
 import Toast from 'react-native-toast-message';
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, ENDPOINTS } from '../../constants';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import { BackButton, ConfirmationModal, SkeletonLoader, AnimatedMascot, Header } from '../../components';
 import api from '../../services/api';
@@ -130,7 +130,7 @@ export const ContributionsScreen: React.FC = () => {
     const fetchContributions = async () => {
         try {
             setIsLoading(true);
-            const response = await api.post('/api/contributions/list', {
+            const response = await api.post(ENDPOINTS.CONTRIBUTIONS.LIST, {
                 goal_id: goalId,
             });
             console.log(response.data);
@@ -303,7 +303,7 @@ export const ContributionsScreen: React.FC = () => {
         // Call API
         try {
             setIsSaving(true);
-            await api.post('/api/contributions/update', {
+            await api.post(ENDPOINTS.CONTRIBUTIONS.UPDATE, {
                 contribution_id: selectedContribution.id,
                 amount: newAmount,
                 note: 'Updated monthly savings',
@@ -369,7 +369,7 @@ export const ContributionsScreen: React.FC = () => {
         closeModal();
         try {
             setIsSaving(true);
-            await api.post('/api/contributions', {
+            await api.post(ENDPOINTS.CONTRIBUTIONS.BASE, {
                 goal_id: goalId,
                 amount: editedContribution,
                 note: 'Monthly savings deposit',

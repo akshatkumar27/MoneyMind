@@ -12,7 +12,7 @@ import {
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, ENDPOINTS } from '../../constants';
 import { Header } from '../../components';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import { api } from '../../services';
@@ -31,7 +31,7 @@ export const GoalChatScreen: React.FC = () => {
     const handleJoinWaitlist = async () => {
         setIsLoading(true);
         try {
-            const response = await api.post('/api/waitlist/join', {
+            const response = await api.post(ENDPOINTS.WAITLIST.JOIN, {
                 feature: 'ai_goals',
             });
 

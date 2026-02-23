@@ -15,7 +15,7 @@ import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, CommonActions } from '@react-navigation/native';
 import { BackButton, Header } from '../../components';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, ENDPOINTS } from '../../constants';
 import { formatCurrency } from '../../utils';
 import { api } from '../../services/api';
 import { notificationService } from '../../services/NotificationService';
@@ -81,12 +81,12 @@ export const PersonalInfoScreen: React.FC = () => {
             // Deregister FCM Token
             const fcmToken = await notificationService.getFCMToken();
             if (fcmToken) {
-                await api.delete('/api/notifications/unregister-token', {
+                await api.delete(ENDPOINTS.NOTIFICATIONS.UNREGISTER_TOKEN, {
                     data: { fcm_token: fcmToken }
                 });
             }
 
-            await api.post('/api/user/delete');
+            await api.post(ENDPOINTS.USER.DELETE);
             await AsyncStorage.clear();
             dispatch(clearFinancialData());
             setDeleteModalVisible(false);

@@ -18,7 +18,7 @@ import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, ENDPOINTS } from '../../constants';
 import { Header, Button, AnimatedMascot } from '../../components';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import { api } from '../../services';
@@ -234,7 +234,7 @@ export const EditGoalScreen: React.FC = () => {
                 monthly_contribution: contributionAmount,
             };
 
-            const response = await api.put(`/api/goals/${goalId}`, payload);
+            const response = await api.put(`${ENDPOINTS.GOALS.BASE}/${goalId}`, payload);
 
             if (response.data.success) {
                 DeviceEventEmitter.emit('refreshGoals');
@@ -271,7 +271,7 @@ export const EditGoalScreen: React.FC = () => {
     const confirmDelete = async () => {
         setIsDeleting(true);
         try {
-            const response = await api.delete(`/api/goals/${goalId}`);
+            const response = await api.delete(`${ENDPOINTS.GOALS.BASE}/${goalId}`);
             if (response.data.success) {
                 DeviceEventEmitter.emit('refreshGoals');
                 setShowDeleteModal(false);

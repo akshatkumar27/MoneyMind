@@ -16,7 +16,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { BackButton, OTPInput, Button } from '../../components';
-import { colors, typography, spacing, API_BASE_URL } from '../../constants';
+import { colors, typography, spacing, ENDPOINTS } from '../../constants';
 import { notificationService } from '../../services/NotificationService';
 import { AuthStackParamList } from '../../navigation/AuthNavigator';
 import { api } from '../../services';
@@ -54,7 +54,7 @@ export const OTPVerificationScreen: React.FC = () => {
     const handleVerify = async () => {
         setLoading(true);
         try {
-            const response = await axios.post(`${API_BASE_URL}/api/auth/verify-otp`,
+            const response = await axios.post(ENDPOINTS.AUTH.VERIFY_OTP,
                 (isSignupFlow && signupData) ? {
                     otpToken: otpToken,
                     code: otp,
@@ -81,7 +81,7 @@ export const OTPVerificationScreen: React.FC = () => {
                 const fcmToken = await notificationService.getFCMToken();
                 if (fcmToken) {
                     await axios.post(
-                        `${API_BASE_URL}/api/notifications/register-token`,
+                        ENDPOINTS.NOTIFICATIONS.REGISTER_TOKEN,
                         {
                             fcm_token: fcmToken,
                             device_type: Platform.OS,
@@ -116,7 +116,7 @@ export const OTPVerificationScreen: React.FC = () => {
             // Use the status in place of the old isOnboardingIncomplete check
 
             const isFinancialProfilePresent = await AsyncStorage.getItem('isFinancialProfilePresent');
-            const meRes = await api.get('/api/auth/me');
+            const meRes = await api.get(ENDPOINTS.AUTH.ME);
             const meData = meRes.data;
 
 
@@ -171,7 +171,7 @@ export const OTPVerificationScreen: React.FC = () => {
         if (timer === 0) {
             setResending(true);
             try {
-                const response = await axios.post(`${API_BASE_URL}/api/auth/send-otp`, {
+                const response = await axios.post(ENDPOINTS.AUTH.SEND_OTP, {
                     email: email,
                 });
                 setOtpToken(response.data.otpToken);

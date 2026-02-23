@@ -16,7 +16,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BackButton, Button, AnimatedMascot, Header } from '../../components';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, ENDPOINTS } from '../../constants';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { api } from '../../services';
 import { formatCurrency } from '../../utils';
@@ -77,7 +77,7 @@ export const MonthlyInvestmentScreen: React.FC = () => {
             await AsyncStorage.setItem('onboardingData', JSON.stringify(payload));
 
             // Save financial profile to backend
-            const response = await api.post('/api/user/financial-profile', payload);
+            const response = await api.post(ENDPOINTS.USER.FINANCIAL_PROFILE, payload);
             console.log('Financial profile saved:', response.data);
 
             // Mark onboarding as complete in local storage

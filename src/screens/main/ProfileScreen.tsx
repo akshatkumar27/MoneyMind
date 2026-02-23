@@ -13,7 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, CommonActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackButton } from '../../components';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, ENDPOINTS } from '../../constants';
 import { notificationService } from '../../services/NotificationService';
 import api from '../../services/api';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
@@ -52,13 +52,13 @@ export const ProfileScreen: React.FC = () => {
             // Deregister FCM Token
             const fcmToken = await notificationService.getFCMToken();
             if (fcmToken) {
-                await api.delete('/api/notifications/unregister-token', {
+                await api.delete(ENDPOINTS.NOTIFICATIONS.UNREGISTER_TOKEN, {
                     data: { fcm_token: fcmToken }
                 });
             }
 
             // Call logout API
-            await api.post('/api/auth/logout');
+            await api.post(ENDPOINTS.AUTH.LOGOUT);
         } catch (error) {
             console.error('Logout API error:', error);
         }
