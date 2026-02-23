@@ -16,7 +16,7 @@ export const colors = {
     // Borders
     border: '#2a2a3e',
     borderFocused: '#2d7ff9',
-    lightloder:"#aca7a7ff",
+    lightloder: "#aca7a7ff",
 
     // Misc
     link: '#2d7ff9',

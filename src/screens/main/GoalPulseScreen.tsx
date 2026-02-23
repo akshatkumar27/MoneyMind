@@ -168,8 +168,8 @@ export const GoalPulseScreen: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             const profileData = await checkAndFetchFinancialProfile();
-            await fetchGoals();
-            await fetchInsights(profileData);
+            const { goals: currentGoals, goalBudget: currentBudget } = await fetchGoals();
+            await fetchInsights(profileData, currentGoals, currentBudget);
             console.log('goalsd');
         };
         fetchData();
@@ -226,25 +226,38 @@ export const GoalPulseScreen: React.FC = () => {
                 setAverageAchievement(response.data.averageAchievement);
                 setGoalBudget(response.data.goalBudget);
                 console.log('goalBudget->', response.data.goalBudget);
+                return { goals: response.data.goals, goalBudget: response.data.goalBudget };
             }
+            return { goals: [], goalBudget: null };
         } catch (error) {
             console.error('Failed to fetch goals:', error);
+            return { goals: [], goalBudget: null };
         } finally {
             if (showLoader) setIsLoading(false);
         }
     };
 
-    const fetchInsights = async (profileData: any) => {
+    const fetchInsights = async (profileData: any, currentGoals: Goal[] = [], currentBudget: GoalBudget | null = null) => {
         try {
             setInsightsLoading(true);
-            setOnboardingInvestment(goalBudget ? goalBudget.availableForNewGoals : onboardingInvestment || 0);
+            const availableForGoals = currentBudget ? currentBudget.availableForNewGoals : (onboardingInvestment || 0);
+            setOnboardingInvestment(availableForGoals);
+
             const payload = {
                 monthly_income: profileData.monthlyIncome || 0,
                 monthly_expenses: profileData.monthlyExpenses || 0,
                 monthly_emi: profileData.monthlyEmi || 0,
                 emi_outstanding: profileData.emiOutstanding || 0,
-                monthly_investment: profileData.monthlyInvestment || 0,
+                monthly_savings: profileData.monthlyInvestment || 0,
+                available_budget: availableForGoals,
+                goals: currentGoals.map(g => ({
+                    name: g.name,
+                    target_amount: typeof g.target_amount === 'string' ? parseFloat(g.target_amount) : g.target_amount,
+                    monthly_contribution: typeof g.monthly_contribution === 'string' ? parseFloat(g.monthly_contribution) : g.monthly_contribution
+                }))
             };
+
+            console.log('Sending Insights Request with Payload:', JSON.stringify(payload, null, 2));
             const res = await api.post('/api/insights', payload);
             console.log('Insights response:', res.data);
             if (res.data.insights) {
