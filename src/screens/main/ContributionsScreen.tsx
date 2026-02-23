@@ -16,6 +16,7 @@ import Toast from 'react-native-toast-message';
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { globalStyles } from '../../styles';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import { BackButton, ConfirmationModal, SkeletonLoader, AnimatedMascot, Header } from '../../components';
 import api from '../../services/api';
@@ -404,7 +405,7 @@ export const ContributionsScreen: React.FC = () => {
     const paidHistory = contributions.filter(c => c.status === 'paid');
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             {/* Confirmation Modal */}
@@ -727,26 +728,6 @@ export const ContributionsScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
-    },
-    headerTitle: {
-        color: colors.textPrimary,
-        fontSize: typography.h3,
-        fontWeight: typography.semibold,
-        flex: 1,
-        marginLeft: spacing.md,
-    },
-    headerSpacer: {
-        width: 36,
-    },
     content: {
         flex: 1,
         paddingHorizontal: spacing.lg,
@@ -925,7 +906,6 @@ const styles = StyleSheet.create({
         backgroundColor: colors.border,
         marginBottom: spacing.md,
     },
-    // History section
     historySection: {
         marginBottom: spacing.xxl,
     },
@@ -994,16 +974,6 @@ const styles = StyleSheet.create({
         fontSize: typography.caption,
         fontWeight: typography.semibold,
     },
-    // Contribution editor styles
-    editableAmount: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 6,
-    },
-    editIcon: {
-        fontSize: 16,
-    },
     editButton: {
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
         paddingHorizontal: 12,
@@ -1042,7 +1012,6 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.sm,
-        // minWidth: 150,
     },
     currencyPrefix: {
         color: colors.primary,
@@ -1089,59 +1058,6 @@ const styles = StyleSheet.create({
         fontSize: typography.body,
         fontWeight: typography.bold,
     },
-    inlineEditContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    inlineEditInput: {
-        backgroundColor: colors.inputBackground,
-        color: colors.textPrimary,
-        borderRadius: 8,
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        width: 80,
-        height: 32,
-        marginRight: 8,
-        fontSize: 14,
-        textAlign: 'right',
-    },
-    inlineEditActions: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    inlineActionButton: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-        backgroundColor: '#22c55e',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginLeft: 4,
-    },
-    inlineActionCancel: {
-        backgroundColor: colors.error,
-    },
-    inlineActionText: {
-        color: '#fff',
-        fontSize: 12,
-        fontWeight: 'bold',
-    },
-    editRowButton: {
-        marginTop: spacing.md,
-        paddingVertical: 8,
-        backgroundColor: colors.inputBackground,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: colors.border,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    editRowButtonText: {
-        fontSize: 12,
-        color: colors.textPrimary,
-        fontWeight: '600',
-    },
-    // Modal Styles
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.6)',
@@ -1234,8 +1150,5 @@ const styles = StyleSheet.create({
         color: '#000',
         fontWeight: typography.bold,
     },
-    editButtonIcon: {
-        fontSize: 16,
-        color: colors.textSecondary,
-    },
 });
+

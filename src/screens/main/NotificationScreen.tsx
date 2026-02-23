@@ -11,6 +11,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { BackButton, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
+import { globalStyles } from '../../styles';
 import { useCurrency } from '../../context/CurrencyContext';
 
 interface NotificationItem {
@@ -111,7 +112,7 @@ export const NotificationScreen: React.FC = () => {
     const unreadCount = NOTIFICATIONS.filter(n => !n.isRead).length;
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             {/* Header */}
@@ -220,37 +221,10 @@ export const NotificationScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
-    },
-    headerTitle: {
-        flex: 1,
-        color: colors.textPrimary,
-        fontSize: typography.h3,
-        fontWeight: typography.bold,
-        textAlign: 'center',
-    },
     settingsButton: {
         paddingHorizontal: spacing.sm,
     },
-    settingsIcon: {
-        fontSize: 24,
-    },
-    markReadButton: {
-        paddingHorizontal: spacing.sm,
-    },
-    markReadText: {
-        color: colors.primary,
-        fontSize: typography.caption,
-        fontWeight: typography.medium,
-    },
+    settingsIcon: { fontSize: 24 },
     unreadBadge: {
         backgroundColor: colors.primary + '20',
         marginHorizontal: spacing.lg,
@@ -296,12 +270,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: spacing.md,
     },
-    icon: {
-        fontSize: 18,
-    },
-    notificationContent: {
-        flex: 1,
-    },
+    icon: { fontSize: 18 },
+    notificationContent: { flex: 1 },
     notificationHeader: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -328,7 +298,5 @@ const styles = StyleSheet.create({
         color: colors.textMuted,
         fontSize: typography.caption - 1,
     },
-    bottomSpacing: {
-        height: spacing.xxl,
-    },
+    bottomSpacing: { height: spacing.xxl },
 });

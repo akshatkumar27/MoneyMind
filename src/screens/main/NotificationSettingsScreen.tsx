@@ -13,6 +13,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { BackButton, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
+import { globalStyles } from '../../styles';
 import { notificationService } from '../../services/NotificationService';
 import Toast from 'react-native-toast-message';
 
@@ -69,7 +70,7 @@ export const NotificationSettingsScreen: React.FC = () => {
     );
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             <Header title="Notification Settings" />
@@ -99,7 +100,7 @@ export const NotificationSettingsScreen: React.FC = () => {
                 </View>
 
                 {/* Categories */}
-                <Text style={styles.sectionHeader}>CATEGORIES</Text>
+                <Text style={globalStyles.sectionLabel}>CATEGORIES</Text>
                 <View style={[styles.card, pauseAll && styles.disabledCard]}>
                     <SettingRow
                         icon="💡"
@@ -147,7 +148,7 @@ export const NotificationSettingsScreen: React.FC = () => {
                 </Text>
 
                 {/* Test Notification Button */}
-                 {/* <TouchableOpacity
+                {/* <TouchableOpacity
                     style={styles.testButton}
                     onPress={async () => {
                         try {
@@ -193,38 +194,9 @@ export const NotificationSettingsScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
-    },
-    headerTitle: {
-        flex: 1,
-        color: colors.textPrimary,
-        fontSize: typography.h3,
-        fontWeight: typography.bold,
-        textAlign: 'center',
-    },
-    headerSpacer: {
-        width: 40,
-    },
     content: {
         flex: 1,
         paddingHorizontal: spacing.lg,
-    },
-    sectionHeader: {
-        color: colors.textSecondary,
-        fontSize: typography.caption,
-        fontWeight: typography.bold,
-        marginBottom: spacing.sm,
-        marginTop: spacing.xl,
-        paddingLeft: spacing.xs,
-        letterSpacing: 1,
     },
     card: {
         backgroundColor: colors.cardBackground,
@@ -259,21 +231,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: spacing.md,
     },
-    disabledIcon: {
-        backgroundColor: colors.background,
-    },
-    iconText: {
-        fontSize: 20,
-    },
+    disabledIcon: { backgroundColor: colors.background },
+    iconText: { fontSize: 20 },
     settingLabel: {
         color: colors.textPrimary,
         fontSize: typography.body,
         fontWeight: typography.medium,
         flex: 1,
     },
-    disabledText: {
-        color: colors.textMuted,
-    },
+    disabledText: { color: colors.textMuted },
     masterLabel: {
         color: colors.textPrimary,
         fontSize: typography.body,
@@ -287,14 +253,14 @@ const styles = StyleSheet.create({
     divider: {
         height: 1,
         backgroundColor: colors.inputBackground,
-        marginLeft: 70, // Align with text start (40 icon + 16 margin + 14 padding ~ 70)
+        marginLeft: 70,
     },
     footerNote: {
         color: colors.textMuted,
         fontSize: typography.caption,
         textAlign: 'center',
         marginTop: spacing.xl,
-        marginBottom: spacing.xxl, // Increased for button
+        marginBottom: spacing.xxl,
         paddingHorizontal: spacing.lg,
     },
     testButton: {

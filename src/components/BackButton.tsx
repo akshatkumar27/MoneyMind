@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
-import { colors } from '../constants';
+import { colors, typography } from '../constants';
 
 interface BackButtonProps {
     onPress: () => void;

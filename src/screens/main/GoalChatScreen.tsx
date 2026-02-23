@@ -13,6 +13,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
 import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { globalStyles } from '../../styles';
 import { Header } from '../../components';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import { api } from '../../services';
@@ -71,7 +72,7 @@ export const GoalChatScreen: React.FC = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             {/* Header */}
@@ -115,40 +116,6 @@ export const GoalChatScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
-    },
-    backButton: {
-        width: 36,
-        height: 36,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: colors.border,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    backButtonText: {
-        color: colors.textPrimary,
-        fontSize: 18,
-        fontWeight: typography.medium,
-    },
-    headerTitle: {
-        color: colors.textPrimary,
-        fontSize: typography.h3,
-        fontWeight: typography.semibold,
-        flex: 1,
-        marginLeft: spacing.md,
-    },
-    headerSpacer: {
-        width: 36,
-    },
     content: {
         flex: 1,
         justifyContent: 'center',

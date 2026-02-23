@@ -2,12 +2,12 @@ import React from 'react';
 import {
     TouchableOpacity,
     Text,
-    StyleSheet,
     ActivityIndicator,
     ViewStyle,
     TextStyle,
 } from 'react-native';
 import { colors } from '../constants';
+import { globalStyles } from '../styles';
 
 interface ButtonProps {
     title: string;
@@ -31,8 +31,8 @@ export const Button: React.FC<ButtonProps> = ({
     return (
         <TouchableOpacity
             style={[
-                styles.button,
-                (disabled || loading) && styles.buttonDisabled,
+                globalStyles.primaryButton,
+                (disabled || loading) && globalStyles.buttonDisabled,
                 style,
             ]}
             onPress={onPress}
@@ -42,7 +42,7 @@ export const Button: React.FC<ButtonProps> = ({
             {loading ? (
                 <ActivityIndicator color={colors.textPrimary} />
             ) : (
-                <Text style={[styles.buttonText, textStyle]}>
+                <Text style={[globalStyles.primaryButtonText, textStyle]}>
                     {title} {showArrow && '→'}
                 </Text>
             )}
@@ -50,21 +50,4 @@ export const Button: React.FC<ButtonProps> = ({
     );
 };
 
-const styles = StyleSheet.create({
-    button: {
-        backgroundColor: colors.primary,
-        paddingVertical: 16,
-        paddingHorizontal: 24,
-        borderRadius: 12,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    buttonDisabled: {
-        opacity: 0.6,
-    },
-    buttonText: {
-        color: colors.textPrimary,
-        fontSize: 16,
-        fontWeight: '600',
-    },
-});
+

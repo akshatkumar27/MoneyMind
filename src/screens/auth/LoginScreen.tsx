@@ -18,6 +18,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Logo, Input, Button, FooterLinks, AnimatedMascot } from '../../components';
 import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { globalStyles } from '../../styles';
 
 type AuthStackParamList = {
     Login: undefined;
@@ -101,11 +102,11 @@ export const LoginScreen: React.FC = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.keyboardView}
+                style={globalStyles.flex1}
             >
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
@@ -116,8 +117,8 @@ export const LoginScreen: React.FC = () => {
                     </View>
 
                     <View style={styles.content}>
-                        <Text style={styles.title}>Welcome Back</Text>
-                        <Text style={styles.subtitle}>Log in to manage your wealth with AI.</Text>
+                        <Text style={[globalStyles.headingLarge, { marginBottom: spacing.sm }]}>Welcome Back</Text>
+                        <Text style={[globalStyles.bodyText, { marginBottom: spacing.xl }]}>Log in to manage your wealth with AI.</Text>
 
                         <View style={styles.form}>
                             <Input
@@ -160,13 +161,6 @@ export const LoginScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    keyboardView: {
-        flex: 1,
-    },
     scrollContent: {
         flexGrow: 1,
     },
@@ -180,26 +174,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.lg,
         paddingTop: spacing.xxl,
     },
-    title: {
-        color: colors.textPrimary,
-        fontSize: typography.h1,
-        fontWeight: typography.bold,
-        marginBottom: spacing.sm,
-    },
-    subtitle: {
-        color: colors.textSecondary,
-        fontSize: typography.body,
-        marginBottom: spacing.xl,
-    },
     form: {
         marginBottom: spacing.lg,
     },
     inputIcon: {
         color: colors.textMuted,
         fontSize: typography.body,
-    },
-    footer: {
-        paddingHorizontal: spacing.lg,
     },
     mascotContainer: {
         paddingHorizontal: spacing.xs,

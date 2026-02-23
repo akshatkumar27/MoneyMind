@@ -191,21 +191,12 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.background,
     },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
-    },
     stepIndicator: {
         flex: 1,
         color: colors.textPrimary,
         fontSize: typography.body,
         fontWeight: typography.medium as any,
         textAlign: 'center',
-    },
-    headerRight: {
-        width: 40,
     },
     content: {
         flex: 1,

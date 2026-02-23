@@ -15,6 +15,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { BackButton, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
+import { globalStyles } from '../../styles';
 
 // Enable LayoutAnimation for Android
 if (
@@ -62,7 +63,7 @@ export const HelpSupportScreen: React.FC = () => {
     ];
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             <Header title="Help & Support" />
@@ -83,7 +84,7 @@ export const HelpSupportScreen: React.FC = () => {
                 </View>
 
                 {/* FAQ Section */}
-                <Text style={styles.sectionTitle}>Frequently Asked Questions</Text>
+                <Text style={globalStyles.sectionLabel}>Frequently Asked Questions</Text>
                 <View style={styles.faqList}>
                     {FAQs.map((faq) => (
                         <View key={faq.id} style={styles.faqItem}>
@@ -115,33 +116,13 @@ export const HelpSupportScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
-    },
-    headerTitle: {
-        flex: 1,
-        color: colors.textPrimary,
-        fontSize: typography.h3,
-        fontWeight: typography.bold,
-        textAlign: 'center',
-    },
-    headerSpacer: {
-        width: 40,
-    },
     content: {
         flex: 1,
         paddingHorizontal: spacing.lg,
     },
     contactCard: {
         backgroundColor: colors.cardBackground,
-        borderRadius: 16, // using number directly
+        borderRadius: 16,
         padding: spacing.lg,
         marginTop: spacing.md,
         marginBottom: spacing.xl,
@@ -164,9 +145,9 @@ const styles = StyleSheet.create({
     },
     contactButton: {
         backgroundColor: colors.primary,
-        paddingVertical: 12, // using number directly
-        paddingHorizontal: 24, // using number directly
-        borderRadius: 24, // using number directly
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 24,
         width: '100%',
         alignItems: 'center',
     },
@@ -174,14 +155,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: typography.body,
         fontWeight: typography.bold,
-    },
-    sectionTitle: {
-        color: colors.textSecondary,
-        fontSize: typography.caption,
-        fontWeight: typography.bold,
-        marginBottom: spacing.md,
-        textTransform: 'uppercase',
-        letterSpacing: 1,
     },
     faqList: {
         backgroundColor: colors.cardBackground,
@@ -223,11 +196,6 @@ const styles = StyleSheet.create({
     footer: {
         alignItems: 'center',
         paddingVertical: spacing.xl,
-    },
-    versionText: {
-        color: colors.textMuted,
-        fontSize: typography.caption,
-        marginBottom: 4,
     },
     copyrightText: {
         color: colors.textMuted,

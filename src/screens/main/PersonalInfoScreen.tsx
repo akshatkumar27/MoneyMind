@@ -16,6 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, CommonActions } from '@react-navigation/native';
 import { BackButton, Header } from '../../components';
 import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { globalStyles } from '../../styles';
 import { formatCurrency } from '../../utils';
 import { api } from '../../services/api';
 import { notificationService } from '../../services/NotificationService';
@@ -133,9 +134,9 @@ export const PersonalInfoScreen: React.FC = () => {
 
     if (isLoading) {
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={globalStyles.container}>
                 <StatusBar barStyle="light-content" backgroundColor={colors.background} />
-                <View style={styles.loadingContainer}>
+                <View style={globalStyles.loadingContainer}>
                     <ActivityIndicator size="large" color={colors.primary} />
                 </View>
             </SafeAreaView>
@@ -143,14 +144,14 @@ export const PersonalInfoScreen: React.FC = () => {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             <Header title="Personal Information" />
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 {/* Profile Section */}
-                <Text style={styles.sectionTitle}>Account Details</Text>
+                <Text style={globalStyles.sectionLabel}>Account Details</Text>
                 <View style={styles.card}>
                     {infoItems.map((item, index) => (
                         <View
@@ -178,8 +179,8 @@ export const PersonalInfoScreen: React.FC = () => {
                 </View>
 
                 {/* Financial Section */}
-                <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>Financial Details</Text>
+                <View style={globalStyles.sectionHeader}>
+                    <Text style={globalStyles.sectionLabel}>Financial Details</Text>
                     <TouchableOpacity onPress={handleEditFinancials}>
                         <Text style={styles.editButtonText}>Edit</Text>
                     </TouchableOpacity>
@@ -264,33 +265,9 @@ export const PersonalInfoScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
     content: {
         flex: 1,
         paddingHorizontal: spacing.lg,
-    },
-    sectionHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: spacing.lg,
-        marginBottom: spacing.sm,
-    },
-    sectionTitle: {
-        color: colors.textSecondary,
-        fontSize: typography.bodySmall,
-        fontWeight: typography.medium,
-        textTransform: 'uppercase',
-        letterSpacing: 1,
     },
     editButtonText: {
         color: colors.primary,

@@ -15,6 +15,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackButton, Button, AnimatedMascot, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
+import { globalStyles } from '../../styles';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { formatNumberInput } from '../../utils/formatNumber';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -48,7 +49,7 @@ export const EMIOutstandingScreen: React.FC = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             <Header title="Step 4 of 5" titleStyle={styles.stepIndicator} />
@@ -63,19 +64,19 @@ export const EMIOutstandingScreen: React.FC = () => {
                     showsVerticalScrollIndicator={false}
                     onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
                 >
-                    <View style={styles.progressSection}>
-                        <Text style={styles.progressLabel}>Profile Completion</Text>
+                    <View style={globalStyles.rowSpaceBetween}>
+                        <Text style={globalStyles.caption}>Profile Completion</Text>
                         <Text style={styles.progressPercent}>80%</Text>
                     </View>
-                    <View style={styles.progressBar}>
-                        <View style={[styles.progressFill, { width: '80%' }]} />
+                    <View style={globalStyles.progressBar}>
+                        <View style={[globalStyles.progressFill, { width: '80%' }]} />
                     </View>
                     {/* Illustration */}
                     <View style={styles.illustrationContainer}>
                         <Text style={styles.emoji}>🏦</Text>
                     </View>
 
-                    <Text style={styles.title}>What is your total outstanding EMI?</Text>
+                    <Text style={[globalStyles.headingMedium, { textAlign: 'center', lineHeight: 32, marginBottom: spacing.sm }]}>What is your total outstanding EMI?</Text>
 
                     <View style={styles.inputContainer}>
                         <Text style={styles.currencySymbol}>{currencySymbol}</Text>
@@ -114,16 +115,6 @@ export const EMIOutstandingScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
-    },
     stepIndicator: {
         flex: 1,
         color: colors.textPrimary,
@@ -131,59 +122,20 @@ const styles = StyleSheet.create({
         fontWeight: typography.medium,
         textAlign: 'center',
     },
-    headerRight: {
-        width: 40,
-    },
     content: {
         flex: 1,
         paddingHorizontal: spacing.lg,
-    },
-    progressSection: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: spacing.xs,
-    },
-    progressLabel: {
-        color: colors.textMuted,
-        fontSize: typography.caption,
     },
     progressPercent: {
         color: colors.primary,
         fontSize: typography.caption,
         fontWeight: typography.medium,
     },
-    progressBar: {
-        height: 4,
-        backgroundColor: colors.border,
-        borderRadius: 2,
-        marginBottom: spacing.xl,
-    },
-    progressFill: {
-        height: '100%',
-        backgroundColor: colors.primary,
-        borderRadius: 2,
-    },
     illustrationContainer: {
         alignItems: 'center',
         marginBottom: spacing.xl,
     },
-    emoji: {
-        fontSize: 80,
-    },
-    title: {
-        color: colors.textPrimary,
-        fontSize: typography.h2,
-        fontWeight: typography.bold,
-        marginBottom: spacing.sm,
-        textAlign: 'center',
-        lineHeight: 32,
-    },
-    subtitle: {
-        color: colors.textSecondary,
-        fontSize: typography.body,
-        textAlign: 'center',
-        marginBottom: spacing.xl,
-    },
+    emoji: { fontSize: 80 },
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -214,10 +166,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: spacing.md,
     },
-    noteIcon: {
-        fontSize: 20,
-        marginRight: spacing.sm,
-    },
+    noteIcon: { fontSize: 20, marginRight: spacing.sm },
     noteText: {
         flex: 1,
         color: colors.textSecondary,
@@ -228,7 +177,5 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.lg,
         paddingBottom: spacing.lg,
     },
-    mascotContainer: {
-        paddingHorizontal: spacing.xs,
-    },
+    mascotContainer: { paddingHorizontal: spacing.xs },
 });

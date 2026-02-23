@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { Logo, Input, Button, FooterLinks, AnimatedMascot } from '../../components';
 import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { globalStyles } from '../../styles';
 import { AuthStackParamList } from '../../navigation/AuthNavigator';
 
 type SignupScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Signup'>;
@@ -175,11 +176,11 @@ export const SignupScreen: React.FC = () => {
     const isFormValid = email.trim() && fullName.trim() && age.trim();
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.keyboardView}
+                style={globalStyles.flex1}
             >
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
@@ -191,8 +192,8 @@ export const SignupScreen: React.FC = () => {
                     </View>
 
                     <View style={styles.content}>
-                        <Text style={styles.title}>Create Account</Text>
-                        <Text style={styles.subtitle}>
+                        <Text style={[globalStyles.headingLarge, { marginBottom: spacing.sm }]}>Create Account</Text>
+                        <Text style={[globalStyles.bodyText, { marginBottom: spacing.lg }]}>
                             Join Finova AI for smarter wealth management.
                         </Text>
 
@@ -260,13 +261,6 @@ export const SignupScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    keyboardView: {
-        flex: 1,
-    },
     scrollContent: {
         flexGrow: 1,
     },
@@ -279,17 +273,6 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: spacing.lg,
         paddingTop: spacing.lg,
-    },
-    title: {
-        color: colors.textPrimary,
-        fontSize: typography.h1,
-        fontWeight: typography.bold as any,
-        marginBottom: spacing.sm,
-    },
-    subtitle: {
-        color: colors.textSecondary,
-        fontSize: typography.body,
-        marginBottom: spacing.lg,
     },
     form: {
         marginBottom: spacing.lg,

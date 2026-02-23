@@ -15,6 +15,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackButton, Button, AnimatedMascot, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
+import { globalStyles } from '../../styles';
 import { formatNumberInput } from '../../utils/formatNumber';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { formatCurrency } from '../../utils';
@@ -73,7 +74,7 @@ export const MonthlyExpensesScreen: React.FC = () => {
     const isValid = amount.trim() !== '' && expenseAmount > 0 && !isExceedingIncome;
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             <Header title="Step 2 of 5" titleStyle={styles.stepIndicator} />
@@ -88,19 +89,19 @@ export const MonthlyExpensesScreen: React.FC = () => {
                     showsVerticalScrollIndicator={false}
                     onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
                 >
-                    <View style={styles.progressSection}>
-                        <Text style={styles.progressLabel}>Profile Completion</Text>
+                    <View style={globalStyles.rowSpaceBetween}>
+                        <Text style={globalStyles.caption}>Profile Completion</Text>
                         <Text style={styles.progressPercent}>40%</Text>
                     </View>
-                    <View style={styles.progressBar}>
-                        <View style={[styles.progressFill, { width: '40%' }]} />
+                    <View style={globalStyles.progressBar}>
+                        <View style={[globalStyles.progressFill, { width: '40%' }]} />
                     </View>
                     {/* Illustration */}
                     <View style={styles.illustrationContainer}>
                         <Text style={styles.emoji}>🛒</Text>
                     </View>
 
-                    <Text style={styles.title}>What are your monthly expenses?</Text>
+                    <Text style={[globalStyles.headingMedium, { textAlign: 'center', lineHeight: 32, marginBottom: spacing.sm }]}>What are your monthly expenses?</Text>
 
                     {/* Available Income Info */}
                     <Text style={styles.availableText}>
@@ -121,7 +122,7 @@ export const MonthlyExpensesScreen: React.FC = () => {
 
                     {/* Error Message */}
                     {isExceedingIncome && (
-                        <Text style={styles.errorText}>
+                        <Text style={[globalStyles.errorText, { textAlign: 'center', marginBottom: spacing.md, fontSize: typography.bodySmall }]}>
                             Expenses cannot exceed your income ({formatCurrency(monthlyIncome, currencySymbol)})
                         </Text>
                     )}
@@ -144,16 +145,6 @@ export const MonthlyExpensesScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
-    },
     stepIndicator: {
         flex: 1,
         color: colors.textPrimary,
@@ -161,53 +152,21 @@ const styles = StyleSheet.create({
         fontWeight: typography.medium as any,
         textAlign: 'center',
     },
-    headerRight: {
-        width: 40,
-    },
+
     content: {
         flex: 1,
         paddingHorizontal: spacing.lg,
-    },
-    progressSection: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: spacing.xs,
-    },
-    progressLabel: {
-        color: colors.textMuted,
-        fontSize: typography.caption,
     },
     progressPercent: {
         color: colors.primary,
         fontSize: typography.caption,
         fontWeight: typography.medium as any,
     },
-    progressBar: {
-        height: 4,
-        backgroundColor: colors.border,
-        borderRadius: 2,
-        marginBottom: spacing.xl,
-    },
-    progressFill: {
-        height: '100%',
-        backgroundColor: colors.primary,
-        borderRadius: 2,
-    },
     illustrationContainer: {
         alignItems: 'center',
         marginBottom: spacing.xl,
     },
-    emoji: {
-        fontSize: 80,
-    },
-    title: {
-        color: colors.textPrimary,
-        fontSize: typography.h2,
-        fontWeight: typography.bold as any,
-        marginBottom: spacing.sm,
-        textAlign: 'center',
-        lineHeight: 32,
-    },
+    emoji: { fontSize: 80 },
     availableText: {
         color: colors.textSecondary,
         fontSize: typography.bodySmall,
@@ -237,20 +196,10 @@ const styles = StyleSheet.create({
         borderBottomColor: colors.primary,
         paddingBottom: spacing.sm,
     },
-    inputError: {
-        borderBottomColor: '#ef4444',
-    },
-    errorText: {
-        color: '#ef4444',
-        fontSize: typography.bodySmall,
-        textAlign: 'center',
-        marginBottom: spacing.md,
-    },
+    inputError: { borderBottomColor: '#ef4444' },
     footer: {
         paddingHorizontal: spacing.lg,
         paddingBottom: spacing.lg,
     },
-    mascotContainer: {
-        paddingHorizontal: spacing.xs,
-    },
+    mascotContainer: { paddingHorizontal: spacing.xs },
 });

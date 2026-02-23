@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackButton, Button, AnimatedMascot, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
+import { globalStyles } from '../../styles';
 import { formatNumberInput } from '../../utils/formatNumber';
 
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
@@ -54,7 +55,7 @@ export const MonthlyIncomeScreen: React.FC = () => {
     // }, []);
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             <Header title="Step 1 of 5" titleStyle={styles.stepIndicator} />
@@ -69,19 +70,19 @@ export const MonthlyIncomeScreen: React.FC = () => {
                     showsVerticalScrollIndicator={false}
                     onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
                 >
-                    <View style={styles.progressSection}>
-                        <Text style={styles.progressLabel}>Profile Completion</Text>
+                    <View style={globalStyles.rowSpaceBetween}>
+                        <Text style={globalStyles.caption}>Profile Completion</Text>
                         <Text style={styles.progressPercent}>20%</Text>
                     </View>
-                    <View style={styles.progressBar}>
-                        <View style={[styles.progressFill, { width: '20%' }]} />
+                    <View style={globalStyles.progressBar}>
+                        <View style={[globalStyles.progressFill, { width: '20%' }]} />
                     </View>
                     {/* Illustration */}
                     <View style={styles.illustrationContainer}>
                         <Text style={styles.emoji}>💰</Text>
                     </View>
 
-                    <Text style={styles.title}>What is your monthly income?</Text>
+                    <Text style={[globalStyles.headingMedium, { textAlign: 'center', lineHeight: 32, marginBottom: spacing.sm }]}>What is your monthly income?</Text>
 
                     <View style={styles.inputContainer}>
                         <Text style={styles.currencySymbol}>{currencySymbol}</Text>
@@ -113,16 +114,6 @@ export const MonthlyIncomeScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
-    },
     stepIndicator: {
         flex: 1,
         color: colors.textPrimary,
@@ -130,59 +121,21 @@ const styles = StyleSheet.create({
         fontWeight: typography.medium,
         textAlign: 'center',
     },
-    headerRight: {
-        width: 40,
-    },
+
     content: {
         flex: 1,
         paddingHorizontal: spacing.lg,
-    },
-    progressSection: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: spacing.xs,
-    },
-    progressLabel: {
-        color: colors.textMuted,
-        fontSize: typography.caption,
     },
     progressPercent: {
         color: colors.primary,
         fontSize: typography.caption,
         fontWeight: typography.medium,
     },
-    progressBar: {
-        height: 4,
-        backgroundColor: colors.border,
-        borderRadius: 2,
-        marginBottom: spacing.xl,
-    },
-    progressFill: {
-        height: '100%',
-        backgroundColor: colors.primary,
-        borderRadius: 2,
-    },
     illustrationContainer: {
         alignItems: 'center',
         marginBottom: spacing.xl,
     },
-    emoji: {
-        fontSize: 80,
-    },
-    title: {
-        color: colors.textPrimary,
-        fontSize: typography.h2,
-        fontWeight: typography.bold,
-        marginBottom: spacing.sm,
-        textAlign: 'center',
-        lineHeight: 32,
-    },
-    subtitle: {
-        color: colors.textSecondary,
-        fontSize: typography.body,
-        textAlign: 'center',
-        marginBottom: spacing.xl,
-    },
+    emoji: { fontSize: 80 },
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -210,7 +163,5 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.lg,
         paddingBottom: spacing.lg,
     },
-    mascotContainer: {
-        paddingHorizontal: spacing.xs,
-    },
+    mascotContainer: { paddingHorizontal: spacing.xs },
 });

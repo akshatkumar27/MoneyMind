@@ -392,25 +392,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.background,
     },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
-    },
-    headerTitle: {
-        flex: 1,
-        color: colors.textPrimary,
-        fontSize: typography.h3,
-        fontWeight: typography.semibold as any,
-        textAlign: 'center',
-    },
-    headerRight: {
-        width: 40,
-    },
-    keyboardView: {
-        flex: 1,
-    },
     content: {
         flex: 1,
         paddingHorizontal: spacing.lg,
@@ -550,11 +531,6 @@ const styles = StyleSheet.create({
     mascotContainer: {
         paddingHorizontal: spacing.xs,
         paddingBottom: spacing.sm,
-    },
-    mascotTopContainer: {
-        paddingHorizontal: spacing.lg,
-        paddingBottom: spacing.sm,
-        marginTop: -spacing.sm,
     },
     budgetCard: {
         flexDirection: 'row',

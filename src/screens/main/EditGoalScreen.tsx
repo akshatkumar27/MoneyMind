@@ -19,6 +19,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
 import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { globalStyles } from '../../styles';
 import { Header, Button, AnimatedMascot } from '../../components';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import { api } from '../../services';
@@ -301,7 +302,7 @@ export const EditGoalScreen: React.FC = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             <KeyboardAvoidingView
@@ -499,10 +500,6 @@ export const EditGoalScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
     keyboardView: {
         flex: 1,
     },
@@ -634,9 +631,6 @@ const styles = StyleSheet.create({
         color: colors.textSecondary,
         fontSize: typography.body,
         marginLeft: spacing.sm,
-    },
-    inputError: {
-        borderColor: colors.error,
     },
     errorText: {
         color: colors.error,

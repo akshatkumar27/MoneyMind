@@ -220,12 +220,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.background,
     },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
-    },
     stepIndicator: {
         flex: 1,
         color: colors.textPrimary,
@@ -233,45 +227,9 @@ const styles = StyleSheet.create({
         fontWeight: typography.medium,
         textAlign: 'center',
     },
-    headerRight: {
-        width: 40,
-    },
     content: {
         flex: 1,
         paddingHorizontal: spacing.lg,
-    },
-    illustrationContainer: {
-        alignItems: 'center',
-        marginBottom: spacing.xl,
-    },
-    celebrationCircle: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        backgroundColor: '#1a2744',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 3,
-        borderColor: colors.primary,
-    },
-    targetEmoji: {
-        fontSize: 48,
-    },
-    sparkles: {
-        position: 'absolute',
-        width: 160,
-        height: 100,
-        justifyContent: 'center',
-    },
-    sparkle: {
-        position: 'absolute',
-        fontSize: 24,
-        left: 0,
-        top: 20,
-    },
-    sparkleRight: {
-        left: 'auto',
-        right: 0,
     },
     title: {
         color: colors.textPrimary,
@@ -280,12 +238,6 @@ const styles = StyleSheet.create({
         marginBottom: spacing.sm,
         textAlign: 'center',
         lineHeight: 32,
-    },
-    subtitle: {
-        color: colors.textSecondary,
-        fontSize: typography.body,
-        textAlign: 'center',
-        marginBottom: spacing.xl,
     },
     goalsContainer: {
         marginBottom: spacing.lg,
@@ -303,9 +255,6 @@ const styles = StyleSheet.create({
     footer: {
         paddingHorizontal: spacing.lg,
         paddingBottom: spacing.lg,
-    },
-    mascotContainer: {
-        paddingHorizontal: spacing.xs,
     },
     mascotInline: {
         marginBottom: spacing.sm,

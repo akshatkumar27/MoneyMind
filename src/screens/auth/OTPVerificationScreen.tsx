@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { BackButton, OTPInput, Button } from '../../components';
 import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { globalStyles } from '../../styles';
 import { notificationService } from '../../services/NotificationService';
 import { AuthStackParamList } from '../../navigation/AuthNavigator';
 import { api } from '../../services';
@@ -210,19 +211,19 @@ export const OTPVerificationScreen: React.FC = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.keyboardView}
+                style={globalStyles.flex1}
             >
                 <View style={styles.header}>
                     <BackButton onPress={() => navigation.goBack()} />
                 </View>
 
                 <View style={styles.content}>
-                    <Text style={styles.title}>Verify your email</Text>
-                    <Text style={styles.subtitle}>
+                    <Text style={[globalStyles.headingLarge, { marginBottom: spacing.sm }]}>Verify your email</Text>
+                    <Text style={[globalStyles.bodyText, { lineHeight: 24 }]}>
                         We've sent a 6-digit code to
                     </Text>
                     <View style={styles.emailContainer}>
@@ -243,7 +244,7 @@ export const OTPVerificationScreen: React.FC = () => {
                     </View>
                 </View>
 
-                <View style={styles.footer}>
+                <View style={globalStyles.footerPlain}>
                     <Button
                         title="Verify & Continue"
                         onPress={handleVerify}
@@ -257,13 +258,6 @@ export const OTPVerificationScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    keyboardView: {
-        flex: 1,
-    },
     header: {
         paddingHorizontal: spacing.lg,
         paddingTop: spacing.md,
@@ -272,17 +266,6 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: spacing.lg,
         paddingTop: spacing.lg,
-    },
-    title: {
-        color: colors.textPrimary,
-        fontSize: typography.h1,
-        fontWeight: typography.bold,
-        marginBottom: spacing.sm,
-    },
-    subtitle: {
-        color: colors.textSecondary,
-        fontSize: typography.body,
-        lineHeight: 24,
     },
     email: {
         color: colors.primary,
@@ -320,9 +303,5 @@ const styles = StyleSheet.create({
     },
     resendDisabled: {
         color: colors.textMuted,
-    },
-    footer: {
-        paddingHorizontal: spacing.lg,
-        paddingBottom: spacing.xl,
     },
 });

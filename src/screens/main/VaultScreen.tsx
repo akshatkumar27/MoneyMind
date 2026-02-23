@@ -15,6 +15,7 @@ import {
     AIInsightCard,
 } from '../../components';
 import { colors, typography, spacing } from '../../constants';
+import { globalStyles } from '../../styles';
 import { useCurrency } from '../../context/CurrencyContext';
 
 export const VaultScreen: React.FC = () => {
@@ -22,7 +23,7 @@ export const VaultScreen: React.FC = () => {
     const { currencySymbol } = useCurrency();
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             {/* Header */}
@@ -184,10 +185,6 @@ export const VaultScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',

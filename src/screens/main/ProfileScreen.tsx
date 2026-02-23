@@ -14,6 +14,7 @@ import { useNavigation, CommonActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackButton } from '../../components';
 import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { globalStyles } from '../../styles';
 import { notificationService } from '../../services/NotificationService';
 import api from '../../services/api';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
@@ -92,7 +93,7 @@ export const ProfileScreen: React.FC = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             {/* Logout Confirmation Modal */}
@@ -206,10 +207,6 @@ export const ProfileScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
     header: {
         flexDirection: 'row',
         alignItems: 'center',

@@ -18,6 +18,7 @@ import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BackButton, AnimatedMascot, Header } from '../../components';
 import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { globalStyles } from '../../styles';
 import { api } from '../../services/api';
 import { formatNumberInput } from '../../utils/formatNumber';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -191,7 +192,7 @@ export const EditFinancialDetailsScreen: React.FC = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             <Header title="Edit Financials" />
@@ -303,26 +304,6 @@ export const EditFinancialDetailsScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
-    },
-    headerTitle: {
-        flex: 1,
-        color: colors.textPrimary,
-        fontSize: typography.h3,
-        fontWeight: typography.bold,
-        textAlign: 'center',
-    },
-    headerSpacer: {
-        width: 40,
-    },
     content: {
         flex: 1,
         paddingHorizontal: spacing.lg,

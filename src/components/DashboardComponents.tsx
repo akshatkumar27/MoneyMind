@@ -415,9 +415,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: spacing.sm,
     },
-    goalIconText: {
-        fontSize: 16,
-    },
     goalInfo: {
         flex: 1,
     },
@@ -434,23 +431,6 @@ const styles = StyleSheet.create({
         color: colors.textPrimary,
         fontSize: typography.body,
         fontWeight: typography.semibold,
-    },
-    aiCard: {
-        backgroundColor: colors.cardBackground,
-        borderRadius: 8,
-        padding: spacing.sm,
-        borderLeftWidth: 3,
-        marginBottom: spacing.sm,
-    },
-    aiTitle: {
-        fontSize: typography.caption,
-        fontWeight: typography.semibold,
-        marginBottom: 4,
-    },
-    aiDescription: {
-        color: colors.textSecondary,
-        fontSize: typography.caption,
-        lineHeight: 18,
     },
     assetRow: {
         flexDirection: 'row',
@@ -504,11 +484,6 @@ const styles = StyleSheet.create({
         padding: spacing.md,
         marginBottom: spacing.md,
     },
-    goalSection: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: spacing.md,
-    },
     goalIconCircle: {
         width: 48,
         height: 48,
@@ -542,45 +517,6 @@ const styles = StyleSheet.create({
         height: '100%',
         borderRadius: 3,
         backgroundColor: '#22c55e',
-    },
-    suggestionSection: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginTop: spacing.md,
-        backgroundColor: colors.inputBackground,
-        borderRadius: 12,
-        padding: spacing.md,
-    },
-    suggestionIconContainer: {
-        width: 28,
-        height: 28,
-        borderRadius: 8,
-        backgroundColor: '#f59e0b20',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: spacing.sm,
-    },
-    suggestionIcon: {
-        fontSize: 14,
-    },
-    suggestionContent: {
-        flex: 1,
-    },
-    suggestionTitle: {
-        color: '#f59e0b',
-        fontSize: typography.caption,
-        fontWeight: typography.bold,
-        letterSpacing: 0.5,
-        marginBottom: 4,
-    },
-    suggestionDescription: {
-        color: colors.textSecondary,
-        fontSize: typography.caption,
-        lineHeight: 18,
-    },
-    suggestionHighlight: {
-        color: '#22c55e',
-        fontWeight: typography.semibold,
     },
     // Standalone AI card styles
     aiSuggestionCard: {

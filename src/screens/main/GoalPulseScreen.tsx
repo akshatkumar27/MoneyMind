@@ -23,6 +23,7 @@ import {
     MascotLoader,
 } from '../../components';
 import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { globalStyles } from '../../styles';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import Toast from 'react-native-toast-message';
 import { api } from '../../services';
@@ -136,6 +137,8 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
 
 const circularStyles = StyleSheet.create({
     container: {
+        width: 120,
+        height: 120,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -145,9 +148,9 @@ const circularStyles = StyleSheet.create({
         alignItems: 'center',
     },
     scoreText: {
-        color: '#22c55e',
-        fontSize: 42,
-        fontWeight: '700',
+        color: colors.textPrimary,
+        fontSize: typography.h2,
+        fontWeight: typography.bold,
     },
 });
 
@@ -266,7 +269,7 @@ export const GoalPulseScreen: React.FC = () => {
     const availableBudget = goalBudget ? goalBudget.availableForNewGoals : 0;
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             {/* Header */}
@@ -491,10 +494,6 @@ export const GoalPulseScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -506,25 +505,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
-    logoIcon: {
-        width: 36,
-        height: 36,
-        borderRadius: 10,
-        backgroundColor: colors.primary,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: spacing.sm,
-    },
     logoImage: {
         width: 40,
         height: 40,
         borderRadius: 10,
         marginRight: spacing.sm,
-    },
-    logoText: {
-        color: colors.textPrimary,
-        fontSize: 12,
-        fontWeight: typography.bold,
     },
     headerTitle: {
         color: colors.textPrimary,
@@ -575,77 +560,8 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 10,
         backgroundColor: colors.textPrimary,
     },
-    avatarText: {
-        fontSize: 16,
-    },
     content: {
         flex: 1,
-    },
-    smartSaveCard: {
-        backgroundColor: '#1a3a5c',
-        marginBottom: spacing.lg,
-    },
-    smartSaveHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: spacing.sm,
-    },
-    smartSaveLabel: {
-        color: '#22c55e',
-        fontSize: typography.caption,
-        fontWeight: typography.semibold,
-    },
-    goldBadge: {
-        backgroundColor: '#f59e0b',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 4,
-        marginLeft: spacing.sm,
-    },
-    goldBadgeText: {
-        color: '#000',
-        fontSize: 10,
-        fontWeight: typography.bold,
-    },
-    roundUpLabel: {
-        color: colors.textSecondary,
-        fontSize: typography.caption,
-        marginBottom: 4,
-    },
-    amountRow: {
-        flexDirection: 'row',
-        alignItems: 'baseline',
-    },
-    rupeeSymbol: {
-        color: colors.textPrimary,
-        fontSize: typography.h2,
-        fontWeight: typography.bold,
-    },
-    amountValue: {
-        color: colors.textPrimary,
-        fontSize: 32,
-        fontWeight: typography.bold,
-    },
-    valueAddedRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: spacing.sm,
-        alignSelf: 'flex-end',
-    },
-    valueAddedLabel: {
-        color: colors.textMuted,
-        fontSize: 10,
-        marginRight: spacing.xs,
-    },
-    valueAddedAmount: {
-        color: '#22c55e',
-        fontSize: typography.bodySmall,
-        fontWeight: typography.semibold,
-    },
-    pulseScoreSection: {
-        alignItems: 'center',
-        paddingVertical: spacing.lg,
-        marginBottom: spacing.lg,
     },
     pulseCard: {
         marginBottom: spacing.xl,
@@ -709,65 +625,9 @@ const styles = StyleSheet.create({
         fontWeight: typography.semibold,
         marginTop: spacing.md,
     },
-    changePositive: {
-        color: '#22c55e',
-        fontSize: typography.bodySmall,
-        fontWeight: typography.semibold,
-    },
-    pulseScoreRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: colors.cardBackground,
-        borderRadius: 12,
-        padding: spacing.md,
-    },
-    scoreCircle: {
-        width: 56,
-        height: 56,
-        borderRadius: 28,
-        borderWidth: 3,
-        borderColor: '#22c55e',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: spacing.md,
-    },
-    scoreValue: {
-        color: '#22c55e',
-        fontSize: typography.h2,
-        fontWeight: typography.bold,
-    },
-    scoreInfo: {
-        flex: 1,
-    },
-    scoreMessage: {
-        color: colors.textPrimary,
-        fontSize: typography.bodySmall,
-        fontWeight: typography.medium,
-    },
-    scoreSubtext: {
-        color: colors.textMuted,
-        fontSize: typography.caption,
-        marginTop: 2,
-    },
     goalsSection: {
         marginBottom: spacing.xxl,
         paddingHorizontal: spacing.lg,
-    },
-    analyticsLink: {
-        color: colors.primary,
-        fontSize: typography.caption,
-        fontWeight: typography.semibold,
-        letterSpacing: 0.5,
-    },
-    progressMessage: {
-        backgroundColor: colors.cardBackground,
-        borderRadius: 8,
-        padding: spacing.sm,
-        alignItems: 'center',
-    },
-    progressText: {
-        color: colors.textSecondary,
-        fontSize: typography.caption,
     },
     fab: {
         position: 'absolute',
@@ -789,16 +649,6 @@ const styles = StyleSheet.create({
         color: colors.textPrimary,
         fontSize: 28,
         fontWeight: '300',
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    combinedCard: {
-        backgroundColor: colors.cardBackground,
-        borderRadius: 16,
-        marginBottom: spacing.md,
     },
     emptyStateContainer: {
         alignItems: 'center',
@@ -832,11 +682,6 @@ const styles = StyleSheet.create({
         padding: spacing.xl,
         alignItems: 'center',
     },
-    emptyStateText: {
-        color: colors.textSecondary,
-        fontSize: typography.body,
-        textAlign: 'center',
-    },
     // AI Suggestions
     suggestionsSection: {
         marginBottom: spacing.xxl,
@@ -844,9 +689,6 @@ const styles = StyleSheet.create({
     suggestionsContent: {
         paddingHorizontal: spacing.lg,
         paddingBottom: spacing.sm,
-    },
-    suggestionsScroll: {
-        marginTop: spacing.sm,
     },
     budgetBadge: {
         color: '#22c55e',
