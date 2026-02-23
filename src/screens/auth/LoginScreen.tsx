@@ -56,6 +56,11 @@ export const LoginScreen: React.FC = () => {
 
     const handleContinue = async () => {
         if (!validateEmail(email)) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Email',
+                text2: emailError || 'Please enter a valid email address.',
+            });
             return;
         }
         setLoading(true);
@@ -133,7 +138,6 @@ export const LoginScreen: React.FC = () => {
                             title="Continue"
                             onPress={handleContinue}
                             loading={loading}
-                            disabled={!email.trim()}
                         />
 
                         {/* Signup Link */}

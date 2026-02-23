@@ -413,7 +413,7 @@ export const EditGoalScreen: React.FC = () => {
                                         placeholder="Enter months"
                                         placeholderTextColor={colors.textMuted}
                                     />
-                                    <Text style={styles.customMonthsLabel}>months</Text>
+                                    <Text style={styles.customMonthsLabel}>{customMonths === '1' ? 'month' : 'months'}</Text>
                                 </View>
                             )}
                         </View>
@@ -449,7 +449,7 @@ export const EditGoalScreen: React.FC = () => {
                         <Button
                             title={isLoading ? 'Saving...' : 'Save'}
                             onPress={handleSave}
-                            disabled={isSaveDisabled}
+                            disabled={isLoading}
                             style={{ marginTop: spacing.xl }}
                         />
                     </View>

@@ -113,7 +113,21 @@ export const SignupScreen: React.FC = () => {
     };
 
     const handleContinue = async () => {
+        if (!email.trim() || !fullName.trim() || !age.trim()) {
+            Toast.show({
+                type: 'error',
+                text1: 'Incomplete Form',
+                text2: 'Please fill out all fields before continuing.',
+            });
+            return;
+        }
+
         if (!validateAllFields()) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Input',
+                text2: 'Please correct the errors in the form before continuing.',
+            });
             return;
         }
         setLoading(true);
@@ -223,14 +237,13 @@ export const SignupScreen: React.FC = () => {
                             title="Continue"
                             onPress={handleContinue}
                             loading={loading}
-                            disabled={!isFormValid}
                         />
                     </View>
 
                     {/* Mascot at the bottom */}
                     <View style={styles.mascotContainer}>
                         <AnimatedMascot text="Let's get you started! 🎉" arrowTopRatio={0.15} mascotWidth={100} customTooltipStyle={{ marginTop: 30 }}
-                         mascotHeight={160} />
+                            mascotHeight={160} />
                     </View>
 
                     <View style={styles.footer}>

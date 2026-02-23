@@ -211,7 +211,6 @@ export const PersonalInfoScreen: React.FC = () => {
                 </View>
 
                 <Text style={styles.footerNote}>
-                    These values were set during onboarding and cannot be changed here.
                 </Text>
 
                 <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteAccount}>

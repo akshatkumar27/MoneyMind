@@ -4,10 +4,13 @@ import {
     Text,
     StyleSheet,
     SafeAreaView,
-    StatusBar,
     ScrollView,
     TextInput,
+    KeyboardAvoidingView,
+    Platform,
+    StatusBar,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackButton, Button, AnimatedMascot, Header } from '../../components';
@@ -23,7 +26,25 @@ type NavigationProp = NativeStackNavigationProp<OnboardingStackParamList>;
 export const MonthlyIncomeScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const [amount, setAmount] = useState('');
+    const scrollViewRef = React.useRef<ScrollView>(null);
     const { currencySymbol } = useCurrency();
+
+    const handleContinue = () => {
+        const incomeValue = parseInt(amount.replace(/,/g, '')) || 0;
+
+        if (!amount.trim() || incomeValue <= 0) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Input',
+                text2: 'Please enter a valid monthly income greater than 0.',
+            });
+            return;
+        }
+
+        navigation.navigate('MonthlyExpenses', {
+            onboardingData: { monthly_income: incomeValue }
+        });
+    };
 
     // React.useEffect(() => {
     //     const saveStatus = async () => {
@@ -38,48 +59,55 @@ export const MonthlyIncomeScreen: React.FC = () => {
 
             <Header title="Step 1 of 5" titleStyle={styles.stepIndicator} />
 
-            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-                <View style={styles.progressSection}>
-                    <Text style={styles.progressLabel}>Profile Completion</Text>
-                    <Text style={styles.progressPercent}>20%</Text>
-                </View>
-                <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: '20%' }]} />
-                </View>
-                {/* Illustration */}
-                <View style={styles.illustrationContainer}>
-                    <Text style={styles.emoji}>💰</Text>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={{ flex: 1 }}
+            >
+                <ScrollView
+                    ref={scrollViewRef}
+                    style={styles.content}
+                    showsVerticalScrollIndicator={false}
+                    onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+                >
+                    <View style={styles.progressSection}>
+                        <Text style={styles.progressLabel}>Profile Completion</Text>
+                        <Text style={styles.progressPercent}>20%</Text>
+                    </View>
+                    <View style={styles.progressBar}>
+                        <View style={[styles.progressFill, { width: '20%' }]} />
+                    </View>
+                    {/* Illustration */}
+                    <View style={styles.illustrationContainer}>
+                        <Text style={styles.emoji}>💰</Text>
+                    </View>
+
+                    <Text style={styles.title}>What is your monthly income?</Text>
+
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.currencySymbol}>{currencySymbol}</Text>
+                        <TextInput
+                            style={styles.amountInput}
+                            value={amount}
+                            onChangeText={(text) => setAmount(formatNumberInput(text))}
+                            keyboardType="number-pad"
+                            placeholder="0"
+                            placeholderTextColor={colors.textMuted}
+                        />
+                    </View>
+                </ScrollView>
+
+                {/* Mascot at bottom */}
+                <View style={styles.mascotContainer}>
+                    <AnimatedMascot text="Let me know your monthly income so I can understand your financial capacity!" />
                 </View>
 
-                <Text style={styles.title}>What is your monthly income?</Text>
-
-                <View style={styles.inputContainer}>
-                    <Text style={styles.currencySymbol}>{currencySymbol}</Text>
-                    <TextInput
-                        style={styles.amountInput}
-                        value={amount}
-                        onChangeText={(text) => setAmount(formatNumberInput(text))}
-                        keyboardType="number-pad"
-                        placeholder="0"
-                        placeholderTextColor={colors.textMuted}
+                <View style={styles.footer}>
+                    <Button
+                        title="Continue"
+                        onPress={handleContinue}
                     />
                 </View>
-            </ScrollView>
-
-            {/* Mascot at bottom */}
-            <View style={styles.mascotContainer}>
-                <AnimatedMascot text="Let me know your monthly income so I can understand your financial capacity!" />
-            </View>
-
-            <View style={styles.footer}>
-                <Button
-                    title="Continue"
-                    onPress={() => navigation.navigate('MonthlyExpenses', {
-                        onboardingData: { monthly_income: parseInt(amount.replace(/,/g, '')) || 0 }
-                    })}
-                    disabled={!amount.trim() || parseInt(amount.replace(/,/g, '')) <= 0}
-                />
-            </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 };

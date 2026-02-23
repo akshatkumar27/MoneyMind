@@ -45,6 +45,12 @@ export const OTPVerificationScreen: React.FC = () => {
         }
     }, [timer]);
 
+    useEffect(() => {
+        if (otp.length === 6) {
+            handleVerify();
+        }
+    }, [otp]);
+
     const handleVerify = async () => {
         setLoading(true);
         try {
@@ -110,15 +116,15 @@ export const OTPVerificationScreen: React.FC = () => {
             // Use the status in place of the old isOnboardingIncomplete check
 
             const isFinancialProfilePresent = await AsyncStorage.getItem('isFinancialProfilePresent');
-   const meRes = await api.get('/api/auth/me');
-       const  meData = meRes.data;
-       
+            const meRes = await api.get('/api/auth/me');
+            const meData = meRes.data;
 
-        // Save in global storage
-        await AsyncStorage.setItem('isFinancialProfilePresent', JSON.stringify(meData?.user?.isFinancialProfilePresent || false));
+
+            // Save in global storage
+            await AsyncStorage.setItem('isFinancialProfilePresent', JSON.stringify(meData?.user?.isFinancialProfilePresent || false));
 
             const isOnboardingIncomplete = meData?.user?.isFinancialProfilePresent;
-console.log('isOnboardingIncomplete--', isOnboardingIncomplete, typeof(isFinancialProfilePresent));
+            console.log('isOnboardingIncomplete--', isOnboardingIncomplete, typeof (isFinancialProfilePresent));
             if (!isOnboardingIncomplete) {
                 // Set status to start of onboarding
                 // await AsyncStorage.setItem('onboardingStatus', 'MonthlyIncome'); // Assuming MonthlyIncome is the first screen

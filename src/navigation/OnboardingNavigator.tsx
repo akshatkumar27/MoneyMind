@@ -25,7 +25,13 @@ export type OnboardingStackParamList = {
     EMIOutstanding: { onboardingData: OnboardingData };
     MonthlyInvestment: { onboardingData: OnboardingData };
     GoalSelection: { onboardingData: OnboardingData };
-    AddGoal: undefined;
+    AddGoal: {
+        suggestionName?: string;
+        suggestionTarget?: number;
+        suggestionMonths?: number;
+        availableForNewGoals?: number;
+        suggestionDescription?: string;
+    } | undefined;
 };
 
 const Stack = createNativeStackNavigator<OnboardingStackParamList>();

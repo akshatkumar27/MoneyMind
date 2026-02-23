@@ -12,6 +12,7 @@ import {
     Modal,
     DeviceEventEmitter,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { colors, typography, spacing } from '../../constants';
@@ -343,6 +344,17 @@ export const ContributionsScreen: React.FC = () => {
     };
 
     const handleSaveContribution = () => {
+        if (!paymentEnabled) {
+            Toast.show({
+                type: 'error',
+                text1: 'Not Due Yet',
+                text2: 'Your monthly contribution is not due yet.',
+            });
+            return;
+        }
+
+        if (isSaving) return;
+
         setModalState({
             visible: true,
             type: 'warning',
@@ -456,7 +468,6 @@ export const ContributionsScreen: React.FC = () => {
                             <TouchableOpacity
                                 style={[styles.modalButton, styles.modalButtonSave]}
                                 onPress={handleSaveEdit}
-                                disabled={isSaving}
                             >
                                 {isSaving ? (
                                     <ActivityIndicator size="small" color="#fff" />
@@ -581,11 +592,11 @@ export const ContributionsScreen: React.FC = () => {
                                         <View style={styles.editorInfo}>
                                             <Text style={styles.editorInfoText}>
                                                 Goal achieved in{' '}
-                                                <Text style={styles.editorHighlight}>{effectiveMonths} months</Text>
+                                                <Text style={styles.editorHighlight}>{effectiveMonths} {effectiveMonths === 1 ? 'month' : 'months'}</Text>
                                             </Text>
                                             {editedContribution < monthlyContribution && (
                                                 <Text style={styles.editorHint}>
-                                                    Original: {formatCurrency(monthlyContribution, currencySymbol)}/mo ({achieveInMonths} months)
+                                                    Original: {formatCurrency(monthlyContribution, currencySymbol)}/mo ({achieveInMonths} {achieveInMonths === 1 ? 'month' : 'months'})
                                                 </Text>
                                             )}
                                         </View>
@@ -603,7 +614,6 @@ export const ContributionsScreen: React.FC = () => {
                                 <TouchableOpacity
                                     style={[styles.payButton, (!paymentEnabled || isSaving) && styles.payButtonDisabled]}
                                     onPress={handleSaveContribution}
-                                    disabled={!paymentEnabled || isSaving}
                                 >
                                     {isSaving ? (
                                         <ActivityIndicator color={colors.background} />

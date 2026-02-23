@@ -183,7 +183,7 @@ export const GoalSelectionScreen: React.FC = () => {
                                 <GoalCard
                                     key={index}
                                     icon={icon}
-                                    title={`${text}\n(${insight.target_months} months)`}
+                                    title={`${text}\n(${insight.target_months} ${insight.target_months === 1 ? 'month' : 'months'})`}
                                     description={insight.description}
                                     highlightedAmount={formatAmount(insight.amount, currencySymbol)}
                                     selected={selectedGoal === index}

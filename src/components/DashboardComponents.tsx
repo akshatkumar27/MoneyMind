@@ -207,7 +207,7 @@ export const GoalCardWithSuggestion: React.FC<GoalCardWithSuggestionProps> = ({
                     </Text>
                 )}
                 {achieveInMonths !== undefined && (
-                    <Text style={styles.achieveInText}>Achieve in {achieveInMonths} months</Text>
+                    <Text style={styles.achieveInText}>Achieve in {achieveInMonths} {achieveInMonths === 1 ? 'month' : 'months'}</Text>
                 )}
             </View>
 

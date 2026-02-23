@@ -11,6 +11,7 @@ import {
     ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
+    DeviceEventEmitter,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
@@ -109,7 +110,23 @@ export const EditFinancialDetailsScreen: React.FC = () => {
     };
 
     const handleSave = async () => {
-        if (!isValid) return;
+        if (!hasChanges) {
+            Toast.show({
+                type: 'info',
+                text1: 'No Changes',
+                text2: 'You have not made any changes to your financial details.',
+            });
+            return;
+        }
+
+        if (!isValid) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Inputs',
+                text2: 'Please check the form for errors before saving.',
+            });
+            return;
+        }
 
         setIsSaving(true);
         try {
@@ -168,6 +185,8 @@ export const EditFinancialDetailsScreen: React.FC = () => {
             navigation.goBack();
         } finally {
             setIsSaving(false);
+            DeviceEventEmitter.emit('refreshGoals');
+
         }
     };
 
@@ -268,9 +287,9 @@ export const EditFinancialDetailsScreen: React.FC = () => {
 
             <View style={styles.footer}>
                 <TouchableOpacity
-                    style={[styles.saveButton, (!isValid || !hasChanges || isSaving) && styles.saveButtonDisabled]}
+                    style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
                     onPress={handleSave}
-                    disabled={!isValid || !hasChanges || isSaving}
+                    disabled={isSaving}
                 >
                     {isSaving ? (
                         <ActivityIndicator size="small" color="#fff" />

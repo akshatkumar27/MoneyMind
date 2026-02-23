@@ -7,7 +7,10 @@ import {
     StatusBar,
     ScrollView,
     TextInput,
+    KeyboardAvoidingView,
+    Platform,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackButton, Button, AnimatedMascot, Header } from '../../components';
@@ -23,8 +26,26 @@ export const EMIOutstandingScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const route = useRoute<ScreenRouteProp>();
     const [amount, setAmount] = useState('');
+    const scrollViewRef = React.useRef<ScrollView>(null);
     const { currencySymbol } = useCurrency();
     const onboardingData = route.params?.onboardingData || {};
+
+    const outstandingAmount = amount.trim() === '' ? -1 : (parseInt(amount.replace(/,/g, '')) || 0);
+
+    const handleContinue = () => {
+        if (amount.trim() === '') {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Input',
+                text2: 'Please enter your outstanding EMI amount (0 is allowed).',
+            });
+            return;
+        }
+
+        navigation.navigate('MonthlyInvestment', {
+            onboardingData: { ...onboardingData, emi_outstanding: outstandingAmount }
+        });
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -32,55 +53,62 @@ export const EMIOutstandingScreen: React.FC = () => {
 
             <Header title="Step 4 of 5" titleStyle={styles.stepIndicator} />
 
-            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-                <View style={styles.progressSection}>
-                    <Text style={styles.progressLabel}>Profile Completion</Text>
-                    <Text style={styles.progressPercent}>80%</Text>
-                </View>
-                <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: '80%' }]} />
-                </View>
-                {/* Illustration */}
-                <View style={styles.illustrationContainer}>
-                    <Text style={styles.emoji}>🏦</Text>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={{ flex: 1 }}
+            >
+                <ScrollView
+                    ref={scrollViewRef}
+                    style={styles.content}
+                    showsVerticalScrollIndicator={false}
+                    onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+                >
+                    <View style={styles.progressSection}>
+                        <Text style={styles.progressLabel}>Profile Completion</Text>
+                        <Text style={styles.progressPercent}>80%</Text>
+                    </View>
+                    <View style={styles.progressBar}>
+                        <View style={[styles.progressFill, { width: '80%' }]} />
+                    </View>
+                    {/* Illustration */}
+                    <View style={styles.illustrationContainer}>
+                        <Text style={styles.emoji}>🏦</Text>
+                    </View>
+
+                    <Text style={styles.title}>What is your total outstanding EMI?</Text>
+
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.currencySymbol}>{currencySymbol}</Text>
+                        <TextInput
+                            style={styles.amountInput}
+                            value={amount}
+                            onChangeText={(text) => setAmount(formatNumberInput(text))}
+                            keyboardType="number-pad"
+                            placeholder="0"
+                            placeholderTextColor={colors.textMuted}
+                        />
+                    </View>
+
+                    <View style={styles.noteCard}>
+                        <Text style={styles.noteIcon}>💡</Text>
+                        <Text style={styles.noteText}>
+                            This is the total principal amount remaining on all your loans
+                        </Text>
+                    </View>
+                </ScrollView>
+
+                {/* Mascot at bottom */}
+                <View style={styles.mascotContainer}>
+                    <AnimatedMascot text="What's the total amount remaining on all your loans?" />
                 </View>
 
-                <Text style={styles.title}>What is your total outstanding EMI?</Text>
-
-                <View style={styles.inputContainer}>
-                    <Text style={styles.currencySymbol}>{currencySymbol}</Text>
-                    <TextInput
-                        style={styles.amountInput}
-                        value={amount}
-                        onChangeText={(text) => setAmount(formatNumberInput(text))}
-                        keyboardType="number-pad"
-                        placeholder="0"
-                        placeholderTextColor={colors.textMuted}
+                <View style={styles.footer}>
+                    <Button
+                        title="Continue"
+                        onPress={handleContinue}
                     />
                 </View>
-
-                <View style={styles.noteCard}>
-                    <Text style={styles.noteIcon}>💡</Text>
-                    <Text style={styles.noteText}>
-                        This is the total principal amount remaining on all your loans
-                    </Text>
-                </View>
-            </ScrollView>
-
-            {/* Mascot at bottom */}
-            <View style={styles.mascotContainer}>
-                <AnimatedMascot text="What's the total amount remaining on all your loans?" />
-            </View>
-
-            <View style={styles.footer}>
-                <Button
-                    title="Continue"
-                    onPress={() => navigation.navigate('MonthlyInvestment', {
-                        onboardingData: { ...onboardingData, emi_outstanding: parseInt(amount.replace(/,/g, '')) || 0 }
-                    })}
-                    disabled={amount.trim() === ''}
-                />
-            </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 };

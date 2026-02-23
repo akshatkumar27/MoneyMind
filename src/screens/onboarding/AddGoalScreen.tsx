@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     View,
     Text,
@@ -19,7 +19,7 @@ import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import { colors, typography, spacing } from '../../constants';
 import { api } from '../../services';
 import { formatCurrency } from '../../utils';
-import { formatNumberInput } from '../../utils/formatNumber';
+import { formatNumberInput, formatNumber } from '../../utils/formatNumber';
 import { useCurrency } from '../../context/CurrencyContext';
 
 // Time duration options in months
@@ -56,6 +56,7 @@ export const AddGoalScreen: React.FC = () => {
     const [monthlyContribution, setMonthlyContribution] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isContributionManuallyEdited, setIsContributionManuallyEdited] = useState(false);
+    const scrollViewRef = useRef<ScrollView>(null);
 
     // useEffect(() => {
     //     const saveStatus = async () => {
@@ -122,20 +123,23 @@ export const AddGoalScreen: React.FC = () => {
         setIsContributionManuallyEdited(false);
     };
 
-    const handleSave = async () => {
+    const handleSaveGoal = async () => {
+        const contributionAmount = parseFloat(monthlyContribution.replace(/,/g, '')) || 0;
+
         if (!name.trim()) {
             Toast.show({
                 type: 'error',
-                text1: 'Error',
-                text2: 'Please enter a goal name',
+                text1: 'Missing Name',
+                text2: 'Please enter a name for your financial goal.',
             });
             return;
         }
+
         if (!target.trim() || targetAmount <= 0) {
             Toast.show({
                 type: 'error',
-                text1: 'Error',
-                text2: 'Please enter a valid target amount',
+                text1: 'Missing Target',
+                text2: 'Please enter a valid target amount for your goal.',
             });
             return;
         }
@@ -144,6 +148,15 @@ export const AddGoalScreen: React.FC = () => {
                 type: 'error',
                 text1: 'Error',
                 text2: 'Please enter a valid duration',
+            });
+            return;
+        }
+
+        if (availableForNewGoals !== undefined && contributionAmount > availableForNewGoals) {
+            Toast.show({
+                type: 'error',
+                text1: 'Excessive Contribution',
+                text2: `Your contribution cannot exceed your available monthly savings (${currencySymbol}${formatCurrency(availableForNewGoals)}).`,
             });
             return;
         }
@@ -204,12 +217,15 @@ export const AddGoalScreen: React.FC = () => {
             <Header title="Add Your Goal" />
 
             <KeyboardAvoidingView
-                style={styles.keyboardView}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={{ flex: 1 }}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
             >
                 <ScrollView
+                    ref={scrollViewRef}
                     style={styles.content}
                     showsVerticalScrollIndicator={false}
+                    onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
                     contentContainerStyle={styles.contentContainer}
                 >
                     {/* Mascot with AI suggestion description — inside scroll so it scrolls with the form */}
@@ -222,6 +238,22 @@ export const AddGoalScreen: React.FC = () => {
                             arrowTopRatio={0.38}
                         />
                     ) : null}
+
+                    {/* Available Budget Card */}
+                    {availableForNewGoals !== undefined && availableForNewGoals > 0 && (
+                        <View style={styles.budgetCard}>
+                            <View style={styles.budgetIconContainer}>
+                                <Text style={styles.budgetIcon}>✨</Text>
+                            </View>
+                            <View style={styles.budgetTextContainer}>
+                                <Text style={styles.budgetLabel}>Monthly Savings Available</Text>
+                                <Text style={styles.budgetAmount}>
+                                    {currencySymbol}{formatNumber(availableForNewGoals, 1)}
+                                </Text>
+                            </View>
+                        </View>
+                    )}
+
                     {/* Name Input */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Name</Text>
@@ -304,7 +336,7 @@ export const AddGoalScreen: React.FC = () => {
                                     placeholderTextColor={colors.textMuted}
                                     autoFocus={!customMonths}
                                 />
-                                <Text style={styles.customMonthsLabel}>months</Text>
+                                <Text style={styles.customMonthsLabel}>{customMonths === '1' ? 'month' : 'months'}</Text>
                             </View>
                         )}
                     </View>
@@ -344,9 +376,10 @@ export const AddGoalScreen: React.FC = () => {
 
                 <View style={styles.footer}>
                     <Button
-                        title={isLoading ? 'Saving...' : 'Save Goal'}
-                        onPress={handleSave}
-                        disabled={isLoading || !name.trim() || !target.trim() || (availableForNewGoals !== undefined && contributionAmount > availableForNewGoals)}
+                        title="Create Goal"
+                        onPress={handleSaveGoal}
+                        loading={isLoading}
+                        disabled={isLoading}
                     />
                 </View>
             </KeyboardAvoidingView>
@@ -522,5 +555,41 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.lg,
         paddingBottom: spacing.sm,
         marginTop: -spacing.sm,
+    },
+    budgetCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: colors.cardBackground,
+        borderRadius: 16,
+        padding: spacing.md,
+        marginBottom: spacing.lg,
+        borderWidth: 1,
+        borderColor: 'rgba(34,197,94,0.3)',
+        marginHorizontal: spacing.lg, // Make it align with standard paddings
+    },
+    budgetIconContainer: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(34,197,94,0.15)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: spacing.md,
+    },
+    budgetIcon: {
+        fontSize: 20,
+    },
+    budgetTextContainer: {
+        flex: 1,
+    },
+    budgetLabel: {
+        color: colors.textSecondary,
+        fontSize: typography.caption,
+        marginBottom: 2,
+    },
+    budgetAmount: {
+        color: '#22c55e',
+        fontSize: typography.h3,
+        fontWeight: typography.bold,
     },
 });

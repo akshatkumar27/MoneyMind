@@ -7,6 +7,8 @@ import {
     StatusBar,
     ScrollView,
     TextInput,
+    KeyboardAvoidingView,
+    Platform,
     ActivityIndicator,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -28,7 +30,8 @@ export const MonthlyInvestmentScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const route = useRoute<ScreenRouteProp>();
     const [amount, setAmount] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const scrollViewRef = React.useRef<ScrollView>(null);
     const { currencySymbol } = useCurrency();
     const onboardingData = route.params?.onboardingData || {};
 
@@ -39,10 +42,27 @@ export const MonthlyInvestmentScreen: React.FC = () => {
 
     const investmentAmount = parseInt(amount.replace(/,/g, '')) || 0;
     const isExceedingAvailable = investmentAmount > availableAmount;
-    const isValid = amount.trim() !== '' && !isExceedingAvailable;
 
-    const handleSubmit = async () => {
-        setIsLoading(true);
+    const handleComplete = async () => {
+        if (amount.trim() === '') {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Input',
+                text2: 'Please enter your monthly savings amount (0 is allowed).',
+            });
+            return;
+        }
+
+        if (isExceedingAvailable) {
+            Toast.show({
+                type: 'error',
+                text1: 'Excessive Savings',
+                text2: `Savings cannot exceed available amount (${currencySymbol}${availableAmount.toLocaleString()})`,
+            });
+            return;
+        }
+
+        setIsSaving(true);
         try {
             const payload = {
                 monthly_income: onboardingData.monthly_income || 0,
@@ -82,7 +102,7 @@ export const MonthlyInvestmentScreen: React.FC = () => {
                 text2: 'Something went wrong. Please try again.',
             });
         } finally {
-            setIsLoading(false);
+            setIsSaving(false);
         }
     };
 
@@ -93,70 +113,74 @@ export const MonthlyInvestmentScreen: React.FC = () => {
             <Header title="Step 5 of 5" titleStyle={styles.stepIndicator} />
 
 
-            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-                <View style={styles.progressSection}>
-                    <Text style={styles.progressLabel}>Profile Completion</Text>
-                    <Text style={styles.progressPercent}>100%</Text>
-                </View>
-                <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: '100%' }]} />
-                </View>
-                {/* Illustration */}
-                <View style={styles.illustrationContainer}>
-                    <Text style={styles.emoji}>📈</Text>
-                    <View style={styles.sparkles}>
-                        <Text style={styles.sparkle}>✨</Text>
-                        <Text style={styles.sparkle}>✨</Text>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={{ flex: 1 }}
+            >
+                <ScrollView
+                    ref={scrollViewRef}
+                    style={styles.content}
+                    showsVerticalScrollIndicator={false}
+                    onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+                >
+                    <View style={styles.progressSection}>
+                        <Text style={styles.progressLabel}>Profile Completion</Text>
+                        <Text style={styles.progressPercent}>100%</Text>
                     </View>
-                </View>
+                    <View style={styles.progressBar}>
+                        <View style={[styles.progressFill, { width: '100%' }]} />
+                    </View>
+                    {/* Illustration */}
+                    <View style={styles.illustrationContainer}>
+                        <Text style={styles.emoji}>📈</Text>
+                        <View style={styles.sparkles}>
+                            <Text style={styles.sparkle}>✨</Text>
+                            <Text style={styles.sparkle}>✨</Text>
+                        </View>
+                    </View>
 
-                <Text style={styles.title}>How much do you save monthly?</Text>
+                    <Text style={styles.title}>How much do you save monthly?</Text>
 
-                {/* Available Amount Info */}
-                <Text style={styles.availableText}>
-                    Available for savings: {formatCurrency(availableAmount, currencySymbol)}
-                </Text>
-
-                <View style={styles.inputContainer}>
-                    <Text style={styles.currencySymbol}>{currencySymbol}</Text>
-                    <TextInput
-                        style={[styles.amountInput, isExceedingAvailable && styles.inputError]}
-                        value={amount}
-                        onChangeText={(text) => setAmount(formatNumberInput(text))}
-                        keyboardType="number-pad"
-                        placeholder="0"
-                        placeholderTextColor={colors.textMuted}
-                    />
-                </View>
-
-                {/* Error/Warning Message */}
-                {isExceedingAvailable && (
-                    <Text style={styles.errorText}>
-                        Investment cannot exceed available amount ({formatCurrency(availableAmount, currencySymbol)})
+                    {/* Available Amount Info */}
+                    <Text style={styles.availableText}>
+                        Available for savings: {formatCurrency(availableAmount, currencySymbol)}
                     </Text>
-                )}
-            </ScrollView>
 
-            {/* Mascot at bottom */}
-            <View style={styles.mascotContainer}>
-                <AnimatedMascot text="Almost there! 🎉
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.currencySymbol}>{currencySymbol}</Text>
+                        <TextInput
+                            style={[styles.amountInput, isExceedingAvailable && styles.inputError]}
+                            value={amount}
+                            onChangeText={(text) => setAmount(formatNumberInput(text))}
+                            keyboardType="number-pad"
+                            placeholder="0"
+                            placeholderTextColor={colors.textMuted}
+                        />
+                    </View>
+
+                    {/* Error/Warning Message */}
+                    {isExceedingAvailable && (
+                        <Text style={styles.errorText}>
+                            Investment cannot exceed available amount ({formatCurrency(availableAmount, currencySymbol)})
+                        </Text>
+                    )}
+                </ScrollView>
+
+                {/* Mascot at bottom */}
+                <View style={styles.mascotContainer}>
+                    <AnimatedMascot text="Almost there! 🎉
 Add monthly savings so I can track them for you." />
-            </View>
+                </View>
 
-            <View style={styles.footer}>
-                <Button
-                    title={isLoading ? 'Saving...' : 'Set Your Goals'}
-                    onPress={handleSubmit}
-                    disabled={isLoading || !isValid}
-                />
-                {isLoading && (
-                    <ActivityIndicator
-                        style={{ marginTop: spacing.md }}
-                        size="small"
-                        color={colors.primary}
+                <View style={styles.footer}>
+                    <Button
+                        title="Set Your Goals"
+                        onPress={handleComplete}
+                        loading={isSaving}
+                        disabled={isSaving}
                     />
-                )}
-            </View>
+                </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 };

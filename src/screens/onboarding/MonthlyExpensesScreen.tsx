@@ -4,10 +4,13 @@ import {
     Text,
     StyleSheet,
     SafeAreaView,
-    StatusBar,
     ScrollView,
     TextInput,
+    KeyboardAvoidingView,
+    Platform,
+    StatusBar,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackButton, Button, AnimatedMascot, Header } from '../../components';
@@ -25,6 +28,7 @@ export const MonthlyExpensesScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const route = useRoute<ScreenRouteProp>();
     const [amount, setAmount] = useState('');
+    const scrollViewRef = React.useRef<ScrollView>(null);
     const { currencySymbol } = useCurrency();
     const onboardingData = route.params?.onboardingData || {};
     const monthlyIncome = onboardingData.monthly_income || 0;
@@ -42,6 +46,30 @@ export const MonthlyExpensesScreen: React.FC = () => {
 
     const expenseAmount = parseInt(amount.replace(/,/g, '')) || 0;
     const isExceedingIncome = expenseAmount > monthlyIncome;
+
+    const handleContinue = () => {
+        if (!amount.trim() || expenseAmount <= 0) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Input',
+                text2: 'Please enter a valid expense amount greater than 0.',
+            });
+            return;
+        }
+
+        if (isExceedingIncome) {
+            Toast.show({
+                type: 'error',
+                text1: 'Excessive Expenses',
+                text2: `Expenses cannot exceed your income (${currencySymbol}${monthlyIncome.toLocaleString()})`,
+            });
+            return;
+        }
+
+        navigation.navigate('MonthlyEMI', {
+            onboardingData: { ...onboardingData, monthly_expenses: expenseAmount }
+        });
+    };
     const isValid = amount.trim() !== '' && expenseAmount > 0 && !isExceedingIncome;
 
     return (
@@ -50,60 +78,67 @@ export const MonthlyExpensesScreen: React.FC = () => {
 
             <Header title="Step 2 of 5" titleStyle={styles.stepIndicator} />
 
-            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-                <View style={styles.progressSection}>
-                    <Text style={styles.progressLabel}>Profile Completion</Text>
-                    <Text style={styles.progressPercent}>40%</Text>
-                </View>
-                <View style={styles.progressBar}>
-                    <View style={[styles.progressFill, { width: '40%' }]} />
-                </View>
-                {/* Illustration */}
-                <View style={styles.illustrationContainer}>
-                    <Text style={styles.emoji}>🛒</Text>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={{ flex: 1 }}
+            >
+                <ScrollView
+                    ref={scrollViewRef}
+                    style={styles.content}
+                    showsVerticalScrollIndicator={false}
+                    onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+                >
+                    <View style={styles.progressSection}>
+                        <Text style={styles.progressLabel}>Profile Completion</Text>
+                        <Text style={styles.progressPercent}>40%</Text>
+                    </View>
+                    <View style={styles.progressBar}>
+                        <View style={[styles.progressFill, { width: '40%' }]} />
+                    </View>
+                    {/* Illustration */}
+                    <View style={styles.illustrationContainer}>
+                        <Text style={styles.emoji}>🛒</Text>
+                    </View>
+
+                    <Text style={styles.title}>What are your monthly expenses?</Text>
+
+                    {/* Available Income Info */}
+                    <Text style={styles.availableText}>
+                        Your income: {formatCurrency(monthlyIncome, currencySymbol)}
+                    </Text>
+
+                    <View style={styles.inputContainer}>
+                        <Text style={styles.currencySymbol}>{currencySymbol}</Text>
+                        <TextInput
+                            style={[styles.amountInput, isExceedingIncome && styles.inputError]}
+                            value={amount}
+                            onChangeText={(text) => setAmount(formatNumberInput(text))}
+                            keyboardType="number-pad"
+                            placeholder="0"
+                            placeholderTextColor={colors.textMuted}
+                        />
+                    </View>
+
+                    {/* Error Message */}
+                    {isExceedingIncome && (
+                        <Text style={styles.errorText}>
+                            Expenses cannot exceed your income ({formatCurrency(monthlyIncome, currencySymbol)})
+                        </Text>
+                    )}
+                </ScrollView>
+
+                {/* Mascot at bottom */}
+                <View style={styles.mascotContainer}>
+                    <AnimatedMascot text="Tell me about your monthly expenses like rent, utilities, and groceries!" />
                 </View>
 
-                <Text style={styles.title}>What are your monthly expenses?</Text>
-
-                {/* Available Income Info */}
-                <Text style={styles.availableText}>
-                    Your income: {formatCurrency(monthlyIncome, currencySymbol)}
-                </Text>
-
-                <View style={styles.inputContainer}>
-                    <Text style={styles.currencySymbol}>{currencySymbol}</Text>
-                    <TextInput
-                        style={[styles.amountInput, isExceedingIncome && styles.inputError]}
-                        value={amount}
-                        onChangeText={(text) => setAmount(formatNumberInput(text))}
-                        keyboardType="number-pad"
-                        placeholder="0"
-                        placeholderTextColor={colors.textMuted}
+                <View style={styles.footer}>
+                    <Button
+                        title="Continue"
+                        onPress={handleContinue}
                     />
                 </View>
-
-                {/* Error Message */}
-                {isExceedingIncome && (
-                    <Text style={styles.errorText}>
-                        Expenses cannot exceed your income ({formatCurrency(monthlyIncome, currencySymbol)})
-                    </Text>
-                )}
-            </ScrollView>
-
-            {/* Mascot at bottom */}
-            <View style={styles.mascotContainer}>
-                <AnimatedMascot text="Tell me about your monthly expenses like rent, utilities, and groceries!" />
-            </View>
-
-            <View style={styles.footer}>
-                <Button
-                    title="Continue"
-                    onPress={() => navigation.navigate('MonthlyEMI', {
-                        onboardingData: { ...onboardingData, monthly_expenses: expenseAmount }
-                    })}
-                    disabled={!isValid}
-                />
-            </View>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 };

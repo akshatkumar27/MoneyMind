@@ -298,7 +298,7 @@ export const GoalPulseScreen: React.FC = () => {
                 </View>
             </View>
 
-            {isLoading ? (
+            {isLoading || refreshing ? (
                 <View style={[styles.content, { justifyContent: 'center', alignItems: 'center', paddingBottom: 100 }]}>
                     <MascotLoader size={140} />
                 </View>
@@ -328,6 +328,14 @@ export const GoalPulseScreen: React.FC = () => {
                                             averageAchievement >= 25 ? '📈 Good start! Keep pushing!' :
                                                 '🌱 Start your journey to financial freedom!'}
                                 </Text>
+
+                                {availableBudget > 0 && (
+                                    <View style={{ marginTop: spacing.xs, alignItems: 'center' }}>
+                                        <Text style={[styles.budgetBadge, { fontSize: typography.body, paddingVertical: 6, paddingHorizontal: spacing.md }]}>
+                                            {currencySymbol}{formatNumber(availableBudget, 1)} available for goals
+                                        </Text>
+                                    </View>
+                                )}
                             </View>
                         </View>
                     )}
@@ -381,9 +389,11 @@ export const GoalPulseScreen: React.FC = () => {
                         <View style={styles.suggestionsSection}>
                             <View style={[styles.sectionHeader, { paddingHorizontal: spacing.lg }]}>
                                 <Text style={styles.sectionTitle}>✨ AI Suggested Goals</Text>
-                                <Text style={styles.budgetBadge}>
-                                    {currencySymbol}{formatNumber(availableBudget, 1)} available for goals
-                                </Text>
+                                {goals.length === 0 && (
+                                    <Text style={styles.budgetBadge}>
+                                        {currencySymbol}{formatNumber(availableBudget, 1)} available for goals
+                                    </Text>
+                                )}
                             </View>
 
                             {insightsLoading ? (
@@ -414,7 +424,7 @@ export const GoalPulseScreen: React.FC = () => {
                                                     {currencySymbol}{insight.amount.toLocaleString()}
                                                 </Text>
                                                 <Text style={styles.suggestionMonths}>
-                                                    {insight.target_months} months
+                                                    {insight.target_months} {insight.target_months === 1 ? 'month' : 'months'}
                                                 </Text>
                                                 <Text style={styles.suggestionDesc} numberOfLines={2}>
                                                     {insight.description}
