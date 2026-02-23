@@ -10,8 +10,10 @@ import {
 } from 'react-native';
 import { Card, AssetRow, AIInsightCard } from '../../components';
 import { colors, typography, spacing } from '../../constants';
+import { useCurrency } from '../../context/CurrencyContext';
 
 export const InvestHubScreen: React.FC = () => {
+    const { currencySymbol } = useCurrency();
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
@@ -42,7 +44,7 @@ export const InvestHubScreen: React.FC = () => {
                 <View style={styles.portfolioSection}>
                     <Text style={styles.portfolioLabel}>Total Portfolio Value</Text>
                     <View style={styles.portfolioRow}>
-                        <Text style={styles.rupeeSymbol}>₹</Text>
+                        <Text style={styles.rupeeSymbol}>{currencySymbol}</Text>
                         <Text style={styles.portfolioValue}>24,85,420</Text>
                         <View style={styles.changePositiveBadge}>
                             <Text style={styles.changePositiveText}>+1.2%</Text>
@@ -50,7 +52,7 @@ export const InvestHubScreen: React.FC = () => {
                     </View>
                     <View style={styles.dayChangeRow}>
                         <Text style={styles.dayChangeLabel}>24h Change:</Text>
-                        <Text style={styles.dayChangeValue}>+₹28,620</Text>
+                        <Text style={styles.dayChangeValue}>+{currencySymbol}28,620</Text>
                         <TouchableOpacity>
                             <Text style={styles.historyLink}>HISTORY</Text>
                         </TouchableOpacity>
@@ -64,7 +66,7 @@ export const InvestHubScreen: React.FC = () => {
                         <Text style={styles.optimizerTitle}>AI PORTFOLIO OPTIMIZER</Text>
                     </View>
                     <Text style={styles.optimizerText}>
-                        Move ₹10,000 from Savings to <Text style={styles.highlightText}>Index Fund</Text> for better long-term growth.
+                        Move {currencySymbol}10,000 from Savings to <Text style={styles.highlightText}>Index Fund</Text> for better long-term growth.
                     </Text>
                     <TouchableOpacity style={styles.rebalanceButton}>
                         <Text style={styles.rebalanceButtonText}>Apply Rebalance</Text>
@@ -79,7 +81,7 @@ export const InvestHubScreen: React.FC = () => {
                         icon="📈"
                         name="Mutual Funds"
                         subtitle="10 Active SIPs"
-                        value="₹14,20,000"
+                        value={`${currencySymbol}14,20,000`}
                         change="+18.4%"
                         isPositive={true}
                     />
@@ -88,7 +90,7 @@ export const InvestHubScreen: React.FC = () => {
                         icon="🪙"
                         name="Digital Gold"
                         subtitle="45.2g"
-                        value="₹3,15,420"
+                        value={`${currencySymbol}3,15,420`}
                         change="+6.2%"
                         isPositive={true}
                     />
@@ -97,7 +99,7 @@ export const InvestHubScreen: React.FC = () => {
                         icon="🏦"
                         name="Fixed Deposits"
                         subtitle="3 FDs Active"
-                        value="₹7,50,000"
+                        value={`${currencySymbol}7,50,000`}
                         change="-7.1%"
                         isPositive={false}
                     />

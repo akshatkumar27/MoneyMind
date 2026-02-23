@@ -10,11 +10,13 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { BackButton, Button, AnimatedMascot } from '../../components';
+import { BackButton, Button, AnimatedMascot, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
 import { formatNumberInput } from '../../utils/formatNumber';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { formatCurrency } from '../../utils';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCurrency } from '../../context/CurrencyContext';
 
 type NavigationProp = NativeStackNavigationProp<OnboardingStackParamList>;
 type ScreenRouteProp = RouteProp<OnboardingStackParamList, 'MonthlyExpenses'>;
@@ -23,22 +25,30 @@ export const MonthlyExpensesScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const route = useRoute<ScreenRouteProp>();
     const [amount, setAmount] = useState('');
+    const { currencySymbol } = useCurrency();
     const onboardingData = route.params?.onboardingData || {};
     const monthlyIncome = onboardingData.monthly_income || 0;
 
+    // React.useEffect(() => {
+    //     const saveStatus = async () => {
+    //         await AsyncStorage.setItem('onboardingStatus', 'MonthlyExpenses');
+    //         // Optionally save current data progress if needed for robust restore
+    //         if (onboardingData) {
+    //             await AsyncStorage.setItem('onboarding_progress_data', JSON.stringify(onboardingData));
+    //         }
+    //     };
+    //     saveStatus();
+    // }, [onboardingData]);
+
     const expenseAmount = parseInt(amount.replace(/,/g, '')) || 0;
     const isExceedingIncome = expenseAmount > monthlyIncome;
-    const isValid = amount.trim() && !isExceedingIncome;
+    const isValid = amount.trim() !== '' && expenseAmount > 0 && !isExceedingIncome;
 
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
-            <View style={styles.header}>
-                <BackButton onPress={() => navigation.goBack()} />
-                <Text style={styles.stepIndicator}>Step 2 of 5</Text>
-                <View style={styles.headerRight} />
-            </View>
+            <Header title="Step 2 of 5" titleStyle={styles.stepIndicator} />
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 <View style={styles.progressSection}>
@@ -57,11 +67,11 @@ export const MonthlyExpensesScreen: React.FC = () => {
 
                 {/* Available Income Info */}
                 <Text style={styles.availableText}>
-                    Your income: {formatCurrency(monthlyIncome)}
+                    Your income: {formatCurrency(monthlyIncome, currencySymbol)}
                 </Text>
 
                 <View style={styles.inputContainer}>
-                    <Text style={styles.currencySymbol}>₹</Text>
+                    <Text style={styles.currencySymbol}>{currencySymbol}</Text>
                     <TextInput
                         style={[styles.amountInput, isExceedingIncome && styles.inputError]}
                         value={amount}
@@ -75,7 +85,7 @@ export const MonthlyExpensesScreen: React.FC = () => {
                 {/* Error Message */}
                 {isExceedingIncome && (
                     <Text style={styles.errorText}>
-                        Expenses cannot exceed your income ({formatCurrency(monthlyIncome)})
+                        Expenses cannot exceed your income ({formatCurrency(monthlyIncome, currencySymbol)})
                     </Text>
                 )}
             </ScrollView>
@@ -185,8 +195,9 @@ const styles = StyleSheet.create({
         color: colors.textPrimary,
         fontSize: 48,
         fontWeight: typography.bold as any,
-        minWidth: 200,
-        textAlign: 'center',
+        minWidth: 20,
+        maxWidth: 280,
+        textAlign: 'left',
         borderBottomWidth: 2,
         borderBottomColor: colors.primary,
         paddingBottom: spacing.sm,

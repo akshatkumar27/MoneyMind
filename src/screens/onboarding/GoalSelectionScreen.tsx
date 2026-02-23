@@ -11,10 +11,12 @@ import {
 import Toast from 'react-native-toast-message';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { BackButton, Button, GoalCard, AnimatedMascot } from '../../components';
+import { BackButton, Button, GoalCard, AnimatedMascot, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../../services';
+import { useCurrency } from '../../context/CurrencyContext';
 
 interface Insight {
     title: string;
@@ -37,9 +39,9 @@ const parseTitle = (title: string) => {
     return { icon: '🎯', text: title };
 };
 
-// Format amount to INR
-const formatAmount = (amount: number) => {
-    return `₹${amount.toLocaleString('en-IN')}`;
+// Format amount
+const formatAmount = (amount: number, currency: string) => {
+    return `${currency}${amount.toLocaleString('en-IN')}`;
 };
 
 type NavigationProp = NativeStackNavigationProp<OnboardingStackParamList>;
@@ -47,6 +49,7 @@ type NavigationProp = NativeStackNavigationProp<OnboardingStackParamList>;
 export const GoalSelectionScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const route = useRoute<ScreenRouteProp>();
+    const { currencySymbol } = useCurrency();
     const [selectedGoal, setSelectedGoal] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -55,6 +58,13 @@ export const GoalSelectionScreen: React.FC = () => {
     const onboardingData = route.params?.onboardingData || {};
 
     useEffect(() => {
+        // const saveStatus = async () => {
+        //     await AsyncStorage.setItem('onboardingStatus', 'GoalSelection');
+        //     if (onboardingData) {
+        //         await AsyncStorage.setItem('onboarding_progress_data', JSON.stringify(onboardingData));
+        //     }
+        // };
+        // saveStatus();
         fetchInsights();
     }, []);
 
@@ -105,7 +115,27 @@ export const GoalSelectionScreen: React.FC = () => {
             const response = await api.post('/api/goals', payload);
             console.log('Goal created:', response.data);
 
+            // Update local user data to mark onboarding as completed
+            try {
+                const userStr = await AsyncStorage.getItem('user');
+                console.log('Current user in storage:', userStr);
+                if (userStr) {
+                    const user = JSON.parse(userStr);
+                    // Force update regardless of current state to ensure it is synced
+                    user.isNewUser = false;
+                    await AsyncStorage.setItem('user', JSON.stringify(user));
+                    console.log('Updated user in storage:', JSON.stringify(user));
+                } else {
+                    console.warn('No user found in storage to update');
+                }
+            } catch (err) {
+                console.error('Error updating user onboarding status:', err);
+            }
+
             // Navigate to main app
+            // Note: Since App state won't update automatically without a context or event,
+            // the user might need to restart the app or we need a way to trigger a refresh.
+            // For now, focusing on the storage update as requested.
             navigation.reset({
                 index: 0,
                 routes: [{ name: 'Main' as never }],
@@ -125,11 +155,7 @@ export const GoalSelectionScreen: React.FC = () => {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
-            <View style={styles.header}>
-                <BackButton onPress={() => navigation.goBack()} />
-                <Text style={styles.stepIndicator}>Your Personalized Insight</Text>
-                <View style={styles.headerRight} />
-            </View>
+            <Header title="Your Personalized Insight" titleStyle={styles.stepIndicator} />
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 {/* Mascot - inline compact version */}
@@ -157,8 +183,9 @@ export const GoalSelectionScreen: React.FC = () => {
                                 <GoalCard
                                     key={index}
                                     icon={icon}
-                                    title={text + " (" + insight.target_months + " months)"}
-                                    description={`${insight.description} • ${formatAmount(insight.amount)}`}
+                                    title={`${text}\n(${insight.target_months} months)`}
+                                    description={insight.description}
+                                    highlightedAmount={formatAmount(insight.amount, currencySymbol)}
                                     selected={selectedGoal === index}
                                     onPress={() => setSelectedGoal(index)}
                                 />

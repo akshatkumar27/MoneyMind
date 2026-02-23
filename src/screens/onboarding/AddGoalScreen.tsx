@@ -12,13 +12,15 @@ import {
     KeyboardAvoidingView,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import { BackButton, Button, AnimatedMascot } from '../../components';
+import { BackButton, Button, AnimatedMascot, Header } from '../../components';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import { colors, typography, spacing } from '../../constants';
 import { api } from '../../services';
 import { formatCurrency } from '../../utils';
 import { formatNumberInput } from '../../utils/formatNumber';
+import { useCurrency } from '../../context/CurrencyContext';
 
 // Time duration options in months
 const DURATION_OPTIONS = [
@@ -33,13 +35,34 @@ export const AddGoalScreen: React.FC = () => {
     const navigation = useNavigation();
     const route = useRoute<RouteProp<MainStackParamList, 'AddGoal'>>();
     const availableForNewGoals = route.params?.availableForNewGoals;
-    const [name, setName] = useState('');
-    const [target, setTarget] = useState('');
-    const [selectedDuration, setSelectedDuration] = useState<number | 'custom'>(12);
-    const [customMonths, setCustomMonths] = useState('');
+    const suggestionName = route.params?.suggestionName;
+    const suggestionTarget = route.params?.suggestionTarget;
+    const suggestionMonths = route.params?.suggestionMonths;
+    const suggestionDescription = route.params?.suggestionDescription;
+
+    // Determine initial duration selection from suggestion
+    const isPreset = DURATION_OPTIONS.some(d => d.value === suggestionMonths);
+    const { currencySymbol } = useCurrency();
+    const [name, setName] = useState(suggestionName || '');
+    const [target, setTarget] = useState(suggestionTarget ? formatNumberInput(suggestionTarget.toString()) : '');
+    const [selectedDuration, setSelectedDuration] = useState<number | 'custom'>(
+        suggestionMonths
+            ? (isPreset ? suggestionMonths : 'custom')
+            : 12
+    );
+    const [customMonths, setCustomMonths] = useState(
+        suggestionMonths && !isPreset ? String(suggestionMonths) : ''
+    );
     const [monthlyContribution, setMonthlyContribution] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isContributionManuallyEdited, setIsContributionManuallyEdited] = useState(false);
+
+    // useEffect(() => {
+    //     const saveStatus = async () => {
+    //         await AsyncStorage.setItem('onboardingStatus', 'AddGoal');
+    //     };
+    //     saveStatus();
+    // }, []);
 
     // Get actual months value
     const achieveInMonths = selectedDuration === 'custom'
@@ -138,6 +161,25 @@ export const AddGoalScreen: React.FC = () => {
             const response = await api.post('/api/goals', payload);
             console.log('Goal created:', response.data);
 
+            // Update local user data if this was part of onboarding
+            try {
+                const userStr = await AsyncStorage.getItem('user');
+                console.log('Current user in storage (AddGoal):', userStr);
+                if (userStr) {
+                    const user = JSON.parse(userStr);
+                    // Update checking: if new user, mark as not new
+                    if (user.isNewUser) {
+                        user.isNewUser = false;
+                        await AsyncStorage.setItem('user', JSON.stringify(user));
+                        // await AsyncStorage.setItem('onboardingStatus', 'COMPLETED');
+                        await AsyncStorage.removeItem('onboarding_progress_data');
+                        console.log('Updated user in storage (AddGoal):', JSON.stringify(user));
+                    }
+                }
+            } catch (err) {
+                console.error('Error updating user onboarding status:', err);
+            }
+
             // Navigate to main app after saving
             navigation.reset({
                 index: 0,
@@ -159,11 +201,7 @@ export const AddGoalScreen: React.FC = () => {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
-            <View style={styles.header}>
-                <BackButton onPress={() => navigation.goBack()} />
-                <Text style={styles.headerTitle}>Add Your Goal</Text>
-                <View style={styles.headerRight} />
-            </View>
+            <Header title="Add Your Goal" />
 
             <KeyboardAvoidingView
                 style={styles.keyboardView}
@@ -174,6 +212,16 @@ export const AddGoalScreen: React.FC = () => {
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={styles.contentContainer}
                 >
+                    {/* Mascot with AI suggestion description — inside scroll so it scrolls with the form */}
+                    {suggestionDescription ? (
+                        <AnimatedMascot
+                            text={suggestionDescription}
+                            mascotImage={require('../../asset/happymascot.png')}
+                            mascotWidth={80}
+                            mascotHeight={110}
+                            arrowTopRatio={0.38}
+                        />
+                    ) : null}
                     {/* Name Input */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Name</Text>
@@ -190,7 +238,7 @@ export const AddGoalScreen: React.FC = () => {
                     <View style={styles.inputRow}>
                         <Text style={styles.rowLabel}>Target</Text>
                         <View style={styles.compactInput}>
-                            <Text style={styles.currencyPrefix}>₹</Text>
+                            <Text style={styles.currencyPrefix}>{currencySymbol}</Text>
                             <TextInput
                                 style={styles.compactInputText2}
                                 value={target}
@@ -254,7 +302,7 @@ export const AddGoalScreen: React.FC = () => {
                                     keyboardType="number-pad"
                                     placeholder="Enter months"
                                     placeholderTextColor={colors.textMuted}
-                                    autoFocus
+                                    autoFocus={!customMonths}
                                 />
                                 <Text style={styles.customMonthsLabel}>months</Text>
                             </View>
@@ -265,7 +313,7 @@ export const AddGoalScreen: React.FC = () => {
                     <View style={styles.inputRow}>
                         <Text style={styles.rowLabel}>Monthly contribution</Text>
                         <View style={[styles.compactInput, styles.highlightedInput]}>
-                            <Text style={[styles.currencyPrefix, styles.highlightedText]}>₹</Text>
+                            <Text style={[styles.currencyPrefix, styles.highlightedText]}>{currencySymbol}</Text>
                             <TextInput
                                 style={[styles.compactInputText, styles.highlightedText]}
                                 value={monthlyContribution}
@@ -280,16 +328,16 @@ export const AddGoalScreen: React.FC = () => {
                     {/* Suggested contribution hint */}
                     {/* {target && achieveInMonths > 0 && (
                         <Text style={styles.suggestionText}>
-                            💡 Suggested: ₹{Math.ceil(parseInt(target) / achieveInMonths).toLocaleString('en-IN')}/month
+                            💡 Suggested: {currencySymbol}{Math.ceil(parseInt(target) / achieveInMonths).toLocaleString('en-IN')}/month
                         </Text>
                     )} */}
                 </ScrollView>
 
-                {availableForNewGoals !== undefined && contributionAmount > availableForNewGoals && (
+                {/* Budget warning mascot — only shown when suggestion mascot is not visible */}
+                {!suggestionDescription && availableForNewGoals !== undefined && contributionAmount > availableForNewGoals && (
                     <View style={styles.mascotContainer}>
                         <AnimatedMascot
-                            text={`You only have ${formatCurrency(availableForNewGoals ?? 0)} available for new goals! 
-Try extending the duration or increasing your income.`}
+                            text={`You only have ${formatCurrency(availableForNewGoals ?? 0, currencySymbol)} available for new goals!`}
                         />
                     </View>
                 )}
@@ -446,7 +494,7 @@ const styles = StyleSheet.create({
         paddingVertical: spacing.sm,
         color: colors.textPrimary,
         fontSize: typography.body,
-        width: 120,
+        width: 180,
         textAlign: 'center',
     },
     customMonthsLabel: {
@@ -469,5 +517,10 @@ const styles = StyleSheet.create({
     mascotContainer: {
         paddingHorizontal: spacing.xs,
         paddingBottom: spacing.sm,
+    },
+    mascotTopContainer: {
+        paddingHorizontal: spacing.lg,
+        paddingBottom: spacing.sm,
+        marginTop: -spacing.sm,
     },
 });

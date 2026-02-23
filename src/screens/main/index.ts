@@ -10,3 +10,4 @@ export { PersonalInfoScreen } from './PersonalInfoScreen';
 export { PrivacySecurityScreen } from './PrivacySecurityScreen';
 export { HelpSupportScreen } from './HelpSupportScreen';
 export { NotificationSettingsScreen } from './NotificationSettingsScreen';
+export { EditFinancialDetailsScreen } from './EditFinancialDetailsScreen';

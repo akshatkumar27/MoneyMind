@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "524729452860",
+    "project_id": "finance-app-87504",
+    "storage_bucket": "finance-app-87504.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:524729452860:android:cc2408920cdefc4aaa7639",
+        "android_client_info": {
+          "package_name": "com.monefyai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvzKC6kPFJw38RraGkINB59nD3h08qLhc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

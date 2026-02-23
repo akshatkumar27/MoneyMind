@@ -15,18 +15,18 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
     borderRadius = 4,
     style,
 }) => {
-    const opacity = useRef(new Animated.Value(0.3)).current;
+    const opacity = useRef(new Animated.Value(0.4)).current;
 
     useEffect(() => {
         const animation = Animated.loop(
             Animated.sequence([
                 Animated.timing(opacity, {
-                    toValue: 0.7,
+                    toValue: 0.8,
                     duration: 800,
                     useNativeDriver: true,
                 }),
                 Animated.timing(opacity, {
-                    toValue: 0.3,
+                    toValue: 0.4,
                     duration: 800,
                     useNativeDriver: true,
                 }),
@@ -56,9 +56,6 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
 
 const styles = StyleSheet.create({
     skeleton: {
-        backgroundColor: colors.cardBackground, // Use a color that fits the theme
-        // lighter or darker depending on the theme. 
-        // cardBackground is likely dark in this app, so maybe a slightly lighter shade for skeleton?
-        // Let's stick with cardBackground + opacity for now, or check colors.
+        backgroundColor: colors.lightloder, // Increased visibility for skeleton loader
     },
 });

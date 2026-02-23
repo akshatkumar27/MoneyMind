@@ -15,6 +15,7 @@ import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Logo, Input, Button, FooterLinks, AnimatedMascot } from '../../components';
 import { colors, typography, spacing, API_BASE_URL } from '../../constants';
 
@@ -63,6 +64,11 @@ export const LoginScreen: React.FC = () => {
                 email: email,
             });
             console.log('OTP sent successfully:', response.data);
+
+            // Save status for resume capability
+            // await AsyncStorage.setItem('onboardingStatus', 'OTP_VERIFICATION');
+            await AsyncStorage.setItem('temp_auth_email', email);
+
             navigation.navigate('OTPVerification', { email, otpToken: response.data.otpToken });
         } catch (error) {
             console.error('Error sending OTP:', error);

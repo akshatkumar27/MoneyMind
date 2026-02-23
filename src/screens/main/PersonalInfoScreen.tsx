@@ -9,14 +9,18 @@ import {
     ActivityIndicator,
     TouchableOpacity,
     Modal,
+    TextInput,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, CommonActions } from '@react-navigation/native';
-import { BackButton } from '../../components';
+import { BackButton, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
 import { formatCurrency } from '../../utils';
 import { api } from '../../services/api';
+import { notificationService } from '../../services/NotificationService';
+import { useAppSelector, useAppDispatch } from '../../store/hooks';
+import { clearFinancialData } from '../../store/slices/financialDataSlice';
 
 interface UserData {
     name?: string;
@@ -33,12 +37,24 @@ interface OnboardingData {
 }
 
 export const PersonalInfoScreen: React.FC = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
+    const dispatch = useAppDispatch();
     const [user, setUser] = useState<UserData>({});
-    const [onboarding, setOnboarding] = useState<OnboardingData>({});
     const [isLoading, setIsLoading] = useState(true);
+
+
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+
+    const financialData = useAppSelector(state => state.financialData);
+
+    // Navigation focus listener to reload data
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            loadData();
+        });
+        return unsubscribe;
+    }, [navigation]);
 
     useEffect(() => {
         loadData();
@@ -46,12 +62,8 @@ export const PersonalInfoScreen: React.FC = () => {
 
     const loadData = async () => {
         try {
-            const [userData, onboardingStr] = await Promise.all([
-                AsyncStorage.getItem('user'),
-                AsyncStorage.getItem('onboardingData'),
-            ]);
+            const userData = await AsyncStorage.getItem('user');
             if (userData) setUser(JSON.parse(userData));
-            if (onboardingStr) setOnboarding(JSON.parse(onboardingStr));
         } catch (error) {
             console.error('Error loading personal info:', error);
         } finally {
@@ -66,8 +78,17 @@ export const PersonalInfoScreen: React.FC = () => {
     const handleConfirmDelete = async () => {
         setIsDeleting(true);
         try {
+            // Deregister FCM Token
+            const fcmToken = await notificationService.getFCMToken();
+            if (fcmToken) {
+                await api.delete('/api/notifications/unregister-token', {
+                    data: { fcm_token: fcmToken }
+                });
+            }
+
             await api.post('/api/user/delete');
             await AsyncStorage.clear();
+            dispatch(clearFinancialData());
             setDeleteModalVisible(false);
             Toast.show({
                 type: 'success',
@@ -92,6 +113,10 @@ export const PersonalInfoScreen: React.FC = () => {
         }
     };
 
+    const handleEditFinancials = () => {
+        navigation.navigate('EditFinancialDetails');
+    };
+
     const infoItems = [
         { icon: '👤', label: 'Full Name', value: user.name || '—' },
         { icon: '📧', label: 'Email', value: user.email || '—' },
@@ -99,11 +124,11 @@ export const PersonalInfoScreen: React.FC = () => {
     ];
 
     const financialItems = [
-        { icon: '💰', label: 'Monthly Income', value: onboarding.monthly_income ? formatCurrency(onboarding.monthly_income) : '—' },
-        { icon: '🛒', label: 'Monthly Expenses', value: onboarding.monthly_expenses ? formatCurrency(onboarding.monthly_expenses) : '—' },
-        { icon: '🏦', label: 'Monthly EMI', value: onboarding.monthly_emi ? formatCurrency(onboarding.monthly_emi) : '—' },
-        { icon: '📋', label: 'EMI Outstanding', value: onboarding.emi_outstanding ? formatCurrency(onboarding.emi_outstanding) : '—' },
-        { icon: '📈', label: 'Monthly Investment', value: onboarding.monthly_investment ? formatCurrency(onboarding.monthly_investment) : '—' },
+        { icon: '💰', label: 'Monthly Income', value: financialData.monthlyIncome ? formatCurrency(financialData.monthlyIncome) : '—' },
+        { icon: '🛒', label: 'Monthly Expenses', value: financialData.monthlyExpenses ? formatCurrency(financialData.monthlyExpenses) : '—' },
+        { icon: '🏦', label: 'Monthly EMI', value: financialData.monthlyEmi ? formatCurrency(financialData.monthlyEmi) : '—' },
+        { icon: '📋', label: 'EMI Outstanding', value: financialData.emiOutstanding ? formatCurrency(financialData.emiOutstanding) : '—' },
+        { icon: '📈', label: 'Monthly Investment', value: financialData.monthlyInvestment ? formatCurrency(financialData.monthlyInvestment) : '—' },
     ];
 
     if (isLoading) {
@@ -121,11 +146,7 @@ export const PersonalInfoScreen: React.FC = () => {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
-            <View style={styles.header}>
-                <BackButton onPress={() => navigation.goBack()} />
-                <Text style={styles.headerTitle}>Personal Information</Text>
-                <View style={styles.headerSpacer} />
-            </View>
+            <Header title="Personal Information" />
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 {/* Profile Section */}
@@ -140,13 +161,29 @@ export const PersonalInfoScreen: React.FC = () => {
                                 <Text style={styles.infoIcon}>{item.icon}</Text>
                                 <Text style={styles.infoLabel}>{item.label}</Text>
                             </View>
-                            <Text style={styles.infoValue}>{item.value}</Text>
+                            <View style={styles.valueContainer}>
+                                <Text style={styles.infoValue}>{item.value}</Text>
+                                {(item as any).onEdit && (
+                                    <TouchableOpacity
+                                        style={styles.editButtonSmall}
+                                        onPress={(item as any).onEdit}
+                                        activeOpacity={0.7}
+                                    >
+                                        <Text style={styles.editIconSmall}>✏️</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
                         </View>
                     ))}
                 </View>
 
                 {/* Financial Section */}
-                <Text style={styles.sectionTitle}>Financial Details</Text>
+                <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>Financial Details</Text>
+                    <TouchableOpacity onPress={handleEditFinancials}>
+                        <Text style={styles.editButtonText}>Edit</Text>
+                    </TouchableOpacity>
+                </View>
                 <View style={styles.card}>
                     {financialItems.map((item, index) => (
                         <View
@@ -157,7 +194,18 @@ export const PersonalInfoScreen: React.FC = () => {
                                 <Text style={styles.infoIcon}>{item.icon}</Text>
                                 <Text style={styles.infoLabel}>{item.label}</Text>
                             </View>
-                            <Text style={styles.infoValue}>{item.value}</Text>
+                            <View style={styles.valueContainer}>
+                                <Text style={styles.infoValue}>{item.value}</Text>
+                                {(item as any).onEdit && (
+                                    <TouchableOpacity
+                                        style={styles.editButtonSmall}
+                                        onPress={(item as any).onEdit}
+                                        activeOpacity={0.7}
+                                    >
+                                        <Text style={styles.editIconSmall}>✏️</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
                         </View>
                     ))}
                 </View>
@@ -209,7 +257,10 @@ export const PersonalInfoScreen: React.FC = () => {
                     </View>
                 </View>
             </Modal>
-        </SafeAreaView>
+
+
+
+        </SafeAreaView >
     );
 };
 
@@ -223,25 +274,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
-    },
-    headerTitle: {
-        flex: 1,
-        color: colors.textPrimary,
-        fontSize: typography.h3,
-        fontWeight: typography.bold,
-        textAlign: 'center',
-    },
-    headerSpacer: {
-        width: 40,
-    },
+
     content: {
         flex: 1,
         paddingHorizontal: spacing.lg,
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: spacing.lg,
+        marginBottom: spacing.sm,
     },
     sectionTitle: {
         color: colors.textSecondary,
@@ -249,8 +292,11 @@ const styles = StyleSheet.create({
         fontWeight: typography.medium,
         textTransform: 'uppercase',
         letterSpacing: 1,
-        marginBottom: spacing.sm,
-        marginTop: spacing.lg,
+    },
+    editButtonText: {
+        color: colors.primary,
+        fontSize: typography.body,
+        fontWeight: '600',
     },
     card: {
         backgroundColor: colors.cardBackground,
@@ -374,6 +420,19 @@ const styles = StyleSheet.create({
     modalDeleteText: {
         color: '#ffffff',
         fontSize: typography.body,
-        fontWeight: typography.bold,
+        fontWeight: 'bold',
+    },
+    valueContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    editButtonSmall: {
+        marginLeft: spacing.sm,
+        padding: 4,
+        backgroundColor: colors.inputBackground,
+        borderRadius: 8,
+    },
+    editIconSmall: {
+        fontSize: 14,
     },
 });

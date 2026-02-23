@@ -7,17 +7,19 @@ import {
     StatusBar,
     ScrollView,
     TouchableOpacity,
-    FlatList,
     ActivityIndicator,
     TextInput,
+    Modal,
+    DeviceEventEmitter,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { colors, typography, spacing } from '../../constants';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
-import { BackButton, ConfirmationModal } from '../../components';
+import { BackButton, ConfirmationModal, SkeletonLoader, AnimatedMascot, Header } from '../../components';
 import api from '../../services/api';
 import { formatCurrency } from '../../utils';
+import { useCurrency } from '../../context/CurrencyContext';
 
 type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
 type ContributionsRouteProp = RouteProp<MainStackParamList, 'Contributions'>;
@@ -45,6 +47,7 @@ interface ModalState {
 export const ContributionsScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const route = useRoute<ContributionsRouteProp>();
+    const { currencySymbol } = useCurrency();
 
     const goalId = route.params?.goalId || '';
     const goalName = route.params?.goalName || 'Goal';
@@ -59,6 +62,12 @@ export const ContributionsScreen: React.FC = () => {
     const [totalPaid, setTotalPaid] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
     const [editedContribution, setEditedContribution] = useState(monthlyContribution);
+    // State for inline editing of past contributions
+    // State for Edit Modal
+    const [editModalVisible, setEditModalVisible] = useState(false);
+    const [selectedContribution, setSelectedContribution] = useState<ContributionItem | null>(null);
+    const [editModalValue, setEditModalValue] = useState<string>('');
+    const [editError, setEditError] = useState<string>('');
     const [modalState, setModalState] = useState<ModalState>({
         visible: false,
         type: 'info',
@@ -69,20 +78,31 @@ export const ContributionsScreen: React.FC = () => {
     });
 
     const STEP_AMOUNT = 500;
-    const MIN_CONTRIBUTION = 500;
+    const MIN_CONTRIBUTION = 50;
 
     // Recalculate months when contribution changes
     const effectiveMonths = editedContribution > 0
         ? Math.ceil(targetAmount / editedContribution)
         : achieveInMonths;
 
+    // Compute estimated completion date based on actual remaining amount.
+    // This accounts for partial payments — e.g. paying ₹150 when ₹300 is due
+    // means the remaining balance is higher, so the goal takes longer.
+    const completionDate = (() => {
+        const remaining = Math.max(0, targetAmount - totalPaid);
+        const monthsLeft = editedContribution > 0
+            ? Math.ceil(remaining / editedContribution)
+            : effectiveMonths;
+        const base = new Date();
+        base.setMonth(base.getMonth() + monthsLeft);
+        return base.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    })();
+
     const handleContributionInputChange = (text: string) => {
         const value = parseInt(text.replace(/[^0-9]/g, ''), 10);
         if (!isNaN(value)) {
             // Clamp: can't exceed original, can't go below MIN
             setEditedContribution(Math.max(MIN_CONTRIBUTION, Math.min(value, monthlyContribution)));
-        } else if (text === '') {
-            setEditedContribution(0);
         }
     };
 
@@ -156,7 +176,12 @@ export const ContributionsScreen: React.FC = () => {
             const upcomingContributions: ContributionItem[] = Array.from({ length: remainingCount }, (_, index) => {
                 const paymentNum = paidCount + index + 1;
                 const upcomingDate = new Date(lastPaidDate);
-                upcomingDate.setMonth(upcomingDate.getMonth() + index + 1);
+
+                // If no contributions yet, start from current month (index 0)
+                // If contributions exist, start from next month after last payment (index + 1)
+                const monthOffset = paidCount === 0 ? index : index + 1;
+                upcomingDate.setMonth(upcomingDate.getMonth() + monthOffset);
+
                 const formattedDate = upcomingDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 const monthKey = upcomingDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
                 return {
@@ -235,6 +260,83 @@ export const ContributionsScreen: React.FC = () => {
     const daysUntilPayment = calculateDaysUntilPayment();
     const { enabled: paymentEnabled, hasPaidThisMonth } = getPaymentStatus();
 
+    const isCurrentMonth = (dateString?: string) => {
+        if (!dateString) return false;
+        const date = new Date(dateString);
+        const today = new Date();
+        return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+    };
+
+    const handleOpenEditModal = (item: ContributionItem) => {
+        setSelectedContribution(item);
+        setEditModalValue(item.amount.toString());
+        setEditError('');
+        setEditModalVisible(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setEditModalVisible(false);
+        setSelectedContribution(null);
+        setEditModalValue('');
+        setEditError('');
+    };
+
+    const handleSaveEdit = async () => {
+        if (!selectedContribution) return;
+
+        const newAmount = parseFloat(editModalValue);
+
+        // Validation
+        if (isNaN(newAmount)) {
+            setEditError('Please enter a valid amount');
+            return;
+        }
+
+
+
+        if (newAmount > monthlyContribution) {
+            setEditError(`Cannot exceed monthly contribution of ${formatCurrency(monthlyContribution, currencySymbol)}`);
+            return;
+        }
+
+        // Call API
+        try {
+            setIsSaving(true);
+            await api.post('/api/contributions/update', {
+                contribution_id: selectedContribution.id,
+                amount: newAmount,
+                note: 'Updated monthly savings',
+            });
+
+            // Success & Refresh
+            handleCloseEditModal();
+            fetchContributions();
+            DeviceEventEmitter.emit('refreshGoals');
+
+            setModalState({
+                visible: true,
+                type: 'success',
+                title: 'Success!',
+                message: 'Contribution updated successfully!',
+                showCancelButton: false,
+                onConfirm: closeModal,
+            });
+
+        } catch (error) {
+            console.error('Failed to update contribution:', error);
+            setModalState({
+                visible: true,
+                type: 'error',
+                title: 'Update Failed',
+                message: 'Could not update contribution. Please try again.',
+                showCancelButton: false,
+                onConfirm: closeModal,
+            });
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
 
     const closeModal = () => {
         setModalState(prev => ({ ...prev, visible: false }));
@@ -245,7 +347,7 @@ export const ContributionsScreen: React.FC = () => {
             visible: true,
             type: 'warning',
             title: 'Confirm Savings',
-            message: `Are you sure you want to save ${formatCurrency(editedContribution)} towards your "${goalName}" goal?`,
+            message: `Are you sure you want to save ${formatCurrency(editedContribution, currencySymbol)} towards your "${goalName}" goal?`,
             showCancelButton: true,
             onConfirm: saveContribution,
         });
@@ -262,6 +364,7 @@ export const ContributionsScreen: React.FC = () => {
             });
             // Refresh contributions list to update button state
             await fetchContributions();
+            DeviceEventEmitter.emit('refreshGoals');
             setModalState({
                 visible: true,
                 type: 'success',
@@ -285,45 +388,8 @@ export const ContributionsScreen: React.FC = () => {
         }
     };
 
-    const renderContributionItem = ({ item }: { item: ContributionItem }) => {
-        const getStatusMark = () => {
-            switch (item.status) {
-                case 'paid':
-                    return '✓';
-                case 'pending':
-                    return '⏰';
-                default:
-                    return '○';
-            }
-        };
-
-        return (
-            <View style={styles.contributionItem}>
-                <View style={styles.contributionLeft}>
-                    <View style={[
-                        styles.paymentIndicator,
-                        item.status === 'paid' && styles.paidIndicator,
-                        item.status === 'pending' && styles.pendingIndicator,
-                    ]}>
-                        <Text style={[
-                            styles.paymentNumber,
-                            item.status === 'paid' && styles.paidText,
-                        ]}>{getStatusMark()}</Text>
-                    </View>
-                    <View style={styles.contributionDetails}>
-                        <Text style={styles.contributionLabel}>{item.monthKey || item.date}</Text>
-                        <Text style={styles.contributionDate}>
-                            {item.status === 'paid' ? 'Paid' : item.date}
-                        </Text>
-                    </View>
-                </View>
-                <View style={styles.contributionRight}>
-                    <Text style={styles.contributionAmount}>{formatCurrency(item.amount)}</Text>
-                    <Text style={styles.totalValue}>Total: {formatCurrency(item.totalValue)}</Text>
-                </View>
-            </View>
-        );
-    };
+    // Only paid contributions are shown in history
+    const paidHistory = contributions.filter(c => c.status === 'paid');
 
     return (
         <SafeAreaView style={styles.container}>
@@ -342,187 +408,310 @@ export const ContributionsScreen: React.FC = () => {
                 onCancel={closeModal}
             />
 
-            {/* Header */}
-            <View style={styles.header}>
-                <BackButton onPress={() => navigation.goBack()} />
-                <Text style={styles.headerTitle}>{goalName}</Text>
-                <View style={styles.headerSpacer} />
-            </View>
+            {/* Edit Contribution Modal */}
+            <Modal
+                visible={editModalVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={handleCloseEditModal}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Edit Contribution</Text>
+                        <Text style={styles.modalSubtitle}>
+                            Enter a new amount for {selectedContribution?.monthKey}
+                        </Text>
 
-            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-                {/* Payment Card - Dynamic based on paid state */}
-                <View style={styles.upcomingCard}>
-                    {hasPaidThisMonth ? (
-                        <>
-                            {/* Already paid this month */}
-                            <View style={styles.upcomingHeader}>
-                                <View style={[styles.timerBadge, { backgroundColor: 'rgba(34, 197, 94, 0.2)' }]}>
-                                    <Text style={styles.timerIcon}>✅</Text>
-                                    <Text style={[styles.timerText, { color: '#22c55e' }]}>Paid</Text>
-                                </View>
-                            </View>
-
-                            <Text style={styles.upcomingLabel}>Last Payment</Text>
-                            <Text style={styles.upcomingAmount}>
-                                {formatCurrency(contributions.filter(c => c.status === 'paid').slice(-1)[0]?.amount || editedContribution)}
-                            </Text>
-                            <Text style={styles.upcomingDate}>
-                                {contributions.filter(c => c.status === 'paid').slice(-1)[0]?.date || ''}
-                            </Text>
-
-                            {/* Next upcoming payment info */}
-                            {upcomingPayment && (
-                                <View style={styles.nextPaymentInfo}>
-                                    <Text style={styles.nextPaymentLabel}>Upcoming Payment</Text>
-                                    <Text style={styles.nextPaymentAmount}>{formatCurrency(editedContribution)}</Text>
-                                    <Text style={styles.nextPaymentDate}>Due: {upcomingPayment.date}</Text>
-                                </View>
-                            )}
-
-                            <TouchableOpacity
-                                style={[styles.payButton, styles.payButtonDisabled]}
-                                disabled={true}
-                            >
-                                <Text style={styles.payButtonText}>Already Paid</Text>
-                            </TouchableOpacity>
-                        </>
-                    ) : (
-                        <>
-                            {/* Not yet paid this month */}
-                            <View style={styles.upcomingHeader}>
-                                <View style={styles.timerBadge}>
-                                    <Text style={styles.timerIcon}>⏰</Text>
-                                    <Text style={styles.timerText}>{daysUntilPayment} days left</Text>
-                                </View>
-                            </View>
-
-                            <Text style={styles.upcomingLabel}>Upcoming Payment</Text>
-                            <TouchableOpacity
-                                style={styles.editableAmount}
-                                onPress={() => setIsEditing(!isEditing)}
-                                activeOpacity={0.7}
-                            >
-                                <Text style={styles.upcomingAmount}>{formatCurrency(editedContribution)}</Text>
-                                <Text style={styles.editIcon}>✏️</Text>
-                            </TouchableOpacity>
-                            <Text style={styles.upcomingDate}>Due: {upcomingPayment?.date}</Text>
-
-                            {/* Inline contribution editor */}
-                            {isEditing && (
-                                <View style={styles.editorContainer}>
-                                    <Text style={styles.editorTitle}>Adjust Monthly Contribution</Text>
-
-                                    <View style={styles.contributionInputContainer}>
-                                        <Text style={styles.currencyPrefix}>₹</Text>
-                                        <TextInput
-                                            style={styles.contributionInput}
-                                            value={editedContribution > 0 ? editedContribution.toString() : ''}
-                                            onChangeText={handleContributionInputChange}
-                                            onBlur={handleContributionBlur}
-                                            keyboardType="number-pad"
-                                            selectTextOnFocus
-                                            autoFocus
-                                        />
-                                    </View>
-
-                                    <View style={styles.editorInfo}>
-                                        <Text style={styles.editorInfoText}>
-                                            Goal achieved in{' '}
-                                            <Text style={styles.editorHighlight}>{effectiveMonths} months</Text>
-                                        </Text>
-                                        {editedContribution < monthlyContribution && (
-                                            <Text style={styles.editorHint}>
-                                                Original: {formatCurrency(monthlyContribution)}/mo ({achieveInMonths} months)
-                                            </Text>
-                                        )}
-                                    </View>
-
-                                    <TouchableOpacity
-                                        style={styles.confirmButton}
-                                        onPress={handleConfirmContribution}
-                                        activeOpacity={0.7}
-                                    >
-                                        <Text style={styles.confirmButtonText}>Confirm</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            )}
-
-                            <TouchableOpacity
-                                style={[styles.payButton, (!paymentEnabled || isSaving) && styles.payButtonDisabled]}
-                                onPress={handleSaveContribution}
-                                disabled={!paymentEnabled || isSaving}
-                            >
-                                {isSaving ? (
-                                    <ActivityIndicator color={colors.background} />
-                                ) : (
-                                    <Text style={styles.payButtonText}>
-                                        {paymentEnabled ? 'Save Now' : 'Not Due Yet'}
-                                    </Text>
-                                )}
-                            </TouchableOpacity>
-                        </>
-                    )}
-                </View>
-
-                {/* Progress Summary */}
-                <View style={styles.summaryCard}>
-                    {/* Progress Bar */}
-                    <View style={styles.progressSection}>
-                        <View style={styles.progressHeader}>
-                            <Text style={styles.progressLabel}>Progress</Text>
-                            <Text style={styles.progressPercent}>
-                                {targetAmount > 0 ? Math.min(100, Math.round((totalPaid / targetAmount) * 100)) : 0}%
-                            </Text>
-                        </View>
-                        <View style={styles.progressBarBackground}>
-                            <View
-                                style={[
-                                    styles.progressBarFill,
-                                    { width: `${targetAmount > 0 ? Math.min(100, (totalPaid / targetAmount) * 100) : 0}%` },
-                                ]}
+                        <View style={styles.modalInputContainer}>
+                            <Text style={styles.modalCurrencyPrefix}>{currencySymbol}</Text>
+                            <TextInput
+                                style={styles.modalInput}
+                                value={editModalValue}
+                                onChangeText={(text) => {
+                                    setEditModalValue(text);
+                                    setEditError('');
+                                }}
+                                keyboardType="number-pad"
+                                autoFocus
+                                placeholder="0"
+                                placeholderTextColor={colors.textMuted}
                             />
                         </View>
-                        <View style={styles.progressAmounts}>
-                            <Text style={styles.progressSaved}>{formatCurrency(totalPaid)} saved</Text>
-                            <Text style={styles.progressTarget}>of {formatCurrency(targetAmount)}</Text>
-                        </View>
-                    </View>
 
-                    <View style={styles.summaryDividerHorizontal} />
+                        {editError ? (
+                            <Text style={styles.modalErrorText}>{editError}</Text>
+                        ) : null}
 
-                    <View style={styles.summaryRow}>
-                        <View style={styles.summaryItem}>
-                            <Text style={styles.summaryValue}>{formatCurrency(targetAmount)}</Text>
-                            <Text style={styles.summaryLabel}>Target</Text>
-                        </View>
-                        <View style={styles.summaryDivider} />
-                        <View style={styles.summaryItem}>
-                            <Text style={[styles.summaryValue, editedContribution !== monthlyContribution && styles.editedValue]}>
-                                {effectiveMonths}
-                            </Text>
-                            <Text style={styles.summaryLabel}>Months</Text>
-                        </View>
-                        <View style={styles.summaryDivider} />
-                        <View style={styles.summaryItem}>
-                            <Text style={[styles.summaryValue, editedContribution !== monthlyContribution && styles.editedValue]}>
-                                {formatCurrency(editedContribution)}
-                            </Text>
-                            <Text style={styles.summaryLabel}>Monthly</Text>
+                        <Text style={styles.modalHintText}>
+                            Max allowed: {formatCurrency(monthlyContribution, currencySymbol)}
+                        </Text>
+
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.modalButtonCancel]}
+                                onPress={handleCloseEditModal}
+                            >
+                                <Text style={styles.modalButtonTextCancel}>Cancel</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.modalButtonSave]}
+                                onPress={handleSaveEdit}
+                                disabled={isSaving}
+                            >
+                                {isSaving ? (
+                                    <ActivityIndicator size="small" color="#fff" />
+                                ) : (
+                                    <Text style={styles.modalButtonTextSave}>Save</Text>
+                                )}
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>
+            </Modal>
 
-                {/* Contributions List */}
-                <View style={styles.listSection}>
-                    <Text style={styles.sectionTitle}>Payment Schedule</Text>
 
-                    {contributions.map((item) => (
-                        <View key={item.id}>
-                            {renderContributionItem({ item })}
-                        </View>
+            {/* Header */}
+            <Header title={goalName} />
+
+            {isLoading ? (
+                <View style={styles.content}>
+                    {/* Upcoming Card Skeleton */}
+                    <SkeletonLoader
+                        height={200}
+                        borderRadius={20}
+                        style={{ marginBottom: spacing.lg, backgroundColor: 'rgba(255, 255, 255, 0.2)', marginTop: spacing.md }}
+                    />
+
+                    {/* Summary Card Skeleton */}
+                    <SkeletonLoader
+                        height={150}
+                        borderRadius={16}
+                        style={{ marginBottom: spacing.xl, backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
+                    />
+
+                    {/* List Section Title Skeleton */}
+                    <SkeletonLoader
+                        width={150}
+                        height={24}
+                        style={{ marginBottom: spacing.md, backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
+                    />
+
+                    {/* List Items Skeleton */}
+                    {[1, 2, 3].map((key) => (
+                        <SkeletonLoader
+                            key={key}
+                            height={70}
+                            borderRadius={12}
+                            style={{ marginBottom: spacing.sm, backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
+                        />
                     ))}
                 </View>
-            </ScrollView>
+            ) : (
+                <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+                    {/* Payment Card - Dynamic based on paid state */}
+                    <View style={styles.upcomingCard}>
+                        {hasPaidThisMonth ? (
+                            <>
+                                {/* Already paid this month */}
+                                <View style={styles.upcomingHeader}>
+                                    <View style={[styles.timerBadge, { backgroundColor: 'rgba(34, 197, 94, 0.2)' }]}>
+                                        <Text style={styles.timerIcon}>✅</Text>
+                                        <Text style={[styles.timerText, { color: '#22c55e' }]}>Paid</Text>
+                                    </View>
+                                </View>
+
+                                <Text style={styles.upcomingLabel}>Last Payment</Text>
+                                <Text style={styles.upcomingAmount}>
+                                    {formatCurrency(contributions.filter(c => c.status === 'paid').slice(-1)[0]?.amount || editedContribution, currencySymbol)}
+                                </Text>
+                                <Text style={styles.upcomingDate}>
+                                    {contributions.filter(c => c.status === 'paid').slice(-1)[0]?.date || ''}
+                                </Text>
+
+                                {/* Next upcoming payment info */}
+                                {upcomingPayment && (
+                                    <View style={styles.nextPaymentInfo}>
+                                        <Text style={styles.nextPaymentLabel}>Upcoming Payment</Text>
+                                        <Text style={styles.nextPaymentAmount}>{formatCurrency(editedContribution, currencySymbol)}</Text>
+                                        <Text style={styles.nextPaymentDate}>Due: {upcomingPayment.date}</Text>
+                                    </View>
+                                )}
+
+
+                            </>
+                        ) : (
+                            <>
+                                {/* Not yet paid this month */}
+                                <View style={styles.upcomingHeader}>
+                                    <View style={styles.timerBadge}>
+                                        <Text style={styles.timerIcon}>⏰</Text>
+                                        <Text style={styles.timerText}>{daysUntilPayment} days left</Text>
+                                    </View>
+                                    <TouchableOpacity
+                                        style={styles.editButton}
+                                        onPress={() => setIsEditing(!isEditing)}
+                                        activeOpacity={0.7}
+                                    >
+                                        <Text style={styles.editButtonText}>Edit</Text>
+                                    </TouchableOpacity>
+                                </View>
+
+                                <Text style={styles.upcomingLabel}>Upcoming Payment</Text>
+                                <Text style={styles.upcomingAmount}>{formatCurrency(editedContribution, currencySymbol)}</Text>
+                                <Text style={styles.upcomingDate}>Due: {upcomingPayment?.date}</Text>
+
+                                {/* Inline contribution editor */}
+                                {isEditing && (
+                                    <View style={styles.editorContainer}>
+                                        <Text style={styles.editorTitle}>Adjust This Month's Contribution</Text>
+
+                                        <View style={styles.contributionInputContainer}>
+                                            <Text style={styles.currencyPrefix}>{currencySymbol}</Text>
+                                            <TextInput
+                                                style={styles.contributionInput}
+                                                value={editedContribution > 0 ? editedContribution.toString() : ''}
+                                                onChangeText={handleContributionInputChange}
+                                                onBlur={handleContributionBlur}
+                                                keyboardType="number-pad"
+                                                selectTextOnFocus
+                                                autoFocus
+                                            />
+                                        </View>
+
+                                        <View style={styles.editorInfo}>
+                                            <Text style={styles.editorInfoText}>
+                                                Goal achieved in{' '}
+                                                <Text style={styles.editorHighlight}>{effectiveMonths} months</Text>
+                                            </Text>
+                                            {editedContribution < monthlyContribution && (
+                                                <Text style={styles.editorHint}>
+                                                    Original: {formatCurrency(monthlyContribution, currencySymbol)}/mo ({achieveInMonths} months)
+                                                </Text>
+                                            )}
+                                        </View>
+
+                                        <TouchableOpacity
+                                            style={styles.confirmButton}
+                                            onPress={handleConfirmContribution}
+                                            activeOpacity={0.7}
+                                        >
+                                            <Text style={styles.confirmButtonText}>Confirm</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+
+                                <TouchableOpacity
+                                    style={[styles.payButton, (!paymentEnabled || isSaving) && styles.payButtonDisabled]}
+                                    onPress={handleSaveContribution}
+                                    disabled={!paymentEnabled || isSaving}
+                                >
+                                    {isSaving ? (
+                                        <ActivityIndicator color={colors.background} />
+                                    ) : (
+                                        <Text style={styles.payButtonText}>
+                                            {paymentEnabled ? 'Save Now' : 'Not Due Yet'}
+                                        </Text>
+                                    )}
+                                </TouchableOpacity>
+
+                            </>
+                        )}
+                    </View>
+
+                    {editedContribution <= MIN_CONTRIBUTION && (
+                        <View style={{}}>
+                            <AnimatedMascot
+                                text={`Since you can't save less than ${currencySymbol}50, try to save at least this amount to keep your goal ongoing! 🚀`}
+                                mascotWidth={60}
+                                mascotHeight={100}
+
+                            />
+                        </View>
+                    )}
+
+                    {/* Progress Summary */}
+                    <View style={styles.summaryCard}>
+                        {/* Progress Bar */}
+                        <View style={styles.progressSection}>
+                            <View style={styles.progressHeader}>
+                                <Text style={styles.progressLabel}>Progress</Text>
+                                <Text style={styles.progressPercent}>
+                                    {targetAmount > 0 ? Math.min(100, Math.round((totalPaid / targetAmount) * 100)) : 0}%
+                                </Text>
+                            </View>
+                            <View style={styles.progressBarBackground}>
+                                <View
+                                    style={[
+                                        styles.progressBarFill,
+                                        { width: `${targetAmount > 0 ? Math.min(100, (totalPaid / targetAmount) * 100) : 0}%` },
+                                    ]}
+                                />
+                            </View>
+                            <View style={styles.progressAmounts}>
+                                <Text style={styles.progressSaved}>{formatCurrency(totalPaid, currencySymbol)} saved</Text>
+                                <Text style={styles.progressTarget}>of {formatCurrency(targetAmount, currencySymbol)}</Text>
+                            </View>
+                            <Text style={styles.completionDate}>📅 Completes by {completionDate}</Text>
+                        </View>
+
+                        <View style={styles.summaryDividerHorizontal} />
+
+                        <View style={styles.summaryRow}>
+                            <View style={styles.summaryItem}>
+                                <Text style={styles.summaryValue}>{formatCurrency(targetAmount, currencySymbol)}</Text>
+                                <Text style={styles.summaryLabel}>Target</Text>
+                            </View>
+                            <View style={styles.summaryDivider} />
+                            <View style={styles.summaryItem}>
+                                <Text style={[styles.summaryValue, editedContribution !== monthlyContribution && styles.editedValue]}>
+                                    {effectiveMonths}
+                                </Text>
+                                <Text style={styles.summaryLabel}>Months</Text>
+                            </View>
+                            <View style={styles.summaryDivider} />
+                            <View style={styles.summaryItem}>
+                                <Text style={[styles.summaryValue, editedContribution !== monthlyContribution && styles.editedValue]}>
+                                    {formatCurrency(editedContribution, currencySymbol)}
+                                </Text>
+                                <Text style={styles.summaryLabel}>Monthly</Text>
+                            </View>
+                        </View>
+                    </View>
+
+                    {/* Contribution History */}
+                    {paidHistory.length > 0 && (
+                        <View style={styles.historySection}>
+                            <Text style={styles.sectionTitle}>Contribution History</Text>
+                            {paidHistory.map((item) => {
+                                const canEdit = isCurrentMonth(item.rawDate);
+                                return (
+                                    <View key={item.id} style={styles.historyItem}>
+                                        <View style={styles.historyDot} />
+                                        <View style={styles.historyContent}>
+                                            <View style={styles.historyRow}>
+                                                <Text style={styles.historyMonth}>{item.monthKey}</Text>
+                                                <Text style={styles.historyAmount}>{formatCurrency(item.amount, currencySymbol)}</Text>
+                                            </View>
+                                            <View style={styles.historyRowSub}>
+                                                <Text style={styles.historyDate}>{item.date}</Text>
+                                                {canEdit && (
+                                                    <TouchableOpacity
+                                                        onPress={() => handleOpenEditModal(item)}
+                                                        style={styles.historyEditBtn}
+                                                    >
+                                                        <Text style={styles.historyEditBtnText}>Edit</Text>
+                                                    </TouchableOpacity>
+                                                )}
+                                            </View>
+                                        </View>
+                                    </View>
+                                );
+                            })}
+                        </View>
+                    )}
+
+                </ScrollView>
+            )}
         </SafeAreaView>
     );
 };
@@ -560,10 +749,13 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#2a4a6a',
         alignItems: 'center',
+        marginTop: spacing.md,
     },
     upcomingHeader: {
         width: '100%',
-        alignItems: 'flex-end',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         marginBottom: spacing.md,
     },
     timerBadge: {
@@ -712,79 +904,85 @@ const styles = StyleSheet.create({
         color: colors.textMuted,
         fontSize: typography.caption,
     },
+    completionDate: {
+        color: colors.textMuted,
+        fontSize: typography.caption,
+        marginTop: spacing.xs,
+        textAlign: 'right',
+    },
     summaryDividerHorizontal: {
         height: 1,
         backgroundColor: colors.border,
         marginBottom: spacing.md,
     },
-    listSection: {
-        marginBottom: spacing.xl,
+    // History section
+    historySection: {
+        marginBottom: spacing.xxl,
     },
     sectionTitle: {
         color: colors.textPrimary,
-        fontSize: typography.h3,
+        fontSize: typography.body,
         fontWeight: typography.semibold,
         marginBottom: spacing.md,
     },
-    contributionItem: {
+    historyItem: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        alignItems: 'flex-start',
+        marginBottom: spacing.md,
+    },
+    historyDot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: '#22c55e',
+        marginTop: 4,
+        marginRight: spacing.md,
+        flexShrink: 0,
+    },
+    historyContent: {
+        flex: 1,
         backgroundColor: colors.cardBackground,
         borderRadius: 12,
         padding: spacing.md,
-        marginBottom: spacing.sm,
+        borderWidth: 1,
+        borderColor: 'rgba(34,197,94,0.15)',
     },
-    contributionLeft: {
+    historyRow: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 2,
+    },
+    historyRowSub: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
     },
-    paymentIndicator: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: colors.inputBackground,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: spacing.md,
-    },
-    paidIndicator: {
-        backgroundColor: 'rgba(34, 197, 94, 0.2)',
-    },
-    pendingIndicator: {
-        backgroundColor: 'rgba(245, 158, 11, 0.2)',
-    },
-    paymentNumber: {
+    historyMonth: {
         color: colors.textPrimary,
         fontSize: typography.bodySmall,
         fontWeight: typography.semibold,
     },
-    paidText: {
+    historyAmount: {
         color: '#22c55e',
-    },
-    contributionDetails: {
-        justifyContent: 'center',
-    },
-    contributionLabel: {
-        color: colors.textPrimary,
         fontSize: typography.bodySmall,
-        fontWeight: typography.medium,
+        fontWeight: typography.bold,
     },
-    contributionDate: {
+    historyDate: {
         color: colors.textMuted,
         fontSize: typography.caption,
     },
-    contributionRight: {
-        alignItems: 'flex-end',
+    historyEditBtn: {
+        paddingHorizontal: spacing.sm,
+        paddingVertical: 2,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: colors.primary + '60',
     },
-    contributionAmount: {
-        color: colors.textPrimary,
-        fontSize: typography.body,
+    historyEditBtnText: {
+        color: colors.primary,
+        fontSize: typography.caption,
         fontWeight: typography.semibold,
-    },
-    totalValue: {
-        color: colors.textMuted,
-        fontSize: typography.caption,
     },
     // Contribution editor styles
     editableAmount: {
@@ -795,6 +993,19 @@ const styles = StyleSheet.create({
     },
     editIcon: {
         fontSize: 16,
+    },
+    editButton: {
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.15)',
+    },
+    editButtonText: {
+        color: colors.primary,
+        fontSize: 12,
+        fontWeight: '600',
     },
     editedValue: {
         color: colors.primary,
@@ -867,5 +1078,154 @@ const styles = StyleSheet.create({
         color: colors.background,
         fontSize: typography.body,
         fontWeight: typography.bold,
+    },
+    inlineEditContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    inlineEditInput: {
+        backgroundColor: colors.inputBackground,
+        color: colors.textPrimary,
+        borderRadius: 8,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        width: 80,
+        height: 32,
+        marginRight: 8,
+        fontSize: 14,
+        textAlign: 'right',
+    },
+    inlineEditActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    inlineActionButton: {
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        backgroundColor: '#22c55e',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 4,
+    },
+    inlineActionCancel: {
+        backgroundColor: colors.error,
+    },
+    inlineActionText: {
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: 'bold',
+    },
+    editRowButton: {
+        marginTop: spacing.md,
+        paddingVertical: 8,
+        backgroundColor: colors.inputBackground,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: colors.border,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    editRowButtonText: {
+        fontSize: 12,
+        color: colors.textPrimary,
+        fontWeight: '600',
+    },
+    // Modal Styles
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: spacing.xl,
+    },
+    modalContent: {
+        width: '100%',
+        backgroundColor: colors.cardBackground,
+        borderRadius: 20,
+        padding: spacing.xl,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    modalTitle: {
+        fontSize: typography.h3,
+        fontWeight: typography.bold,
+        color: colors.textPrimary,
+        marginBottom: spacing.xs,
+    },
+    modalSubtitle: {
+        fontSize: typography.bodySmall,
+        color: colors.textMuted,
+        marginBottom: spacing.lg,
+        textAlign: 'center',
+    },
+    modalInputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: colors.inputBackground,
+        borderRadius: 12,
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.sm,
+        marginBottom: spacing.sm,
+        borderWidth: 1,
+        borderColor: colors.border,
+        width: '100%',
+    },
+    modalCurrencyPrefix: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: colors.primary,
+        marginRight: spacing.sm,
+    },
+    modalInput: {
+        flex: 1,
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: colors.textPrimary,
+        paddingVertical: 0,
+    },
+    modalErrorText: {
+        color: colors.error,
+        fontSize: typography.caption,
+        marginBottom: spacing.sm,
+        alignSelf: 'flex-start',
+    },
+    modalHintText: {
+        color: colors.textMuted,
+        fontSize: typography.caption,
+        marginBottom: spacing.xl,
+        alignSelf: 'flex-start',
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        gap: spacing.md,
+    },
+    modalButton: {
+        flex: 1,
+        paddingVertical: spacing.md,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    modalButtonCancel: {
+        backgroundColor: colors.inputBackground,
+    },
+    modalButtonSave: {
+        backgroundColor: colors.primary,
+    },
+    modalButtonTextCancel: {
+        color: colors.textSecondary,
+        fontWeight: typography.bold,
+    },
+    modalButtonTextSave: {
+        color: '#000',
+        fontWeight: typography.bold,
+    },
+    editButtonIcon: {
+        fontSize: 16,
+        color: colors.textSecondary,
     },
 });

@@ -13,6 +13,7 @@ import {
     PrivacySecurityScreen,
     HelpSupportScreen,
     NotificationSettingsScreen,
+    EditFinancialDetailsScreen,
 } from '../screens/main';
 import { AddGoalScreen } from '../screens/onboarding';
 
@@ -23,10 +24,13 @@ export type MainStackParamList = {
     Profile: undefined;
     Notifications: undefined;
     EditGoal: {
+        goalId?: string;
         name?: string;
         target?: number;
         achieveIn?: number;
         monthlyContribution?: number;
+        savedAmount?: number;
+        availableForNewGoals?: number;
     };
     GoalChat: {
         goalTitle?: string;
@@ -34,6 +38,10 @@ export type MainStackParamList = {
     };
     AddGoal: {
         availableForNewGoals?: number;
+        suggestionName?: string;
+        suggestionTarget?: number;
+        suggestionMonths?: number;
+        suggestionDescription?: string;
     };
     Contributions: {
         goalId?: string;
@@ -47,6 +55,15 @@ export type MainStackParamList = {
     PrivacySecurity: undefined;
     HelpSupport: undefined;
     NotificationSettings: undefined;
+    EditFinancialDetails: {
+        onboardingData: {
+            monthly_income?: number;
+            monthly_expenses?: number;
+            monthly_emi?: number;
+            emi_outstanding?: number;
+            monthly_investment?: number;
+        };
+    };
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -72,6 +89,7 @@ export const MainStackNavigator: React.FC = () => {
             <Stack.Screen name="PrivacySecurity" component={PrivacySecurityScreen} />
             <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
             <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
+            <Stack.Screen name="EditFinancialDetails" component={EditFinancialDetailsScreen} />
         </Stack.Navigator>
     );
 };

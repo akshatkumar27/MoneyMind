@@ -9,8 +9,9 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { BackButton } from '../../components';
+import { BackButton, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
+import { useCurrency } from '../../context/CurrencyContext';
 
 interface NotificationItem {
     id: string;
@@ -21,56 +22,6 @@ interface NotificationItem {
     isRead: boolean;
 }
 
-const NOTIFICATIONS: NotificationItem[] = [
-    {
-        id: '1',
-        type: 'suggestion',
-        title: 'AI Suggestion',
-        description: 'Auto-invest ₹2,500 extra to reach your Marriage Fund target by Nov 2025.',
-        time: '2 hours ago',
-        isRead: false,
-    },
-    {
-        id: '2',
-        type: 'alert',
-        title: 'Unusual Spending Detected',
-        description: 'You spent ₹4,500 on food delivery this week. That\'s 40% higher than usual.',
-        time: '5 hours ago',
-        isRead: false,
-    },
-    {
-        id: '3',
-        type: 'achievement',
-        title: 'Goal Milestone! 🎉',
-        description: 'You\'ve reached 50% of your Marriage Fund goal. Keep it up!',
-        time: 'Yesterday',
-        isRead: true,
-    },
-    {
-        id: '4',
-        type: 'update',
-        title: 'Account Synced',
-        description: 'Your HDFC Bank account has been successfully synced.',
-        time: 'Yesterday',
-        isRead: true,
-    },
-    {
-        id: '5',
-        type: 'suggestion',
-        title: 'Investment Opportunity',
-        description: 'Based on your risk profile, consider investing in Nifty 50 Index Fund.',
-        time: '2 days ago',
-        isRead: true,
-    },
-    {
-        id: '6',
-        type: 'alert',
-        title: 'Bill Reminder',
-        description: 'Your electricity bill of ₹2,340 is due in 3 days.',
-        time: '3 days ago',
-        isRead: true,
-    },
-];
 
 const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -104,6 +55,58 @@ const getNotificationColor = (type: string) => {
 
 export const NotificationScreen: React.FC = () => {
     const navigation = useNavigation();
+    const { currencySymbol } = useCurrency();
+
+    const NOTIFICATIONS: NotificationItem[] = React.useMemo(() => [
+        {
+            id: '1',
+            type: 'suggestion',
+            title: 'AI Suggestion',
+            description: `Auto-invest ${currencySymbol}2,500 extra to reach your Marriage Fund target by Nov 2025.`,
+            time: '2 hours ago',
+            isRead: false,
+        },
+        {
+            id: '2',
+            type: 'alert',
+            title: 'Unusual Spending Detected',
+            description: `You spent ${currencySymbol}4,500 on food delivery this week. That's 40% higher than usual.`,
+            time: '5 hours ago',
+            isRead: false,
+        },
+        {
+            id: '3',
+            type: 'achievement',
+            title: 'Goal Milestone! 🎉',
+            description: 'You\'ve reached 50% of your Marriage Fund goal. Keep it up!',
+            time: 'Yesterday',
+            isRead: true,
+        },
+        {
+            id: '4',
+            type: 'update',
+            title: 'Account Synced',
+            description: 'Your HDFC Bank account has been successfully synced.',
+            time: 'Yesterday',
+            isRead: true,
+        },
+        {
+            id: '5',
+            type: 'suggestion',
+            title: 'Investment Opportunity',
+            description: 'Based on your risk profile, consider investing in Nifty 50 Index Fund.',
+            time: '2 days ago',
+            isRead: true,
+        },
+        {
+            id: '6',
+            type: 'alert',
+            title: 'Bill Reminder',
+            description: `Your electricity bill of ${currencySymbol}2,340 is due in 3 days.`,
+            time: '3 days ago',
+            isRead: true,
+        },
+    ], [currencySymbol]);
 
     const unreadCount = NOTIFICATIONS.filter(n => !n.isRead).length;
 
@@ -112,16 +115,17 @@ export const NotificationScreen: React.FC = () => {
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             {/* Header */}
-            <View style={styles.header}>
-                <BackButton onPress={() => navigation.goBack()} />
-                <Text style={styles.headerTitle}>Notifications</Text>
-                <TouchableOpacity
-                    style={styles.settingsButton}
-                    onPress={() => navigation.navigate('NotificationSettings' as never)}
-                >
-                    <Text style={styles.settingsIcon}>⚙️</Text>
-                </TouchableOpacity>
-            </View>
+            <Header
+                title="Notifications"
+                rightElement={
+                    <TouchableOpacity
+                        style={styles.settingsButton}
+                        onPress={() => navigation.navigate('NotificationSettings' as never)}
+                    >
+                        <Text style={styles.settingsIcon}>⚙️</Text>
+                    </TouchableOpacity>
+                }
+            />
 
             {/* Unread Badge */}
             {unreadCount > 0 && (

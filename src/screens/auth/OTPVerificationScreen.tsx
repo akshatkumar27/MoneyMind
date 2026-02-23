@@ -17,20 +17,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { BackButton, OTPInput, Button } from '../../components';
 import { colors, typography, spacing, API_BASE_URL } from '../../constants';
-
-type AuthStackParamList = {
-    Login: undefined;
-    Signup: undefined;
-    OTPVerification: {
-        email: string;
-        otpToken: string;
-        isSignupFlow?: boolean;
-        signupData?: {
-            name: string;
-            age: string;
-        };
-    };
-};
+import { notificationService } from '../../services/NotificationService';
+import { AuthStackParamList } from '../../navigation/AuthNavigator';
+import { api } from '../../services';
 
 type OTPVerificationScreenRouteProp = RouteProp<AuthStackParamList, 'OTPVerification'>;
 
@@ -81,14 +70,69 @@ export const OTPVerificationScreen: React.FC = () => {
                 await AsyncStorage.setItem('signupData', JSON.stringify(signupData));
             }
 
-            // Check if user is new and navigate accordingly
-            if (response.data.user?.isNewUser || true) {
+            // Register FCM Token
+            try {
+                const fcmToken = await notificationService.getFCMToken();
+                if (fcmToken) {
+                    await axios.post(
+                        `${API_BASE_URL}/api/notifications/register-token`,
+                        {
+                            fcm_token: fcmToken,
+                            device_type: Platform.OS,
+                        },
+                        {
+                            headers: { Authorization: `Bearer ${response.data.token}` }
+                        }
+                    );
+                    console.log('FCM Token registered successfully');
+                }
+            } catch (fcmError) {
+                console.error('Failed to register FCM token:', fcmError);
+                // Non-blocking error
+            }
+
+            // Check if user is new or if onboarding data is missing
+            const user = response.data.user;
+            console.log('response.data.user?.isNewUser00', user);
+
+            // Save onboardingData and financial profile status
+            if (user) {
+                const payload = {
+                    monthly_income: user.monthly_income || 0,
+                    monthly_expenses: user.monthly_expenses || 0,
+                    monthly_emi: user.monthly_emi || 0,
+                    emi_outstanding: user.emi_outstanding || 0,
+                    monthly_investment: user.monthly_investment || 0,
+                };
+                await AsyncStorage.setItem('onboardingData', JSON.stringify(payload));
+            }
+
+            // Use the status in place of the old isOnboardingIncomplete check
+
+            const isFinancialProfilePresent = await AsyncStorage.getItem('isFinancialProfilePresent');
+   const meRes = await api.get('/api/auth/me');
+       const  meData = meRes.data;
+       
+
+        // Save in global storage
+        await AsyncStorage.setItem('isFinancialProfilePresent', JSON.stringify(meData?.user?.isFinancialProfilePresent || false));
+
+            const isOnboardingIncomplete = meData?.user?.isFinancialProfilePresent;
+console.log('isOnboardingIncomplete--', isOnboardingIncomplete, typeof(isFinancialProfilePresent));
+            if (!isOnboardingIncomplete) {
+                // Set status to start of onboarding
+                // await AsyncStorage.setItem('onboardingStatus', 'MonthlyIncome'); // Assuming MonthlyIncome is the first screen
+
                 // Navigate to onboarding questions
                 navigation.reset({
                     index: 0,
                     routes: [{ name: 'Onboarding' as never }],
                 });
             } else {
+                // Completed
+                // await AsyncStorage.setItem('onboardingStatus', 'COMPLETED');
+                await AsyncStorage.removeItem('temp_auth_email');
+
                 // Navigate to main app
                 navigation.reset({
                     index: 0,

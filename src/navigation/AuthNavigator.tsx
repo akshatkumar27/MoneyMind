@@ -9,7 +9,15 @@ import {
 export type AuthStackParamList = {
     Login: undefined;
     Signup: undefined;
-    OTPVerification: { email: string };
+    OTPVerification: {
+        email: string;
+        otpToken: string;
+        isSignupFlow?: boolean;
+        signupData?: {
+            name: string;
+            age: string;
+        };
+    };
 };
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();

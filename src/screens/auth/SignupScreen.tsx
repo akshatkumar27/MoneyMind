@@ -15,20 +15,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { Logo, Input, Button, FooterLinks, AnimatedMascot } from '../../components';
 import { colors, typography, spacing, API_BASE_URL } from '../../constants';
-
-type AuthStackParamList = {
-    Login: undefined;
-    Signup: undefined;
-    OTPVerification: {
-        email: string;
-        otpToken: string;
-        isSignupFlow?: boolean;
-        signupData?: {
-            name: string;
-            age: string;
-        };
-    };
-};
+import { AuthStackParamList } from '../../navigation/AuthNavigator';
 
 type SignupScreenNavigationProp = NativeStackNavigationProp<AuthStackParamList, 'Signup'>;
 
@@ -90,8 +77,8 @@ export const SignupScreen: React.FC = () => {
             setAgeError('You must be at least 18 years old');
             return false;
         }
-        if (ageNum > 120) {
-            setAgeError('Please enter a valid age');
+        if (ageNum > 90) {
+            setAgeError('Age must not be more than 90');
             return false;
         }
         setAgeError('');
@@ -242,7 +229,8 @@ export const SignupScreen: React.FC = () => {
 
                     {/* Mascot at the bottom */}
                     <View style={styles.mascotContainer}>
-                        <AnimatedMascot text="Let's get you started! 🎉" />
+                        <AnimatedMascot text="Let's get you started! 🎉" arrowTopRatio={0.15} mascotWidth={100} customTooltipStyle={{ marginTop: 30 }}
+                         mascotHeight={160} />
                     </View>
 
                     <View style={styles.footer}>

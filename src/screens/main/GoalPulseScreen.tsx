@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
     View,
     Text,
@@ -9,19 +9,28 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     Image,
+    RefreshControl,
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Svg, { Circle } from 'react-native-svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
     Card,
     GoalCardWithSuggestion,
     ProgressBar,
-    SkeletonLoader,
+    AnimatedMascot,
+    MascotLoader,
 } from '../../components';
 import { colors, typography, spacing } from '../../constants';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
+import Toast from 'react-native-toast-message';
 import { api } from '../../services';
+import { formatNumber } from '../../utils/formatNumber';
+import { useCurrency } from '../../context/CurrencyContext';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { setFinancialData } from '../../store/slices/financialDataSlice';
+import { DeviceEventEmitter } from 'react-native';
 
 type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
@@ -52,6 +61,22 @@ interface GoalsResponse {
     goalBudget: GoalBudget;
     averageAchievement: number;
 }
+
+interface Insight {
+    title: string;
+    description: string;
+    amount: number;
+    target_months: number;
+}
+
+// Extract emoji + text from insight title
+const parseInsightTitle = (title: string) => {
+    const emojiMatch = title.match(/^(\p{Emoji}+)\s*/u);
+    if (emojiMatch) {
+        return { icon: emojiMatch[1], text: title.replace(emojiMatch[0], '').trim() };
+    }
+    return { icon: '🎯', text: title };
+};
 
 // Circular Progress Component using SVG
 interface CircularProgressProps {
@@ -128,33 +153,117 @@ const circularStyles = StyleSheet.create({
 
 export const GoalPulseScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
+    const dispatch = useAppDispatch();
+    const financialData = useAppSelector(state => state.financialData);
     const [goals, setGoals] = useState<Goal[]>([]);
     const [averageAchievement, setAverageAchievement] = useState(0);
     const [goalBudget, setGoalBudget] = useState<GoalBudget | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [insights, setInsights] = useState<Insight[]>([]);
+    const [insightsLoading, setInsightsLoading] = useState(false);
+    const [onboardingInvestment, setOnboardingInvestment] = useState(0);
+    const { currencySymbol } = useCurrency();
 
-    useFocusEffect(
-        useCallback(() => {
-            fetchGoals();
-        }, [])
-    );
+    useEffect(() => {
+        const fetchData = async () => {
+            const profileData = await checkAndFetchFinancialProfile();
+            await fetchGoals();
+            await fetchInsights(profileData);
+            console.log('goalsd');
+        };
+        fetchData();
 
-    const fetchGoals = async () => {
+        const subscription = DeviceEventEmitter.addListener('refreshGoals', () => {
+            fetchData();
+        });
+
+        return () => {
+            subscription.remove();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const checkAndFetchFinancialProfile = async () => {
+        const hasData = financialData.monthlyIncome > 0 || financialData.monthlyExpenses > 0 || financialData.monthlyEmi > 0 || financialData.monthlyInvestment > 0 || financialData.emiOutstanding > 0;
+        console.log('hasData-->', hasData);
+        if (!hasData) {
+            try {
+                const response = await api.get('/api/user/financial-profile');
+                if (response.data?.success) {
+                    console.log('newProfileData tot-->', response.data);
+
+                    const profile = response.data.profile;
+                    console.log('profile-->', profile);
+                    const newProfileData = {
+                        monthlyIncome: profile.monthly_income || 0,
+                        monthlyExpenses: profile.monthly_expenses || 0,
+                        monthlyEmi: profile.monthly_emi || 0,
+                        emiOutstanding: profile.emi_outstanding || 0,
+                        monthlyInvestment: profile.monthly_savings || 0,
+                    };
+                    console.log('newProfileData-->', newProfileData);
+                    dispatch(setFinancialData({
+                        ...newProfileData,
+                        isFinancialProfilePresent: true,
+                    }));
+
+                    return newProfileData;
+                }
+            } catch (error) {
+                console.error('Failed to fetch financial profile:', error);
+            }
+        }
+        return financialData;
+    };
+
+    const fetchGoals = async (showLoader = true) => {
         try {
-            setIsLoading(true);
+            if (showLoader) setIsLoading(true);
             const response = await api.get<GoalsResponse>('/api/goals');
             if (response.data.success) {
                 setGoals(response.data.goals);
                 setAverageAchievement(response.data.averageAchievement);
                 setGoalBudget(response.data.goalBudget);
-                console.log(response.data);
+                console.log('goalBudget->', response.data.goalBudget);
             }
         } catch (error) {
             console.error('Failed to fetch goals:', error);
         } finally {
-            setIsLoading(false);
+            if (showLoader) setIsLoading(false);
         }
     };
+
+    const fetchInsights = async (profileData: any) => {
+        try {
+            setInsightsLoading(true);
+            setOnboardingInvestment(goalBudget ? goalBudget.availableForNewGoals : onboardingInvestment || 0);
+            const payload = {
+                monthly_income: profileData.monthlyIncome || 0,
+                monthly_expenses: profileData.monthlyExpenses || 0,
+                monthly_emi: profileData.monthlyEmi || 0,
+                emi_outstanding: profileData.emiOutstanding || 0,
+                monthly_investment: profileData.monthlyInvestment || 0,
+            };
+            const res = await api.post('/api/insights', payload);
+            console.log('Insights response:', res.data);
+            if (res.data.insights) {
+                setInsights(res.data.insights);
+            }
+        } catch (error) {
+            console.error('Insights fetch error:', error);
+        } finally {
+            setInsightsLoading(false);
+        }
+    };
+
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        await fetchGoals(false);
+        setRefreshing(false);
+    }, []);
+
+    const availableBudget = goalBudget ? goalBudget.availableForNewGoals : 0;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -190,82 +299,54 @@ export const GoalPulseScreen: React.FC = () => {
             </View>
 
             {isLoading ? (
-                <View style={styles.content}>
-                    {/* Skeleton for Pulse Card */}
-                    <View style={styles.pulseCard}>
-                        <View style={styles.pulseCardGradient}>
-                            <SkeletonLoader width={200} height={32} style={{ marginBottom: 8 }} />
-                            <SkeletonLoader width={150} height={16} style={{ marginBottom: 24 }} />
-
-                            <View style={styles.pulseScoreContainer}>
-                                <SkeletonLoader width={160} height={160} borderRadius={80} />
-                            </View>
-
-                            <SkeletonLoader width={250} height={20} />
-                        </View>
-                    </View>
-
-                    {/* Skeleton for Goals Section */}
-                    <View style={styles.goalsSection}>
-                        <View style={styles.sectionHeader}>
-                            <SkeletonLoader width={120} height={24} />
-                        </View>
-
-                        {/* 3 Skeleton Goal Cards */}
-                        {[1, 2, 3].map((key) => (
-                            <View key={key} style={[styles.combinedCard, { padding: 16, marginBottom: 16 }]}>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 }}>
-                                    <SkeletonLoader width={150} height={24} />
-                                    <SkeletonLoader width={50} height={24} />
-                                </View>
-                                <SkeletonLoader width={100} height={16} style={{ marginBottom: 16 }} />
-                                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
-                                    <SkeletonLoader width="100%" height={8} />
-                                </View>
-                                <SkeletonLoader width="100%" height={60} borderRadius={8} />
-                            </View>
-                        ))}
-                    </View>
+                <View style={[styles.content, { justifyContent: 'center', alignItems: 'center', paddingBottom: 100 }]}>
+                    <MascotLoader size={140} />
                 </View>
             ) : (
-                <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-                    {/* Monthly Pulse Score - Premium Card */}
-                    <View style={styles.pulseCard}>
-                        <View style={styles.pulseCardGradient}>
-                            <Text style={styles.pulseCardTitle}>Monthly Progress Score</Text>
-                            <Text style={styles.pulseCardSubtitle}>Your overall goal achievement</Text>
+                <ScrollView
+                    style={styles.content}
+                    showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+                    }
+                >
+                    {/* Monthly Pulse Score - only show when there are goals */}
+                    {goals.length > 0 && (
+                        <View style={styles.pulseCard}>
+                            <View style={styles.pulseCardGradient}>
+                                <Text style={styles.pulseCardTitle}>Monthly Progress Score</Text>
+                                <Text style={styles.pulseCardSubtitle}>Your overall goal achievement</Text>
 
-                            <View style={styles.pulseScoreContainer}>
-                                <View style={styles.glowEffect} />
-                                <CircularProgress progress={averageAchievement} size={160} strokeWidth={14} />
+                                <View style={styles.pulseScoreContainer}>
+                                    <View style={styles.glowEffect} />
+                                    <CircularProgress progress={averageAchievement} size={160} strokeWidth={14} />
+                                </View>
+
+                                <Text style={styles.encourageText}>
+                                    {averageAchievement >= 75 ? '🚀 Outstanding progress! Keep it up!' :
+                                        averageAchievement >= 50 ? '💪 Great job! You\'re on track!' :
+                                            averageAchievement >= 25 ? '📈 Good start! Keep pushing!' :
+                                                '🌱 Start your journey to financial freedom!'}
+                                </Text>
+                            </View>
+                        </View>
+                    )}
+
+                    {/* Financial Goals — only shown when goals exist */}
+                    {goals.length > 0 && (
+                        <View style={styles.goalsSection}>
+                            <View style={styles.sectionHeader}>
+                                <Text style={styles.sectionTitle}>💵 Financial Goals</Text>
                             </View>
 
-                            <Text style={styles.encourageText}>
-                                {averageAchievement >= 75 ? '🚀 Outstanding progress! Keep it up!' :
-                                    averageAchievement >= 50 ? '💪 Great job! You\'re on track!' :
-                                        averageAchievement >= 25 ? '📈 Good start! Keep pushing!' :
-                                            '🌱 Start your journey to financial freedom!'}
-                            </Text>
-                        </View>
-                    </View>
-
-                    {/* Financial Goals */}
-                    <View style={styles.goalsSection}>
-                        <View style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>Financial Goals</Text>
-                        </View>
-
-                        {goals.length === 0 ? (
-                            <View style={styles.emptyState}>
-                                <Text style={styles.emptyStateText}>No goals yet. Tap + to add one!</Text>
-                            </View>
-                        ) : (
-                            goals.map((goal) => (
+                            {goals.map((goal) => (
                                 <GoalCardWithSuggestion
                                     key={goal.id}
                                     title={goal.name}
                                     progress={goal.progress}
                                     achieveInMonths={goal.achieve_in_months}
+                                    targetAmount={typeof goal.target_amount === 'string' ? parseFloat(goal.target_amount) : goal.target_amount}
+                                    savedAmount={goal.saved_amount}
                                     color="#22c55e"
                                     suggestionTitle="AI suggestions"
                                     suggestionDescription="Track your progress and stay on target for this goal."
@@ -278,31 +359,123 @@ export const GoalPulseScreen: React.FC = () => {
                                         goalCreatedAt: goal.created_at,
                                     })}
                                     onEditPress={() => navigation.navigate('EditGoal', {
+                                        goalId: goal.id,
                                         name: goal.name,
                                         target: goal.target_amount,
                                         achieveIn: goal.achieve_in_months,
                                         monthlyContribution: goal.monthly_contribution,
+                                        savedAmount: goal.saved_amount,
+                                        availableForNewGoals: goalBudget?.availableForNewGoals,
                                     })}
                                     onAskAiPress={() => navigation.navigate('GoalChat', {
                                         goalTitle: goal.name,
                                         initialSuggestion: 'How can I achieve this goal faster?',
                                     })}
                                 />
-                            ))
-                        )}
-                    </View>
+                            ))}
+                        </View>
+                    )}
+
+                    {/* AI Suggested Goals — only when budget available */}
+                    {availableBudget > 0 && (
+                        <View style={styles.suggestionsSection}>
+                            <View style={[styles.sectionHeader, { paddingHorizontal: spacing.lg }]}>
+                                <Text style={styles.sectionTitle}>✨ AI Suggested Goals</Text>
+                                <Text style={styles.budgetBadge}>
+                                    {currencySymbol}{formatNumber(availableBudget, 1)} available for goals
+                                </Text>
+                            </View>
+
+                            {insightsLoading ? (
+                                <ScrollView
+                                    horizontal
+                                    showsHorizontalScrollIndicator={false}
+                                    contentContainerStyle={styles.suggestionsContent}
+                                >
+                                    {[1, 2].map(k => (
+                                        <View key={k} style={styles.suggestionCard}>
+                                            <ActivityIndicator size="small" color={colors.primary} style={{ marginVertical: 20 }} />
+                                        </View>
+                                    ))}
+                                </ScrollView>
+                            ) : insights.length > 0 ? (
+                                <ScrollView
+                                    horizontal
+                                    showsHorizontalScrollIndicator={false}
+                                    contentContainerStyle={styles.suggestionsContent}
+                                >
+                                    {insights.map((insight, idx) => {
+                                        const { icon, text } = parseInsightTitle(insight.title);
+                                        return (
+                                            <View key={idx} style={styles.suggestionCard}>
+                                                <Text style={styles.suggestionIcon}>{icon}</Text>
+                                                <Text style={styles.suggestionName} numberOfLines={2}>{text}</Text>
+                                                <Text style={styles.suggestionAmount}>
+                                                    {currencySymbol}{insight.amount.toLocaleString()}
+                                                </Text>
+                                                <Text style={styles.suggestionMonths}>
+                                                    {insight.target_months} months
+                                                </Text>
+                                                <Text style={styles.suggestionDesc} numberOfLines={2}>
+                                                    {insight.description}
+                                                </Text>
+                                                <TouchableOpacity
+                                                    style={styles.suggestionAddBtn}
+                                                    onPress={() => navigation.navigate('AddGoal', {
+                                                        availableForNewGoals: availableBudget,
+                                                        suggestionName: text,
+                                                        suggestionTarget: insight.amount,
+                                                        suggestionMonths: insight.target_months,
+                                                        suggestionDescription: insight.description,
+                                                    })}
+                                                >
+                                                    <Text style={styles.suggestionAddBtnText}>+ Add Goal</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        );
+                                    })}
+                                </ScrollView>
+                            ) : null}
+                        </View>
+                    )}
+
+                    {/* Empty State when no goals exist */}
+                    {goals.length === 0 && (
+                        <View style={styles.emptyStateContainer}>
+                            <Image
+                                source={require('../../asset/happymascot.png')}
+                                style={styles.emptyStateMascot}
+                            />
+                            <Text style={styles.emptyStateTitle}>Hi, I'm Fino! 👋</Text>
+                            <Text style={styles.emptyStateDesc}>
+                                You haven't added any goals yet. Start your financial journey by adding a goal from the + button below or pick one from our suggestions.
+                            </Text>
+                        </View>
+                    )}
                 </ScrollView>
             )}
 
             {/* FAB */}
-            <TouchableOpacity
-                style={styles.fab}
-                onPress={() => navigation.navigate('AddGoal', {
-                    availableForNewGoals: goalBudget?.availableForNewGoals
-                })}
-            >
-                <Text style={styles.fabText}>+</Text>
-            </TouchableOpacity>
+            {
+                <TouchableOpacity
+                    style={styles.fab}
+                    onPress={() => {
+                        if (availableBudget > 0) {
+                            navigation.navigate('AddGoal', {
+                                availableForNewGoals: availableBudget
+                            });
+                        } else {
+                            Toast.show({
+                                type: 'error',
+                                text1: 'No Budget Available',
+                                text2: 'No more money is left to create a new goal.',
+                            });
+                        }
+                    }}
+                >
+                    <Text style={styles.fabText}>+</Text>
+                </TouchableOpacity>
+            }
         </SafeAreaView>
     );
 };
@@ -397,7 +570,6 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        paddingHorizontal: spacing.lg,
     },
     smartSaveCard: {
         backgroundColor: '#1a3a5c',
@@ -467,6 +639,7 @@ const styles = StyleSheet.create({
     },
     pulseCard: {
         marginBottom: spacing.xl,
+        marginHorizontal: spacing.lg,
         borderRadius: 20,
         overflow: 'hidden',
     },
@@ -524,6 +697,7 @@ const styles = StyleSheet.create({
         color: colors.textPrimary,
         fontSize: typography.body,
         fontWeight: typography.semibold,
+        marginTop: spacing.md,
     },
     changePositive: {
         color: '#22c55e',
@@ -567,6 +741,7 @@ const styles = StyleSheet.create({
     },
     goalsSection: {
         marginBottom: spacing.xxl,
+        paddingHorizontal: spacing.lg,
     },
     analyticsLink: {
         color: colors.primary,
@@ -615,6 +790,32 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         marginBottom: spacing.md,
     },
+    emptyStateContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: spacing.xl,
+        // paddingTop: spacing.xl,
+        paddingBottom: spacing.xl,
+    },
+    emptyStateMascot: {
+        width: 140,
+        height: 140,
+        // marginBottom: spacing.lg,
+        resizeMode: 'contain',
+    },
+    emptyStateTitle: {
+        color: colors.textPrimary,
+        fontSize: typography.h2,
+        fontWeight: typography.bold,
+        marginBottom: spacing.sm,
+        textAlign: 'center',
+    },
+    emptyStateDesc: {
+        color: colors.textSecondary,
+        fontSize: typography.body,
+        textAlign: 'center',
+        lineHeight: 24,
+    },
     emptyState: {
         backgroundColor: colors.cardBackground,
         borderRadius: 12,
@@ -626,4 +827,77 @@ const styles = StyleSheet.create({
         fontSize: typography.body,
         textAlign: 'center',
     },
+    // AI Suggestions
+    suggestionsSection: {
+        marginBottom: spacing.xxl,
+    },
+    suggestionsContent: {
+        paddingHorizontal: spacing.lg,
+        paddingBottom: spacing.sm,
+    },
+    suggestionsScroll: {
+        marginTop: spacing.sm,
+    },
+    budgetBadge: {
+        color: '#22c55e',
+        fontSize: typography.caption,
+        fontWeight: typography.semibold,
+        backgroundColor: 'rgba(34,197,94,0.12)',
+        paddingHorizontal: spacing.sm,
+        paddingVertical: 3,
+        borderRadius: 20,
+        overflow: 'hidden',
+        marginTop: spacing.md,
+        marginBottom: spacing.xs,
+    },
+    suggestionCard: {
+        width: 180,
+        backgroundColor: colors.cardBackground,
+        borderRadius: 16,
+        padding: spacing.md,
+        marginRight: spacing.md,
+        borderWidth: 1,
+        borderColor: colors.primary + '30',
+    },
+    suggestionIcon: {
+        fontSize: 28,
+        marginBottom: spacing.sm,
+    },
+    suggestionName: {
+        color: colors.textPrimary,
+        fontSize: typography.body,
+        fontWeight: typography.semibold,
+        marginBottom: spacing.xs,
+        lineHeight: 20,
+    },
+    suggestionAmount: {
+        color: colors.primary,
+        fontSize: typography.h3,
+        fontWeight: typography.bold,
+        marginBottom: 2,
+    },
+    suggestionMonths: {
+        color: colors.textMuted,
+        fontSize: typography.caption,
+        marginBottom: spacing.sm,
+    },
+    suggestionDesc: {
+        color: colors.textSecondary,
+        fontSize: typography.caption,
+        lineHeight: 16,
+        marginBottom: spacing.md,
+        flex: 1,
+    },
+    suggestionAddBtn: {
+        backgroundColor: colors.primary,
+        borderRadius: 8,
+        paddingVertical: spacing.sm,
+        alignItems: 'center',
+    },
+    suggestionAddBtnText: {
+        color: '#fff',
+        fontSize: typography.bodySmall,
+        fontWeight: typography.semibold,
+    },
 });
+

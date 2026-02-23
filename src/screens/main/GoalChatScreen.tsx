@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -6,11 +6,16 @@ import {
     SafeAreaView,
     StatusBar,
     TouchableOpacity,
+    ActivityIndicator,
+    Alert,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Toast from 'react-native-toast-message';
 import { colors, typography, spacing } from '../../constants';
+import { Header } from '../../components';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
+import { api } from '../../services';
 
 type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
 type GoalChatRouteProp = RouteProp<MainStackParamList, 'GoalChat'>;
@@ -20,21 +25,57 @@ export const GoalChatScreen: React.FC = () => {
     const route = useRoute<GoalChatRouteProp>();
     const goalTitle = route.params?.goalTitle || 'Goal Chat';
 
+    const [isLoading, setIsLoading] = useState(false);
+    const [joined, setJoined] = useState(false);
+
+    const handleJoinWaitlist = async () => {
+        setIsLoading(true);
+        try {
+            const response = await api.post('/api/waitlist/join', {
+                feature: 'ai_goals',
+            });
+
+            if (response.data.success) {
+                setJoined(true);
+                Toast.show({
+                    type: 'success',
+                    text1: 'You\'re on the list!',
+                    text2: 'We\'ll notify you when AI Goals are available.',
+                });
+            } else {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Something went wrong',
+                    text2: response.data.message || 'Please try again later.',
+                });
+            }
+        } catch (error: any) {
+            console.error('Failed to join waitlist:', error);
+            if (error.response && error.response.status === 409) {
+                setJoined(true);
+                Toast.show({
+                    type: 'info',
+                    text1: 'Already Joined',
+                    text2: 'You have already joined the waitlist!',
+                });
+            } else {
+                Toast.show({
+                    type: 'error',
+                    text1: 'Connection Error',
+                    text2: 'Please check your internet connection.',
+                });
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
             {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => navigation.goBack()}
-                >
-                    <Text style={styles.backButtonText}>{'<'}</Text>
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>{goalTitle}</Text>
-                <View style={styles.headerSpacer} />
-            </View>
+            <Header title={goalTitle} />
 
             {/* Coming Soon Content */}
             <View style={styles.content}>
@@ -47,7 +88,27 @@ export const GoalChatScreen: React.FC = () => {
                 </Text>
                 <View style={styles.featureList}>
                     <Text style={styles.featureItem}>✨ Personalized advice</Text>
+                    <Text style={styles.featureItem}>📊 Smart goal tracking</Text>
+                    <Text style={styles.featureItem}>💡 Investment insights</Text>
                 </View>
+
+                {joined ? (
+                    <View style={styles.joinedContainer}>
+                        <Text style={styles.joinedText}>You're on the list! 🚀</Text>
+                    </View>
+                ) : (
+                    <TouchableOpacity
+                        style={[styles.button, isLoading && styles.disabledButton]}
+                        onPress={handleJoinWaitlist}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <ActivityIndicator color={colors.textPrimary} />
+                        ) : (
+                            <Text style={styles.buttonText}>Join Waitlist</Text>
+                        )}
+                    </TouchableOpacity>
+                )}
             </View>
         </SafeAreaView>
     );
@@ -122,11 +183,43 @@ const styles = StyleSheet.create({
     },
     featureList: {
         alignItems: 'flex-start',
+        marginBottom: spacing.xl,
     },
     featureItem: {
         color: colors.textSecondary,
         fontSize: typography.body,
         marginBottom: spacing.sm,
+    },
+    button: {
+        backgroundColor: colors.primary,
+        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.xl,
+        borderRadius: 12,
+        width: '100%',
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: colors.textPrimary,
+        fontSize: typography.body,
+        fontWeight: typography.semibold,
+    },
+    joinedContainer: {
+        backgroundColor: colors.cardBackground,
+        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.xl,
+        borderRadius: 12,
+        width: '100%',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: colors.primary,
+    },
+    joinedText: {
+        color: colors.primary,
+        fontSize: typography.body,
+        fontWeight: typography.semibold,
+    },
+    disabledButton: {
+        opacity: 0.7,
     },
 });
 

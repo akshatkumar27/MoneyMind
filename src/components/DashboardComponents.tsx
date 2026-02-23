@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle, TouchableOpacity } from 'react-native';
 import { colors, typography, spacing } from '../constants';
+import { useCurrency } from '../context/CurrencyContext';
 
 interface CardProps {
     children: React.ReactNode;
@@ -146,6 +147,8 @@ interface GoalCardWithSuggestionProps {
     suggestionDescription?: string;
     suggestionHighlight?: string;
     achieveInMonths?: number;
+    targetAmount?: number;
+    savedAmount?: number;
     onEditPress?: () => void;
     onAskAiPress?: () => void;
     onCardPress?: () => void;
@@ -158,10 +161,26 @@ export const GoalCardWithSuggestion: React.FC<GoalCardWithSuggestionProps> = ({
     suggestionTitle,
     suggestionDescription,
     achieveInMonths,
+    targetAmount,
+    savedAmount,
     onEditPress,
     onAskAiPress,
     onCardPress,
 }) => {
+    const { currencySymbol } = useCurrency();
+    const formatCurrency = (amount: number) => {
+        if (amount >= 1000000000) {
+            return currencySymbol + (amount / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+        }
+        if (amount >= 1000000) {
+            return currencySymbol + (amount / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+        }
+        if (amount >= 1000) {
+            return currencySymbol + (amount / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+        }
+        return currencySymbol + amount.toString();
+    };
+
     return (
         <TouchableOpacity
             style={styles.combinedCard}
@@ -179,10 +198,18 @@ export const GoalCardWithSuggestion: React.FC<GoalCardWithSuggestionProps> = ({
                 </TouchableOpacity>
             </View>
 
-            {/* Timeline */}
-            {achieveInMonths !== undefined && (
-                <Text style={styles.achieveInText}>achieve in {achieveInMonths} months</Text>
-            )}
+            {/* Timeline and Amount */}
+            <View style={{ marginBottom: spacing.sm }}>
+                {targetAmount !== undefined && (
+                    <Text style={styles.goalAmountText}>
+                        {savedAmount !== undefined ? `${formatCurrency(savedAmount)} / ` : ''}
+                        {formatCurrency(targetAmount)}
+                    </Text>
+                )}
+                {achieveInMonths !== undefined && (
+                    <Text style={styles.achieveInText}>Achieve in {achieveInMonths} months</Text>
+                )}
+            </View>
 
             {/* Progress Bar with Percentage */}
             <View style={styles.progressRow}>
@@ -207,7 +234,7 @@ export const GoalCardWithSuggestion: React.FC<GoalCardWithSuggestionProps> = ({
                 e.stopPropagation?.();
                 onAskAiPress?.();
             }}>
-                <Text style={styles.askAiButtonText}>Ask Ai about your goal</Text>
+                <Text style={styles.askAiButtonText}>Ask AI about your goal</Text>
             </TouchableOpacity>
         </TouchableOpacity>
     );
@@ -614,7 +641,13 @@ const styles = StyleSheet.create({
     achieveInText: {
         color: colors.textSecondary,
         fontSize: typography.caption,
-        marginBottom: spacing.md,
+        marginBottom: 2,
+    },
+    goalAmountText: {
+        color: colors.textPrimary,
+        fontSize: typography.body,
+        fontWeight: typography.bold,
+        marginBottom: 2,
     },
     progressRow: {
         flexDirection: 'row',

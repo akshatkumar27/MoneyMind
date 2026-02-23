@@ -56,12 +56,12 @@ const styles = StyleSheet.create({
     mascotContainer: {
         marginRight: spacing.md,
         backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        borderRadius: 20,
-        padding: 4,
+        borderRadius: 30,
+        padding: 6,
     },
     mascot: {
-        width: 40,
-        height: 40,
+        width: 60,
+        height: 60,
     },
     textContainer: {
         flex: 1,

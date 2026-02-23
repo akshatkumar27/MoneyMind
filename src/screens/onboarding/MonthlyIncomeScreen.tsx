@@ -10,34 +10,33 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { BackButton, Button, AnimatedMascot } from '../../components';
+import { BackButton, Button, AnimatedMascot, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
 import { formatNumberInput } from '../../utils/formatNumber';
 
-type OnboardingStackParamList = {
-    MonthlyIncome: undefined;
-    MonthlyExpenses: undefined;
-    MonthlyEMI: undefined;
-    EMIOutstanding: undefined;
-    MonthlyInvestment: undefined;
-    GoalSelection: undefined;
-};
+import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useCurrency } from '../../context/CurrencyContext';
 
 type NavigationProp = NativeStackNavigationProp<OnboardingStackParamList>;
 
 export const MonthlyIncomeScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const [amount, setAmount] = useState('');
+    const { currencySymbol } = useCurrency();
+
+    // React.useEffect(() => {
+    //     const saveStatus = async () => {
+    //         await AsyncStorage.setItem('onboardingStatus', 'MonthlyIncome');
+    //     };
+    //     saveStatus();
+    // }, []);
 
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
-            <View style={styles.header}>
-                <BackButton onPress={() => navigation.goBack()} />
-                <Text style={styles.stepIndicator}>Step 1 of 5</Text>
-                <View style={styles.headerRight} />
-            </View>
+            <Header title="Step 1 of 5" titleStyle={styles.stepIndicator} />
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 <View style={styles.progressSection}>
@@ -55,7 +54,7 @@ export const MonthlyIncomeScreen: React.FC = () => {
                 <Text style={styles.title}>What is your monthly income?</Text>
 
                 <View style={styles.inputContainer}>
-                    <Text style={styles.currencySymbol}>₹</Text>
+                    <Text style={styles.currencySymbol}>{currencySymbol}</Text>
                     <TextInput
                         style={styles.amountInput}
                         value={amount}
@@ -78,7 +77,7 @@ export const MonthlyIncomeScreen: React.FC = () => {
                     onPress={() => navigation.navigate('MonthlyExpenses', {
                         onboardingData: { monthly_income: parseInt(amount.replace(/,/g, '')) || 0 }
                     })}
-                    disabled={!amount.trim()}
+                    disabled={!amount.trim() || parseInt(amount.replace(/,/g, '')) <= 0}
                 />
             </View>
         </SafeAreaView>
@@ -172,8 +171,9 @@ const styles = StyleSheet.create({
         color: colors.textPrimary,
         fontSize: 48,
         fontWeight: typography.bold,
-        minWidth: 200,
-        textAlign: 'center',
+        minWidth: 20,
+        maxWidth: 280,
+        textAlign: 'left',
         borderBottomWidth: 2,
         borderBottomColor: colors.primary,
         paddingBottom: spacing.sm,

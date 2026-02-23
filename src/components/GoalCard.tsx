@@ -9,6 +9,7 @@ interface GoalCardProps {
     selected: boolean;
     onPress: () => void;
     style?: ViewStyle;
+    highlightedAmount?: string;
 }
 
 export const GoalCard: React.FC<GoalCardProps> = ({
@@ -18,6 +19,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({
     selected,
     onPress,
     style,
+    highlightedAmount,
 }) => {
     return (
         <TouchableOpacity
@@ -29,7 +31,14 @@ export const GoalCard: React.FC<GoalCardProps> = ({
                 <Text style={styles.icon}>{icon}</Text>
             </View>
             <View style={styles.content}>
-                <Text style={[styles.title, selected && styles.titleSelected]}>{title}</Text>
+                <View style={styles.headerRow}>
+                    <Text style={[styles.title, selected && styles.titleSelected]}>{title}</Text>
+                    {highlightedAmount && (
+                        <View style={styles.amountBadge}>
+                            <Text style={styles.amountText}>{highlightedAmount}</Text>
+                        </View>
+                    )}
+                </View>
                 <Text style={styles.description}>{description}</Text>
             </View>
             {selected && (
@@ -75,10 +84,30 @@ const styles = StyleSheet.create({
         color: colors.textPrimary,
         fontSize: typography.body,
         fontWeight: typography.semibold,
-        marginBottom: spacing.xs,
+        flex: 1,
+        marginRight: spacing.sm,
     },
     titleSelected: {
         color: colors.primary,
+    },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: spacing.xs,
+    },
+    amountBadge: {
+        backgroundColor: 'rgba(45, 127, 249, 0.1)',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: 'rgba(45, 127, 249, 0.2)',
+    },
+    amountText: {
+        color: colors.primary,
+        fontSize: typography.bodySmall,
+        fontWeight: typography.bold,
     },
     description: {
         color: colors.textSecondary,

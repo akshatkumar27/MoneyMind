@@ -7,10 +7,14 @@ import {
     StatusBar,
     ScrollView,
     Switch,
+    TouchableOpacity,
+    Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { BackButton } from '../../components';
+import { BackButton, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
+import { notificationService } from '../../services/NotificationService';
+import Toast from 'react-native-toast-message';
 
 export const NotificationSettingsScreen: React.FC = () => {
     const navigation = useNavigation();
@@ -25,7 +29,11 @@ export const NotificationSettingsScreen: React.FC = () => {
         security: true,
     });
 
-    const toggleSwitch = (key: keyof typeof settings) => {
+    const toggleSwitch = async (key: keyof typeof settings) => {
+        if (!settings[key]) {
+            // If turning on, ensure we have permissions
+            await notificationService.requestUserPermission();
+        }
         setSettings(prev => ({ ...prev, [key]: !prev[key] }));
     };
 
@@ -64,11 +72,7 @@ export const NotificationSettingsScreen: React.FC = () => {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
-            <View style={styles.header}>
-                <BackButton onPress={() => navigation.goBack()} />
-                <Text style={styles.headerTitle}>Notification Settings</Text>
-                <View style={styles.headerSpacer} />
-            </View>
+            <Header title="Notification Settings" />
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
 
@@ -141,6 +145,47 @@ export const NotificationSettingsScreen: React.FC = () => {
                 <Text style={styles.footerNote}>
                     Note: Critical security alerts may still be sent even if "Pause All" is enabled.
                 </Text>
+
+                {/* Test Notification Button */}
+                 {/* <TouchableOpacity
+                    style={styles.testButton}
+                    onPress={async () => {
+                        try {
+                            await notificationService.displayNotification(
+                                'Test Notification',
+                                'This is a test notification from Finova!'
+                            );
+                        } catch (error: any) {
+                            console.error('Notification Error:', error);
+                            Toast.show({
+                                type: 'error',
+                                text1: 'Notification Failed',
+                                text2: error.message || 'Check console for details',
+                            });
+                        }
+                    }}
+                >
+                    <Text style={styles.testButtonText}>Send Test Notification</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[styles.testButton, { marginTop: -spacing.xl, borderColor: colors.primary, backgroundColor: 'transparent' }]}
+                    onPress={async () => {
+                        const token = await notificationService.getFCMToken();
+                        if (token) {
+                            console.log('FCM Token:', token);
+                            Alert.alert('FCM Token', token);
+                        } else {
+                            Toast.show({
+                                type: 'error',
+                                text1: 'Token Error',
+                                text2: 'Could not retrieve token',
+                            });
+                        }
+                    }}
+                >
+                    <Text style={styles.testButtonText}>Get FCM Token</Text>
+                </TouchableOpacity>  */}
 
             </ScrollView>
         </SafeAreaView>
@@ -249,7 +294,22 @@ const styles = StyleSheet.create({
         fontSize: typography.caption,
         textAlign: 'center',
         marginTop: spacing.xl,
-        marginBottom: spacing.xxl,
+        marginBottom: spacing.xxl, // Increased for button
         paddingHorizontal: spacing.lg,
+    },
+    testButton: {
+        backgroundColor: colors.inputBackground,
+        marginHorizontal: spacing.lg,
+        paddingVertical: spacing.md,
+        borderRadius: 12,
+        alignItems: 'center',
+        marginBottom: spacing.xxl,
+        borderWidth: 1,
+        borderColor: colors.border,
+    },
+    testButtonText: {
+        color: colors.primary,
+        fontSize: typography.body,
+        fontWeight: typography.semibold,
     },
 });

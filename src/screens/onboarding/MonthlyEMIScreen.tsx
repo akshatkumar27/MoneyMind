@@ -10,11 +10,12 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { BackButton, Button, AnimatedMascot } from '../../components';
+import { BackButton, Button, AnimatedMascot, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { formatCurrency } from '../../utils';
 import { formatNumberInput } from '../../utils/formatNumber';
+import { useCurrency } from '../../context/CurrencyContext';
 
 type NavigationProp = NativeStackNavigationProp<OnboardingStackParamList>;
 type ScreenRouteProp = RouteProp<OnboardingStackParamList, 'MonthlyEMI'>;
@@ -23,6 +24,7 @@ export const MonthlyEMIScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const route = useRoute<ScreenRouteProp>();
     const [amount, setAmount] = useState('');
+    const { currencySymbol } = useCurrency();
     const onboardingData = route.params?.onboardingData || {};
 
     const monthlyIncome = onboardingData.monthly_income || 0;
@@ -30,18 +32,13 @@ export const MonthlyEMIScreen: React.FC = () => {
     const availableAmount = monthlyIncome - monthlyExpenses;
     const emiAmount = parseInt(amount.replace(/,/g, '')) || 0;
     const isExceedingAvailable = emiAmount > availableAmount;
-    // EMI can be 0 (no EMI), so only validate if amount is entered
-    const isValid = !isExceedingAvailable;
+    const isValid = amount.trim() !== '' && !isExceedingAvailable;
 
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
-            <View style={styles.header}>
-                <BackButton onPress={() => navigation.goBack()} />
-                <Text style={styles.stepIndicator}>Step 3 of 5</Text>
-                <View style={styles.headerRight} />
-            </View>
+            <Header title="Step 3 of 5" titleStyle={styles.stepIndicator} />
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 <View style={styles.progressSection}>
@@ -60,11 +57,11 @@ export const MonthlyEMIScreen: React.FC = () => {
 
                 {/* Available Amount Info */}
                 <Text style={styles.availableText}>
-                    Available after expenses: {formatCurrency(availableAmount)}
+                    Available after expenses: {formatCurrency(availableAmount, currencySymbol)}
                 </Text>
 
                 <View style={styles.inputContainer}>
-                    <Text style={styles.currencySymbol}>₹</Text>
+                    <Text style={styles.currencySymbol}>{currencySymbol}</Text>
                     <TextInput
                         style={[styles.amountInput, isExceedingAvailable && styles.inputError]}
                         value={amount}
@@ -78,7 +75,7 @@ export const MonthlyEMIScreen: React.FC = () => {
                 {/* Error Message */}
                 {isExceedingAvailable && (
                     <Text style={styles.errorText}>
-                        EMI cannot exceed available amount ({formatCurrency(availableAmount)})
+                        EMI cannot exceed available amount ({formatCurrency(availableAmount, currencySymbol)})
                     </Text>
                 )}
 
@@ -195,8 +192,9 @@ const styles = StyleSheet.create({
         color: colors.textPrimary,
         fontSize: 48,
         fontWeight: typography.bold as any,
-        minWidth: 200,
-        textAlign: 'center',
+        minWidth: 20,
+        maxWidth: 280,
+        textAlign: 'left',
         borderBottomWidth: 2,
         borderBottomColor: colors.primary,
         paddingBottom: spacing.sm,

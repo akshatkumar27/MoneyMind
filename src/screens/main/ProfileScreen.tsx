@@ -14,13 +14,17 @@ import { useNavigation, CommonActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackButton } from '../../components';
 import { colors, typography, spacing } from '../../constants';
+import { notificationService } from '../../services/NotificationService';
 import api from '../../services/api';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
+import { useAppDispatch } from '../../store/hooks';
+import { clearFinancialData } from '../../store/slices/financialDataSlice';
 
 type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
 export const ProfileScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
+    const dispatch = useAppDispatch();
     const [logoutModalVisible, setLogoutModalVisible] = useState(false);
     const [userName, setUserName] = useState('');
     const [userEmail, setUserEmail] = useState('');
@@ -45,6 +49,14 @@ export const ProfileScreen: React.FC = () => {
     const handleLogout = async () => {
         setLogoutModalVisible(false);
         try {
+            // Deregister FCM Token
+            const fcmToken = await notificationService.getFCMToken();
+            if (fcmToken) {
+                await api.delete('/api/notifications/unregister-token', {
+                    data: { fcm_token: fcmToken }
+                });
+            }
+
             // Call logout API
             await api.post('/api/auth/logout');
         } catch (error) {
@@ -56,6 +68,10 @@ export const ProfileScreen: React.FC = () => {
         } catch (error) {
             console.error('Error clearing local data:', error);
         }
+
+        // Clear global state
+        dispatch(clearFinancialData());
+
         // Reset navigation to Auth screen
         navigation.dispatch(
             CommonActions.reset({

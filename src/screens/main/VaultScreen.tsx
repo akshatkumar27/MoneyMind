@@ -15,9 +15,11 @@ import {
     AIInsightCard,
 } from '../../components';
 import { colors, typography, spacing } from '../../constants';
+import { useCurrency } from '../../context/CurrencyContext';
 
 export const VaultScreen: React.FC = () => {
     const [viewMode, setViewMode] = useState<'consolidated' | 'manual'>('consolidated');
+    const { currencySymbol } = useCurrency();
 
     return (
         <SafeAreaView style={styles.container}>
@@ -59,7 +61,7 @@ export const VaultScreen: React.FC = () => {
                 <View style={styles.balanceSection}>
                     <Text style={styles.balanceLabel}>TOTAL LIQUID BALANCE</Text>
                     <View style={styles.balanceRow}>
-                        <Text style={styles.rupeeSymbol}>₹</Text>
+                        <Text style={styles.rupeeSymbol}>{currencySymbol}</Text>
                         <Text style={styles.balanceValue}>12,45,600</Text>
                         <Text style={styles.balanceDecimal}>.{viewMode === 'consolidated' ? '42' : '00'}</Text>
                     </View>
@@ -69,13 +71,13 @@ export const VaultScreen: React.FC = () => {
                 <View style={styles.statsRow}>
                     {viewMode === 'consolidated' ? (
                         <>
-                            <StatCard label="AVAILABLE TO INVEST" value="₹4.2L" />
+                            <StatCard label="AVAILABLE TO INVEST" value={`${currencySymbol}4.2L`} />
                             <View style={styles.statGap} />
-                            <StatCard label="MONTHLY YIELD" value="₹8,420" valueColor="#f59e0b" />
+                            <StatCard label="MONTHLY YIELD" value={`${currencySymbol}8,420`} valueColor="#f59e0b" />
                         </>
                     ) : (
                         <>
-                            <StatCard label="MANUAL INPUT BASE" value="₹12.4L" />
+                            <StatCard label="MANUAL INPUT BASE" value={`${currencySymbol}12.4L`} />
                             <View style={styles.statGap} />
                             <View style={styles.lastUpdateBadge}>
                                 <Text style={styles.lastUpdateLabel}>LAST UPDATE</Text>
@@ -101,7 +103,7 @@ export const VaultScreen: React.FC = () => {
                             icon="🏦"
                             name={viewMode === 'consolidated' ? 'HDFC Bank' : 'Savings Account'}
                             subtitle={viewMode === 'consolidated' ? '•••• 5829' : 'UPDATED 2 DAYS AGO'}
-                            amount="₹8,24,500"
+                            amount={`${currencySymbol}8,24,500`}
                             badge={viewMode === 'consolidated' ? 'GPAY LINKED' : 'UPDATE'}
                             badgeColor={viewMode === 'consolidated' ? '#22c55e' : '#f59e0b'}
                         />
@@ -110,7 +112,7 @@ export const VaultScreen: React.FC = () => {
                             icon="💰"
                             name={viewMode === 'consolidated' ? 'ICICI Savings' : 'Cash in Hand'}
                             subtitle={viewMode === 'consolidated' ? '•••• 0042' : 'UPDATED 12 DAYS AGO'}
-                            amount={viewMode === 'consolidated' ? '₹3,12,000' : '₹12,000'}
+                            amount={viewMode === 'consolidated' ? `${currencySymbol}3,12,000` : `${currencySymbol}12,000`}
                             badge={viewMode === 'consolidated' ? 'LOW INTEREST' : 'UPDATE'}
                             badgeColor={viewMode === 'consolidated' ? '#ef4444' : '#f59e0b'}
                         />
@@ -119,7 +121,7 @@ export const VaultScreen: React.FC = () => {
                             icon="📱"
                             name={viewMode === 'consolidated' ? 'Paytm Wallet' : 'Digital Wallet'}
                             subtitle={viewMode === 'consolidated' ? 'Mobile Wallet' : 'UPDATED TODAY'}
-                            amount="₹9,100"
+                            amount={`${currencySymbol}9,100`}
                             badge={viewMode === 'consolidated' ? 'GPAY LINKED' : 'UPDATE'}
                             badgeColor={viewMode === 'consolidated' ? '#22c55e' : '#f59e0b'}
                         />
@@ -130,7 +132,7 @@ export const VaultScreen: React.FC = () => {
                 <View style={styles.spendsSection}>
                     <View style={styles.sectionHeader}>
                         <Text style={styles.sectionTitle}>Monthly Spends</Text>
-                        <Text style={styles.spendsAmount}>₹42,800</Text>
+                        <Text style={styles.spendsAmount}>{currencySymbol}42,800</Text>
                     </View>
                     <Text style={styles.spendsSubtitle}>
                         {viewMode === 'consolidated' ? 'Smart Categorization' : 'Based on manual entries'}

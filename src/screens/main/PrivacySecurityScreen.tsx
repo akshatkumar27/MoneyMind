@@ -8,7 +8,7 @@ import {
     ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { BackButton } from '../../components';
+import { BackButton, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
 
 export const PrivacySecurityScreen: React.FC = () => {
@@ -25,11 +25,7 @@ export const PrivacySecurityScreen: React.FC = () => {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
-            <View style={styles.header}>
-                <BackButton onPress={() => navigation.goBack()} />
-                <Text style={styles.headerTitle}>Privacy & Security</Text>
-                <View style={styles.headerSpacer} />
-            </View>
+            <Header title="Privacy & Security" />
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 <Text style={styles.mainDescription}>

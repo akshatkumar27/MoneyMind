@@ -11,11 +11,12 @@ export const colors = {
     // Text
     textPrimary: '#ffffff',
     textSecondary: '#8a8a9a',
-    textMuted: '#5a5a6a',
+    textMuted: '#cacadbff',
 
     // Borders
     border: '#2a2a3e',
     borderFocused: '#2d7ff9',
+    lightloder:"#aca7a7ff",
 
     // Misc
     link: '#2d7ff9',

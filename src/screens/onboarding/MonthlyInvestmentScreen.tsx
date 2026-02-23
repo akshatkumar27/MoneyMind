@@ -13,12 +13,13 @@ import Toast from 'react-native-toast-message';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BackButton, Button, AnimatedMascot } from '../../components';
+import { BackButton, Button, AnimatedMascot, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { api } from '../../services';
 import { formatCurrency } from '../../utils';
 import { formatNumberInput } from '../../utils/formatNumber';
+import { useCurrency } from '../../context/CurrencyContext';
 
 type NavigationProp = NativeStackNavigationProp<OnboardingStackParamList>;
 type ScreenRouteProp = RouteProp<OnboardingStackParamList, 'MonthlyInvestment'>;
@@ -28,6 +29,7 @@ export const MonthlyInvestmentScreen: React.FC = () => {
     const route = useRoute<ScreenRouteProp>();
     const [amount, setAmount] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const { currencySymbol } = useCurrency();
     const onboardingData = route.params?.onboardingData || {};
 
     const monthlyIncome = onboardingData.monthly_income || 0;
@@ -37,8 +39,7 @@ export const MonthlyInvestmentScreen: React.FC = () => {
 
     const investmentAmount = parseInt(amount.replace(/,/g, '')) || 0;
     const isExceedingAvailable = investmentAmount > availableAmount;
-    // Investment can be 0, so only validate if amount is entered and exceeds
-    const isValid = !isExceedingAvailable;
+    const isValid = amount.trim() !== '' && !isExceedingAvailable;
 
     const handleSubmit = async () => {
         setIsLoading(true);
@@ -50,22 +51,35 @@ export const MonthlyInvestmentScreen: React.FC = () => {
                 emi_outstanding: onboardingData.emi_outstanding || 0,
                 monthly_investment: investmentAmount,
             };
+            console.log('payload--', payload);
 
-            // Save onboarding data to AsyncStorage for later use
+            // Save onboarding data for use in Pulse screen suggestions
             await AsyncStorage.setItem('onboardingData', JSON.stringify(payload));
 
-            const res = await api.post('/api/insights', payload);
-            console.log(res.data, payload);
+            // Save financial profile to backend
+            const response = await api.post('/api/user/financial-profile', payload);
+            console.log('Financial profile saved:', response.data);
 
-            navigation.navigate('GoalSelection', {
-                onboardingData: { ...onboardingData, monthly_investment: investmentAmount }
+            // Mark onboarding as complete in local storage
+            const userStr = await AsyncStorage.getItem('user');
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                user.isNewUser = false;
+                await AsyncStorage.setItem('user', JSON.stringify(user));
+            }
+            // await AsyncStorage.setItem('onboardingStatus', 'COMPLETED');
+
+            // Go directly to the main app (Pulse screen)
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Main' as never }],
             });
         } catch (error) {
-            console.error('Onboarding API error:', error);
+            console.error('Onboarding submit error:', error);
             Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'Could not load your recommended monthly investment. Please try again.',
+                text2: 'Something went wrong. Please try again.',
             });
         } finally {
             setIsLoading(false);
@@ -76,11 +90,8 @@ export const MonthlyInvestmentScreen: React.FC = () => {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
-            <View style={styles.header}>
-                <BackButton onPress={() => navigation.goBack()} />
-                <Text style={styles.stepIndicator}>Step 5 of 5</Text>
-                <View style={styles.headerRight} />
-            </View>
+            <Header title="Step 5 of 5" titleStyle={styles.stepIndicator} />
+
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 <View style={styles.progressSection}>
@@ -103,11 +114,11 @@ export const MonthlyInvestmentScreen: React.FC = () => {
 
                 {/* Available Amount Info */}
                 <Text style={styles.availableText}>
-                    Available for savings: {formatCurrency(availableAmount)}
+                    Available for savings: {formatCurrency(availableAmount, currencySymbol)}
                 </Text>
 
                 <View style={styles.inputContainer}>
-                    <Text style={styles.currencySymbol}>₹</Text>
+                    <Text style={styles.currencySymbol}>{currencySymbol}</Text>
                     <TextInput
                         style={[styles.amountInput, isExceedingAvailable && styles.inputError]}
                         value={amount}
@@ -121,7 +132,7 @@ export const MonthlyInvestmentScreen: React.FC = () => {
                 {/* Error/Warning Message */}
                 {isExceedingAvailable && (
                     <Text style={styles.errorText}>
-                        Investment cannot exceed available amount ({formatCurrency(availableAmount)})
+                        Investment cannot exceed available amount ({formatCurrency(availableAmount, currencySymbol)})
                     </Text>
                 )}
             </ScrollView>
@@ -246,8 +257,9 @@ const styles = StyleSheet.create({
         color: colors.textPrimary,
         fontSize: 48,
         fontWeight: typography.bold as any,
-        minWidth: 200,
-        textAlign: 'center',
+        minWidth: 20,
+        maxWidth: 280,
+        textAlign: 'left',
         borderBottomWidth: 2,
         borderBottomColor: colors.primary,
         paddingBottom: spacing.sm,

@@ -8,13 +8,16 @@ import {
     Easing,
 } from 'react-native';
 import { colors, typography } from '../constants';
-import { ImageSourcePropType } from 'react-native';
+import { ImageSourcePropType, StyleProp, ViewStyle } from 'react-native';
 
 interface AnimatedMascotProps {
     text?: string;
     mascotImage?: ImageSourcePropType;
     mascotWidth?: number;
     mascotHeight?: number;
+    /** Fraction of mascotHeight where the arrow should point (0=top, 1=bottom). Default 0.40 targets Fino's mouth. */
+    arrowTopRatio?: number;
+    customTooltipStyle?: StyleProp<ViewStyle>;
 }
 
 export const AnimatedMascot: React.FC<AnimatedMascotProps> = ({
@@ -22,7 +25,11 @@ export const AnimatedMascot: React.FC<AnimatedMascotProps> = ({
     mascotImage,
     mascotWidth = 100,
     mascotHeight = 120,
+    arrowTopRatio = 0.40,
+    customTooltipStyle
 }) => {
+    // Arrow vertical position: points to Fino's mouth, proportional to current mascot height
+    const arrowTop = Math.round(mascotHeight * arrowTopRatio);
     const floatAnim = useRef(new Animated.Value(0)).current;
     const mascotSlideAnim = useRef(new Animated.Value(-150)).current;
     const tooltipOpacity = useRef(new Animated.Value(0)).current;
@@ -39,12 +46,12 @@ export const AnimatedMascot: React.FC<AnimatedMascotProps> = ({
                 useNativeDriver: true,
             }),
             // Small delay before tooltip appears
-            Animated.delay(200),
+            Animated.delay(100),
             // Step 2: Tooltip fades in with scale
             Animated.parallel([
                 Animated.timing(tooltipOpacity, {
                     toValue: 1,
-                    duration: 400,
+                    duration: 200,
                     useNativeDriver: true,
                 }),
                 Animated.spring(tooltipScale, {
@@ -114,11 +121,12 @@ export const AnimatedMascot: React.FC<AnimatedMascotProps> = ({
                         opacity: tooltipOpacity,
                         transform: [{ scale: tooltipScale }],
                     },
+                    customTooltipStyle
                 ]}
             >
-                {/* Arrow pointing to mascot */}
-                <View style={styles.tooltipArrow} />
-                <View style={styles.tooltipArrowInner} />
+                {/* Arrow pointing to mascot mouth — positioned at arrowTop px from top of tooltip */}
+                <View style={[styles.tooltipArrow, { top: arrowTop, marginTop: -10 }]} />
+                <View style={[styles.tooltipArrowInner, { top: arrowTop, marginTop: -8 }]} />
 
                 <View style={styles.tooltipBubble}>
                     <Text style={styles.tooltipText}>{text}</Text>
@@ -131,9 +139,9 @@ export const AnimatedMascot: React.FC<AnimatedMascotProps> = ({
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         paddingHorizontal: 16,
-        paddingVertical: 20,
+        paddingVertical: 12,
     },
     mascotContainer: {
         zIndex: 2,
@@ -146,12 +154,11 @@ const styles = StyleSheet.create({
         flex: 1,
         marginLeft: -10,
         position: 'relative',
+        paddingTop: 0,
     },
     tooltipArrow: {
         position: 'absolute',
         left: 0,
-        top: '20%',
-        marginTop: -10,
         width: 0,
         height: 0,
         borderTopWidth: 10,
@@ -165,8 +172,6 @@ const styles = StyleSheet.create({
     tooltipArrowInner: {
         position: 'absolute',
         left: 2,
-        top: '20%',
-        marginTop: -8,
         width: 0,
         height: 0,
         borderTopWidth: 8,

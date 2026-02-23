@@ -13,7 +13,7 @@ import {
     Linking,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { BackButton } from '../../components';
+import { BackButton, Header } from '../../components';
 import { colors, typography, spacing } from '../../constants';
 
 // Enable LayoutAnimation for Android
@@ -65,11 +65,7 @@ export const HelpSupportScreen: React.FC = () => {
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
-            <View style={styles.header}>
-                <BackButton onPress={() => navigation.goBack()} />
-                <Text style={styles.headerTitle}>Help & Support</Text>
-                <View style={styles.headerSpacer} />
-            </View>
+            <Header title="Help & Support" />
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 {/* Contact Section */}

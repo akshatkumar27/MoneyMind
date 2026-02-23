@@ -10,7 +10,8 @@ export * from './OnboardingComponents';
 export { AnimatedMascot } from './AnimatedMascot';
 export { SkeletonLoader } from './SkeletonLoader';
 export { ConfirmationModal } from './ConfirmationModal';
-
+export { MascotLoader } from './MascotLoader';
 
 
 export { toastConfig } from './CustomToast';
+export * from './Header';
