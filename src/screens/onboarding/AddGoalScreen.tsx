@@ -31,6 +31,7 @@ import {
 import {ENDPOINTS} from '../../constants/endpoints';
 import {api} from '../../services/api';
 import {formatCurrency} from '../../utils/formatNumber';
+import {STORAGE_KEYS} from '../../constants/storage';
 
 // Time duration options in months
 const DURATION_OPTIONS = [
@@ -200,16 +201,18 @@ export const AddGoalScreen: React.FC = () => {
 
       // Update local user data if this was part of onboarding
       try {
-        const userStr = await AsyncStorage.getItem('user');
+        const userStr = await AsyncStorage.getItem(STORAGE_KEYS.USER);
         console.log('Current user in storage (AddGoal):', userStr);
         if (userStr) {
           const user = JSON.parse(userStr);
           // Update checking: if new user, mark as not new
           if (user.isNewUser) {
             user.isNewUser = false;
-            await AsyncStorage.setItem('user', JSON.stringify(user));
+            await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
             // await AsyncStorage.setItem('onboardingStatus', 'COMPLETED');
-            await AsyncStorage.removeItem('onboarding_progress_data');
+            await AsyncStorage.removeItem(
+              STORAGE_KEYS.ONBOARDING_PROGRESS_DATA,
+            );
             console.log(
               'Updated user in storage (AddGoal):',
               JSON.stringify(user),

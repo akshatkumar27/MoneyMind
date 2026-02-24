@@ -24,6 +24,7 @@ import {AnimatedMascot} from '../../components/AnimatedMascot';
 import {colors, typography, spacing} from '../../constants/theme';
 import {ENDPOINTS} from '../../constants/endpoints';
 import {globalStyles} from '../../styles/globalStyles';
+import {STORAGE_KEYS} from '../../constants/storage';
 
 type AuthStackParamList = {
   Login: undefined;
@@ -81,7 +82,7 @@ export const LoginScreen: React.FC = () => {
 
       // Save status for resume capability
       // await AsyncStorage.setItem('onboardingStatus', 'OTP_VERIFICATION');
-      await AsyncStorage.setItem('temp_auth_email', email);
+      await AsyncStorage.setItem(STORAGE_KEYS.TEMP_AUTH_EMAIL, email);
 
       navigation.navigate('OTPVerification', {
         email,

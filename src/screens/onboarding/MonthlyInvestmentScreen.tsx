@@ -32,6 +32,7 @@ import {
 import {ENDPOINTS} from '../../constants/endpoints';
 import {api} from '../../services/api';
 import {formatCurrency} from '../../utils/formatNumber';
+import {STORAGE_KEYS} from '../../constants/storage';
 
 type NavigationProp = NativeStackNavigationProp<OnboardingStackParamList>;
 type ScreenRouteProp = RouteProp<OnboardingStackParamList, 'MonthlyInvestment'>;
@@ -84,7 +85,10 @@ export const MonthlyInvestmentScreen: React.FC = () => {
       console.log('payload--', payload);
 
       // Save onboarding data for use in Pulse screen suggestions
-      await AsyncStorage.setItem('onboardingData', JSON.stringify(payload));
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.ONBOARDING_DATA,
+        JSON.stringify(payload),
+      );
 
       // Save financial profile to backend
       const response = await api.post(
@@ -94,11 +98,11 @@ export const MonthlyInvestmentScreen: React.FC = () => {
       console.log('Financial profile saved:', response.data);
 
       // Mark onboarding as complete in local storage
-      const userStr = await AsyncStorage.getItem('user');
+      const userStr = await AsyncStorage.getItem(STORAGE_KEYS.USER);
       if (userStr) {
         const user = JSON.parse(userStr);
         user.isNewUser = false;
-        await AsyncStorage.setItem('user', JSON.stringify(user));
+        await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
       }
       // await AsyncStorage.setItem('onboardingStatus', 'COMPLETED');
 

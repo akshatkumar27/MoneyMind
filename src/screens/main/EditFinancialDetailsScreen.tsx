@@ -33,6 +33,7 @@ import {
 } from '../../constants/theme';
 import {ENDPOINTS} from '../../constants/endpoints';
 import {globalStyles} from '../../styles/globalStyles';
+import {STORAGE_KEYS} from '../../constants/storage';
 
 export const EditFinancialDetailsScreen: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -170,7 +171,7 @@ export const EditFinancialDetailsScreen: React.FC = () => {
       // First get existing to preserve other fields if any (though currently we have full object)
       // But let's overwrite for safety if format matches
       await AsyncStorage.setItem(
-        'onboardingData',
+        STORAGE_KEYS.ONBOARDING_DATA,
         JSON.stringify(updatedOnboarding),
       );
 

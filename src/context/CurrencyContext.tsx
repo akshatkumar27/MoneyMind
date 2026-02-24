@@ -6,6 +6,7 @@ import React, {
   ReactNode,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {STORAGE_KEYS} from '../constants/storage';
 
 interface CurrencyContextType {
   currencySymbol: string;
@@ -38,7 +39,7 @@ export const CurrencyProvider: React.FC<CurrencyProviderProps> = ({
 
   const setCurrencySymbol = async (symbol: string) => {
     setCurrencySymbolState(symbol);
-    await AsyncStorage.setItem('appCurrencySymbol', symbol);
+    await AsyncStorage.setItem(STORAGE_KEYS.APP_CURRENCY_SYMBOL, symbol);
   };
 
   return (

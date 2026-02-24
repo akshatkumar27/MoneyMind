@@ -30,6 +30,7 @@ import {
 import {ENDPOINTS} from '../../constants/endpoints';
 import {globalStyles} from '../../styles/globalStyles';
 import {formatCurrency} from '../../utils/formatNumber';
+import {STORAGE_KEYS} from '../../constants/storage';
 
 interface UserData {
   name?: string;
@@ -70,7 +71,7 @@ export const PersonalInfoScreen: React.FC = () => {
 
   const loadData = async () => {
     try {
-      const userData = await AsyncStorage.getItem('user');
+      const userData = await AsyncStorage.getItem(STORAGE_KEYS.USER);
       if (userData) {
         setUser(JSON.parse(userData));
       }

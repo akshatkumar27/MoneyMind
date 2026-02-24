@@ -24,6 +24,7 @@ import {colors, typography, spacing} from '../../constants/theme';
 import {ENDPOINTS} from '../../constants/endpoints';
 import {globalStyles} from '../../styles/globalStyles';
 import {api} from '../../services/api';
+import {STORAGE_KEYS} from '../../constants/storage';
 
 type OTPVerificationScreenRouteProp = RouteProp<
   AuthStackParamList,
@@ -78,12 +79,18 @@ export const OTPVerificationScreen: React.FC = () => {
       console.log('OTP verified successfully:', response.data);
 
       // Save token to AsyncStorage
-      await AsyncStorage.setItem('authToken', response.data.token);
-      await AsyncStorage.setItem('user', JSON.stringify(response.data.user));
+      await AsyncStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, response.data.token);
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.USER,
+        JSON.stringify(response.data.user),
+      );
 
       // If signup flow, store additional signup data
       if (isSignupFlow && signupData) {
-        await AsyncStorage.setItem('signupData', JSON.stringify(signupData));
+        await AsyncStorage.setItem(
+          STORAGE_KEYS.SIGNUP_DATA,
+          JSON.stringify(signupData),
+        );
       }
 
       // Register FCM Token
@@ -120,20 +127,23 @@ export const OTPVerificationScreen: React.FC = () => {
           emi_outstanding: user.emi_outstanding || 0,
           monthly_investment: user.monthly_investment || 0,
         };
-        await AsyncStorage.setItem('onboardingData', JSON.stringify(payload));
+        await AsyncStorage.setItem(
+          STORAGE_KEYS.ONBOARDING_DATA,
+          JSON.stringify(payload),
+        );
       }
 
       // Use the status in place of the old isOnboardingIncomplete check
 
       const isFinancialProfilePresent = await AsyncStorage.getItem(
-        'isFinancialProfilePresent',
+        STORAGE_KEYS.IS_FINANCIAL_PROFILE_PRESENT,
       );
       const meRes = await api.get(ENDPOINTS.AUTH.ME);
       const meData = meRes.data;
 
       // Save in global storage
       await AsyncStorage.setItem(
-        'isFinancialProfilePresent',
+        STORAGE_KEYS.IS_FINANCIAL_PROFILE_PRESENT,
         JSON.stringify(meData?.user?.isFinancialProfilePresent || false),
       );
 
@@ -155,7 +165,7 @@ export const OTPVerificationScreen: React.FC = () => {
       } else {
         // Completed
         // await AsyncStorage.setItem('onboardingStatus', 'COMPLETED');
-        await AsyncStorage.removeItem('temp_auth_email');
+        await AsyncStorage.removeItem(STORAGE_KEYS.TEMP_AUTH_EMAIL);
 
         // Navigate to main app
         navigation.reset({

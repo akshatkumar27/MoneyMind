@@ -12,6 +12,7 @@ import {toastConfig} from './src/components/CustomToast';
 import {Logo} from './src/components/Logo';
 import {api} from './src/services/api';
 import {ENDPOINTS} from './src/constants/endpoints';
+import {STORAGE_KEYS} from './src/constants/storage';
 
 function App(): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
@@ -36,7 +37,9 @@ function App(): React.JSX.Element {
 
     const setupCurrency = async () => {
       try {
-        const storedSymbol = await AsyncStorage.getItem('appCurrencySymbol');
+        const storedSymbol = await AsyncStorage.getItem(
+          STORAGE_KEYS.APP_CURRENCY_SYMBOL,
+        );
         if (storedSymbol) {
           setAppCurrency(storedSymbol);
           return; // Already cached
@@ -81,7 +84,7 @@ function App(): React.JSX.Element {
           }
         }
 
-        await AsyncStorage.setItem('appCurrencySymbol', symbol);
+        await AsyncStorage.setItem(STORAGE_KEYS.APP_CURRENCY_SYMBOL, symbol);
         setAppCurrency(symbol);
       } catch (e) {
         console.warn('Currency setup failed', e);
@@ -102,7 +105,7 @@ function App(): React.JSX.Element {
 
   const checkAuthStatus = async () => {
     try {
-      const token = await AsyncStorage.getItem('authToken');
+      const token = await AsyncStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
 
       if (!token) {
         // No token at all — go to Auth
@@ -124,7 +127,7 @@ function App(): React.JSX.Element {
 
         // Save in global storage
         await AsyncStorage.setItem(
-          'isFinancialProfilePresent',
+          STORAGE_KEYS.IS_FINANCIAL_PROFILE_PRESENT,
           JSON.stringify(meData?.user?.isFinancialProfilePresent || false),
         );
 
@@ -142,7 +145,7 @@ function App(): React.JSX.Element {
                 monthly_investment: profileData.monthly_investment || 0,
               };
               await AsyncStorage.setItem(
-                'onboardingData',
+                STORAGE_KEYS.ONBOARDING_DATA,
                 JSON.stringify(payload),
               );
 
@@ -171,10 +174,10 @@ function App(): React.JSX.Element {
         if (status === 401) {
           // Token expired — clear everything and go to Auth
           await AsyncStorage.multiRemove([
-            'authToken',
-            'user',
-            'onboardingStatus',
-            'onboarding_draft',
+            STORAGE_KEYS.AUTH_TOKEN,
+            STORAGE_KEYS.USER,
+            STORAGE_KEYS.ONBOARDING_STATUS,
+            STORAGE_KEYS.ONBOARDING_DRAFT,
           ]);
           store.dispatch({type: 'financialData/clearFinancialData'});
           setIsLoggedIn(false);

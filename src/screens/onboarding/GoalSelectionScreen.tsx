@@ -22,6 +22,7 @@ import {Header} from '../../components/Header';
 import {colors, typography, spacing} from '../../constants/theme';
 import {ENDPOINTS} from '../../constants/endpoints';
 import {api} from '../../services/api';
+import {STORAGE_KEYS} from '../../constants/storage';
 
 interface Insight {
   title: string;
@@ -125,13 +126,13 @@ export const GoalSelectionScreen: React.FC = () => {
 
       // Update local user data to mark onboarding as completed
       try {
-        const userStr = await AsyncStorage.getItem('user');
+        const userStr = await AsyncStorage.getItem(STORAGE_KEYS.USER);
         console.log('Current user in storage:', userStr);
         if (userStr) {
           const user = JSON.parse(userStr);
           // Force update regardless of current state to ensure it is synced
           user.isNewUser = false;
-          await AsyncStorage.setItem('user', JSON.stringify(user));
+          await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
           console.log('Updated user in storage:', JSON.stringify(user));
         } else {
           console.warn('No user found in storage to update');

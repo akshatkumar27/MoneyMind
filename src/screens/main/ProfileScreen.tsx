@@ -27,6 +27,7 @@ import {
 } from '../../constants/theme';
 import {ENDPOINTS} from '../../constants/endpoints';
 import {globalStyles} from '../../styles/globalStyles';
+import {STORAGE_KEYS} from '../../constants/storage';
 
 type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
@@ -43,7 +44,7 @@ export const ProfileScreen: React.FC = () => {
 
   const loadUserData = async () => {
     try {
-      const userData = await AsyncStorage.getItem('user');
+      const userData = await AsyncStorage.getItem(STORAGE_KEYS.USER);
       if (userData) {
         const user = JSON.parse(userData);
         setUserName(user.name || '');
