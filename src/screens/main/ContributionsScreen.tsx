@@ -1034,34 +1034,7 @@ const styles = StyleSheet.create({
         fontSize: typography.body,
         fontWeight: typography.bold,
     },
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: spacing.xl,
-    },
-    modalContent: {
-        width: '100%',
-        backgroundColor: colors.cardBackground,
-        borderRadius: 20,
-        padding: spacing.xl,
-        alignItems: 'center',
-        borderWidth: borderWidths.thin,
-        borderColor: colors.border,
-    },
-    modalTitle: {
-        fontSize: typography.h3,
-        fontWeight: typography.bold,
-        color: colors.textPrimary,
-        marginBottom: spacing.xs,
-    },
-    modalSubtitle: {
-        fontSize: typography.bodySmall,
-        color: colors.textMuted,
-        marginBottom: spacing.lg,
-        textAlign: 'center',
-    },
+
     modalInputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -1099,32 +1072,6 @@ const styles = StyleSheet.create({
         marginBottom: spacing.xl,
         alignSelf: 'flex-start',
     },
-    modalButtons: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        gap: spacing.md,
-    },
-    modalButton: {
-        flex: 1,
-        paddingVertical: spacing.md,
-        borderRadius: 12,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    modalButtonCancel: {
-        backgroundColor: colors.inputBackground,
-    },
-    modalButtonSave: {
-        backgroundColor: colors.primary,
-    },
-    modalButtonTextCancel: {
-        color: colors.textSecondary,
-        fontWeight: typography.bold,
-    },
-    modalButtonTextSave: {
-        color: '#000',
-        fontWeight: typography.bold,
-    },
+
 });
 

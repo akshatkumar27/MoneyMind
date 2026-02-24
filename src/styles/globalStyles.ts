@@ -249,49 +249,7 @@ export const globalStyles = StyleSheet.create({
         paddingBottom: spacing.lg,
     },
 
-    // ─── Modal ───────────────────────────────────────────────────────────────────
-    /** Full-screen semi-transparent overlay */
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
-    },
 
-    /** White/card modal container */
-    modalCard: {
-        backgroundColor: colors.cardBackground,
-        borderRadius: radii.xl,
-        padding: spacing.xl,
-        width: '100%',
-        maxWidth: 320,
-        alignItems: 'center',
-    },
-
-    /** Modal title */
-    modalTitle: {
-        color: colors.textPrimary,
-        fontSize: typography.h3,
-        fontWeight: typography.bold,
-        marginBottom: spacing.sm,
-    },
-
-    /** Modal body message */
-    modalMessage: {
-        color: colors.textSecondary,
-        fontSize: typography.body,
-        textAlign: 'center',
-        marginBottom: spacing.xl,
-        lineHeight: 22,
-    },
-
-    /** Modal action buttons row */
-    modalButtons: {
-        flexDirection: 'row',
-        width: '100%',
-        gap: spacing.sm,
-    },
 
     // ─── Divider ─────────────────────────────────────────────────────────────────
     /** Horizontal thin separator line */
@@ -301,14 +259,5 @@ export const globalStyles = StyleSheet.create({
         marginVertical: spacing.sm,
     },
 
-    // ─── Icon Badge ──────────────────────────────────────────────────────────────
-    /** Circular icon container (e.g. modal icon, avatar) */
-    iconCircle: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: spacing.md,
-    },
+
 });

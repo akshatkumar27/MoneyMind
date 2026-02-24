@@ -304,75 +304,7 @@ const styles = StyleSheet.create({
         fontSize: typography.body,
         fontWeight: 'bold',
     },
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
-    },
-    modalContainer: {
-        backgroundColor: colors.cardBackground,
-        borderRadius: radii.xl,
-        padding: spacing.xl,
-        width: '100%',
-        maxWidth: 320,
-        alignItems: 'center',
-    },
-    modalIconContainer: {
-        width: 60,
-        height: 60,
-        borderRadius: radii.full,
-        backgroundColor: colors.dangerSubtle,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: spacing.md,
-    },
-    modalIcon: {
-        fontSize: 28,
-    },
-    modalTitle: {
-        color: colors.textPrimary,
-        fontSize: typography.h3,
-        fontWeight: typography.bold,
-        marginBottom: spacing.sm,
-    },
-    modalMessage: {
-        color: colors.textSecondary,
-        fontSize: typography.body,
-        textAlign: 'center',
-        marginBottom: spacing.xl,
-        lineHeight: 22,
-    },
-    modalButtons: {
-        flexDirection: 'row',
-        width: '100%',
-        gap: spacing.sm, // Note: gap might require newer React Native, but user seems to be using it
-    },
-    modalCancelButton: {
-        flex: 1,
-        backgroundColor: colors.inputBackground,
-        borderRadius: radii.md,
-        paddingVertical: spacing.md,
-        alignItems: 'center',
-    },
-    modalCancelText: {
-        color: colors.textPrimary,
-        fontSize: typography.body,
-        fontWeight: typography.medium,
-    },
-    modalDeleteButton: {
-        flex: 1,
-        backgroundColor: colors.danger,
-        borderRadius: radii.md,
-        paddingVertical: spacing.md,
-        alignItems: 'center',
-    },
-    modalDeleteText: {
-        color: '#ffffff',
-        fontSize: typography.body,
-        fontWeight: 'bold',
-    },
+
     valueContainer: {
         flexDirection: 'row',
         alignItems: 'center',
