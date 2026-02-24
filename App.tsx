@@ -1,21 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { StatusBar, View, ActivityIndicator, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import React, {useState, useEffect} from 'react';
+import {StatusBar, View, ActivityIndicator, StyleSheet} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { RootNavigator } from './src/navigation';
 import Toast from 'react-native-toast-message';
-import { toastConfig, Logo } from './src/components';
-import { notificationService } from './src/services/NotificationService';
-import { api } from './src/services';
-import { CurrencyProvider } from './src/context/CurrencyContext';
-import { Provider } from 'react-redux';
-import { store } from './src/store';
-import { ENDPOINTS } from './src/constants';
+import {notificationService} from './src/services/NotificationService';
+import {CurrencyProvider} from './src/context/CurrencyContext';
+import {Provider} from 'react-redux';
+import {store} from './src/store/store';
+import {RootNavigator} from './src/navigation/RootNavigator';
+import {toastConfig} from './src/components/CustomToast';
+import {Logo} from './src/components/Logo';
+import {api} from './src/services/api';
+import {ENDPOINTS} from './src/constants/endpoints';
+
 function App(): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isOnboardingCompleted, setIsOnboardingCompleted] = useState(false);
-  const [initialRoute, setInitialRoute] = useState<string | undefined>(undefined);
+  const [initialRoute, setInitialRoute] = useState<string | undefined>(
+    undefined,
+  );
   const [initialParams, setInitialParams] = useState<any>(undefined);
   const [appCurrency, setAppCurrency] = useState('₹');
 
@@ -57,7 +61,10 @@ function App(): React.JSX.Element {
             }
           }
         } catch (apiError) {
-          console.warn('IP API currency detection failed, falling back to locale', apiError);
+          console.warn(
+            'IP API currency detection failed, falling back to locale',
+            apiError,
+          );
           // Fallback to system locale currency
           const localeCurrency = Intl.NumberFormat().resolvedOptions().currency;
           if (localeCurrency) {
@@ -116,7 +123,10 @@ function App(): React.JSX.Element {
         setIsOnboardingCompleted(meData?.user?.isFinancialProfilePresent);
 
         // Save in global storage
-        await AsyncStorage.setItem('isFinancialProfilePresent', JSON.stringify(meData?.user?.isFinancialProfilePresent || false));
+        await AsyncStorage.setItem(
+          'isFinancialProfilePresent',
+          JSON.stringify(meData?.user?.isFinancialProfilePresent || false),
+        );
 
         if (meData?.user?.isFinancialProfilePresent) {
           // store.dispatch({ type: 'financialData/setFinancialProfilePresent', payload: true });
@@ -131,7 +141,10 @@ function App(): React.JSX.Element {
                 emi_outstanding: profileData.emi_outstanding || 0,
                 monthly_investment: profileData.monthly_investment || 0,
               };
-              await AsyncStorage.setItem('onboardingData', JSON.stringify(payload));
+              await AsyncStorage.setItem(
+                'onboardingData',
+                JSON.stringify(payload),
+              );
 
               // store.dispatch({
               //   type: 'financialData/setFinancialData',
@@ -148,14 +161,22 @@ function App(): React.JSX.Element {
             console.error('Failed to fetch financial profile:', profileErr);
           }
         } else {
-          store.dispatch({ type: 'financialData/setFinancialProfilePresent', payload: false });
+          store.dispatch({
+            type: 'financialData/setFinancialProfilePresent',
+            payload: false,
+          });
         }
       } catch (err: any) {
         const status = err?.response?.status;
         if (status === 401) {
           // Token expired — clear everything and go to Auth
-          await AsyncStorage.multiRemove(['authToken', 'user', 'onboardingStatus', 'onboarding_draft']);
-          store.dispatch({ type: 'financialData/clearFinancialData' });
+          await AsyncStorage.multiRemove([
+            'authToken',
+            'user',
+            'onboardingStatus',
+            'onboarding_draft',
+          ]);
+          store.dispatch({type: 'financialData/clearFinancialData'});
           setIsLoggedIn(false);
           setIsOnboardingCompleted(false);
           setInitialRoute('Auth');
@@ -194,7 +215,11 @@ function App(): React.JSX.Element {
         <StatusBar barStyle="light-content" backgroundColor="#0a0a14" />
         <View style={styles.splashContent}>
           <Logo size="large" />
-          <ActivityIndicator size="small" color="#1192e9ff" style={styles.splashSpinner} />
+          <ActivityIndicator
+            size="small"
+            color="#1192e9ff"
+            style={styles.splashSpinner}
+          />
         </View>
       </View>
     );
@@ -211,7 +236,12 @@ function App(): React.JSX.Element {
             initialRouteName={initialRoute}
             initialParams={initialParams}
           />
-          <Toast config={toastConfig} position="bottom" bottomOffset={40} visibilityTime={4000} />
+          <Toast
+            config={toastConfig}
+            position="bottom"
+            bottomOffset={40}
+            visibilityTime={4000}
+          />
         </NavigationContainer>
       </CurrencyProvider>
     </Provider>

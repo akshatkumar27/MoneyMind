@@ -10,254 +10,255 @@
  *   // Merge with local: style={[globalStyles.card, { marginTop: 8 }]}
  */
 
-import { StyleSheet } from 'react-native';
-import { colors, typography, spacing, radii, borderWidths
-} from '../constants';
+import {StyleSheet} from 'react-native';
+import {
+  colors,
+  typography,
+  spacing,
+  radii,
+  borderWidths,
+} from '../constants/theme';
 
 export const globalStyles = StyleSheet.create({
-    // ─── Root ───────────────────────────────────────────────────────────────────
-    /** Full-screen SafeAreaView background */
-    container: {
-        flex: 1,
-        backgroundColor: colors.background,
-    },
+  // ─── Root ───────────────────────────────────────────────────────────────────
+  /** Full-screen SafeAreaView background */
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
 
-    /** Flex: 1 with no background (for KeyboardAvoidingView or inner wrappers) */
-    flex1: {
-        flex: 1,
-    },
+  /** Flex: 1 with no background (for KeyboardAvoidingView or inner wrappers) */
+  flex1: {
+    flex: 1,
+  },
 
-    // ─── Layout ──────────────────────────────────────────────────────────────────
-    /** Padded horizontal content area */
-    screenContent: {
-        flex: 1,
-        paddingHorizontal: spacing.lg,
-    },
+  // ─── Layout ──────────────────────────────────────────────────────────────────
+  /** Padded horizontal content area */
+  screenContent: {
+    flex: 1,
+    paddingHorizontal: spacing.lg,
+  },
 
-    /** Centered loading container */
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
+  /** Centered loading container */
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
-    // ─── Card ────────────────────────────────────────────────────────────────────
-    /** Base dark card */
-    card: {
-        backgroundColor: colors.cardBackground,
-        borderRadius: radii.lg,
-        overflow: 'hidden',
-    },
+  // ─── Card ────────────────────────────────────────────────────────────────────
+  /** Base dark card */
+  card: {
+    backgroundColor: colors.cardBackground,
+    borderRadius: radii.lg,
+    overflow: 'hidden',
+  },
 
-    /** Card with padding */
-    cardPadded: {
-        backgroundColor: colors.cardBackground,
-        borderRadius: radii.lg,
-        padding: spacing.md,
-    },
+  /** Card with padding */
+  cardPadded: {
+    backgroundColor: colors.cardBackground,
+    borderRadius: radii.lg,
+    padding: spacing.md,
+  },
 
-    // ─── Header Row ──────────────────────────────────────────────────────────────
-    /** Row with space-between for section titles + action buttons */
-    sectionHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: spacing.lg,
-        marginBottom: spacing.sm,
-    },
+  // ─── Header Row ──────────────────────────────────────────────────────────────
+  /** Row with space-between for section titles + action buttons */
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
+  },
 
-    /** Muted uppercased section label */
-    sectionLabel: {
-        color: colors.textSecondary,
-        fontSize: typography.bodySmall,
-        fontWeight: typography.medium,
-        textTransform: 'uppercase',
-        letterSpacing: 1,
-    },
+  /** Muted uppercased section label */
+  sectionLabel: {
+    color: colors.textSecondary,
+    fontSize: typography.bodySmall,
+    fontWeight: typography.medium,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
 
-    // ─── Typography ───────────────────────────────────────────────────────────────
-    /** Primary large heading */
-    headingLarge: {
-        color: colors.textPrimary,
-        fontSize: typography.h1,
-        fontWeight: typography.bold,
-    },
+  // ─── Typography ───────────────────────────────────────────────────────────────
+  /** Primary large heading */
+  headingLarge: {
+    color: colors.textPrimary,
+    fontSize: typography.h1,
+    fontWeight: typography.bold,
+  },
 
-    /** H2 heading */
-    headingMedium: {
-        color: colors.textPrimary,
-        fontSize: typography.h2,
-        fontWeight: typography.bold,
-    },
+  /** H2 heading */
+  headingMedium: {
+    color: colors.textPrimary,
+    fontSize: typography.h2,
+    fontWeight: typography.bold,
+  },
 
-    /** H3 heading */
-    headingSmall: {
-        color: colors.textPrimary,
-        fontSize: typography.h3,
-        fontWeight: typography.semibold,
-    },
+  /** H3 heading */
+  headingSmall: {
+    color: colors.textPrimary,
+    fontSize: typography.h3,
+    fontWeight: typography.semibold,
+  },
 
-    /** Standard body text */
-    bodyText: {
-        color: colors.textSecondary,
-        fontSize: typography.body,
-        lineHeight: 24,
-    },
+  /** Standard body text */
+  bodyText: {
+    color: colors.textSecondary,
+    fontSize: typography.body,
+    lineHeight: 24,
+  },
 
-    /** Small body text */
-    bodySmall: {
-        color: colors.textSecondary,
-        fontSize: typography.bodySmall,
-    },
+  /** Small body text */
+  bodySmall: {
+    color: colors.textSecondary,
+    fontSize: typography.bodySmall,
+  },
 
-    /** Muted caption text */
-    caption: {
-        color: colors.textMuted,
-        fontSize: typography.caption,
-    },
+  /** Muted caption text */
+  caption: {
+    color: colors.textMuted,
+    fontSize: typography.caption,
+  },
 
-    /** Error text (below inputs etc.) */
-    errorText: {
-        color: colors.error,
-        fontSize: typography.caption,
-        marginTop: 4,
-    },
+  /** Error text (below inputs etc.) */
+  errorText: {
+    color: colors.error,
+    fontSize: typography.caption,
+    marginTop: 4,
+  },
 
-    /** Accent/link text */
-    linkText: {
-        color: colors.link,
-        fontSize: typography.body,
-        fontWeight: typography.semibold,
-    },
+  /** Accent/link text */
+  linkText: {
+    color: colors.link,
+    fontSize: typography.body,
+    fontWeight: typography.semibold,
+  },
 
-    // ─── Buttons ─────────────────────────────────────────────────────────────────
-    /** Primary filled button */
-    primaryButton: {
-        backgroundColor: colors.primary,
-        paddingVertical: 16,
-        paddingHorizontal: 24,
-        borderRadius: radii.md,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
+  // ─── Buttons ─────────────────────────────────────────────────────────────────
+  /** Primary filled button */
+  primaryButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: radii.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 
-    /** Primary button text */
-    primaryButtonText: {
-        color: colors.textPrimary,
-        fontSize: typography.body,
-        fontWeight: typography.semibold,
-    },
+  /** Primary button text */
+  primaryButtonText: {
+    color: colors.textPrimary,
+    fontSize: typography.body,
+    fontWeight: typography.semibold,
+  },
 
-    /** Disabled/muted overlay for buttons */
-    buttonDisabled: {
-        opacity: 0.6,
-    },
+  /** Disabled/muted overlay for buttons */
+  buttonDisabled: {
+    opacity: 0.6,
+  },
 
-    /** Danger/destructive button */
-    dangerButton: {
-        backgroundColor: colors.danger,
-        paddingVertical: spacing.md,
-        borderRadius: radii.md,
-        alignItems: 'center',
-    },
+  /** Danger/destructive button */
+  dangerButton: {
+    backgroundColor: colors.danger,
+    paddingVertical: spacing.md,
+    borderRadius: radii.md,
+    alignItems: 'center',
+  },
 
-    /** Danger button text */
-    dangerButtonText: {
-        color: '#ffffff',
-        fontSize: typography.body,
-        fontWeight: typography.semibold,
-    },
+  /** Danger button text */
+  dangerButtonText: {
+    color: '#ffffff',
+    fontSize: typography.body,
+    fontWeight: typography.semibold,
+  },
 
-    // ─── Inputs ──────────────────────────────────────────────────────────────────
-    /** Input wrapper row */
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: colors.inputBackground,
-        borderRadius: radii.md,
-        borderWidth: borderWidths.thin,
-        borderColor: colors.border,
-        paddingHorizontal: spacing.md,
-    },
+  // ─── Inputs ──────────────────────────────────────────────────────────────────
+  /** Input wrapper row */
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.inputBackground,
+    borderRadius: radii.md,
+    borderWidth: borderWidths.thin,
+    borderColor: colors.border,
+    paddingHorizontal: spacing.md,
+  },
 
-    /** Input field (inside inputContainer) */
-    inputField: {
-        flex: 1,
-        color: colors.textPrimary,
-        fontSize: typography.body,
-        paddingVertical: spacing.md,
-    },
+  /** Input field (inside inputContainer) */
+  inputField: {
+    flex: 1,
+    color: colors.textPrimary,
+    fontSize: typography.body,
+    paddingVertical: spacing.md,
+  },
 
-    /** Error border state for input */
-    inputError: {
-        borderColor: colors.error,
-    },
+  /** Error border state for input */
+  inputError: {
+    borderColor: colors.error,
+  },
 
-    /** Input label text */
-    inputLabel: {
-        color: colors.textSecondary,
-        fontSize: typography.caption,
-        fontWeight: typography.medium,
-        marginBottom: 8,
-        textTransform: 'uppercase',
-        letterSpacing: 1,
-    },
+  /** Input label text */
+  inputLabel: {
+    color: colors.textSecondary,
+    fontSize: typography.caption,
+    fontWeight: typography.medium,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
 
-    // ─── Row helpers ─────────────────────────────────────────────────────────────
-    /** Horizontal row, vertically centered */
-    row: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
+  // ─── Row helpers ─────────────────────────────────────────────────────────────
+  /** Horizontal row, vertically centered */
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
 
-    /** Row with space-between */
-    rowSpaceBetween: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
+  /** Row with space-between */
+  rowSpaceBetween: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
 
-    // ─── Progress Bar ─────────────────────────────────────────────────────────────
-    /** Track */
-    progressBar: {
-        height: 4,
-        backgroundColor: colors.border,
-        borderRadius: 2,
-        marginBottom: spacing.xl,
-    },
+  // ─── Progress Bar ─────────────────────────────────────────────────────────────
+  /** Track */
+  progressBar: {
+    height: 4,
+    backgroundColor: colors.border,
+    borderRadius: 2,
+    marginBottom: spacing.xl,
+  },
 
-    /** Fill (apply explicit width via inline style) */
-    progressFill: {
-        height: '100%',
-        backgroundColor: colors.primary,
-        borderRadius: 2,
-    },
+  /** Fill (apply explicit width via inline style) */
+  progressFill: {
+    height: '100%',
+    backgroundColor: colors.primary,
+    borderRadius: 2,
+  },
 
-    // ─── Footer ──────────────────────────────────────────────────────────────────
-    /** Sticky bottom footer with top border */
-    footer: {
-        paddingHorizontal: spacing.lg,
-        paddingBottom: spacing.lg,
-        borderTopWidth: borderWidths.thin,
-        borderTopColor: colors.border,
-        backgroundColor: colors.background,
-    },
+  // ─── Footer ──────────────────────────────────────────────────────────────────
+  /** Sticky bottom footer with top border */
+  footer: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
+    borderTopWidth: borderWidths.thin,
+    borderTopColor: colors.border,
+    backgroundColor: colors.background,
+  },
 
-    /** Footer without top border (floating) */
-    footerPlain: {
-        paddingHorizontal: spacing.lg,
-        paddingBottom: spacing.lg,
-    },
+  /** Footer without top border (floating) */
+  footerPlain: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
+  },
 
-
-
-    // ─── Divider ─────────────────────────────────────────────────────────────────
-    /** Horizontal thin separator line */
-    divider: {
-        height: 0.5,
-        backgroundColor: colors.border,
-        marginVertical: spacing.sm,
-    },
-
-
+  // ─── Divider ─────────────────────────────────────────────────────────────────
+  /** Horizontal thin separator line */
+  divider: {
+    height: 0.5,
+    backgroundColor: colors.border,
+    marginVertical: spacing.sm,
+  },
 });
