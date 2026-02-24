@@ -10,6 +10,7 @@ import { api } from './src/services';
 import { CurrencyProvider } from './src/context/CurrencyContext';
 import { Provider } from 'react-redux';
 import { store } from './src/store';
+import { ENDPOINTS } from './src/constants';
 function App(): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -109,7 +110,7 @@ function App(): React.JSX.Element {
 
       // Removed dispatch imports to top level manually next
       try {
-        const meRes = await api.get('/api/auth/me');
+        const meRes = await api.get(ENDPOINTS.AUTH.ME);
         meData = meRes.data;
         console.log('meData', meData?.user);
         setIsOnboardingCompleted(meData?.user?.isFinancialProfilePresent);
@@ -120,7 +121,7 @@ function App(): React.JSX.Element {
         if (meData?.user?.isFinancialProfilePresent) {
           // store.dispatch({ type: 'financialData/setFinancialProfilePresent', payload: true });
           try {
-            const profileRes = await api.get('/api/user/financial-profile');
+            const profileRes = await api.get(ENDPOINTS.USER.FINANCIAL_PROFILE);
             if (profileRes.data && profileRes.data.data) {
               const profileData = profileRes.data.data;
               const payload = {
