@@ -8,7 +8,8 @@ import {
     TouchableWithoutFeedback,
     Dimensions,
 } from 'react-native';
-import { colors, typography, spacing } from '../constants';
+import { colors, typography, spacing, radii, borderWidths
+} from '../constants';
 
 import { ConfirmationModalProps } from './types';
 
@@ -32,26 +33,26 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             case 'success':
                 return {
                     icon: '✅',
-                    iconBg: 'rgba(34, 197, 94, 0.15)',
-                    confirmBg: '#22c55e',
+                    iconBg: colors.successSubtle,
+                    confirmBg: colors.success,
                 };
             case 'error':
                 return {
                     icon: '❌',
-                    iconBg: 'rgba(239, 68, 68, 0.15)',
-                    confirmBg: '#ef4444',
+                    iconBg: colors.dangerSubtle,
+                    confirmBg: colors.danger,
                 };
             case 'warning':
                 return {
                     icon: '⚠️',
-                    iconBg: 'rgba(245, 158, 11, 0.15)',
-                    confirmBg: '#f59e0b',
+                    iconBg: colors.warningSubtle,
+                    confirmBg: colors.warning,
                 };
             default:
                 return {
                     icon: '💡',
-                    iconBg: 'rgba(59, 130, 246, 0.15)',
-                    confirmBg: '#3b82f6',
+                    iconBg: colors.infoSubtle,
+                    confirmBg: colors.info,
                 };
         }
     };
@@ -123,13 +124,13 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: spacing.xl,
         alignItems: 'center',
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
     },
     iconContainer: {
         width: 64,
         height: 64,
-        borderRadius: 32,
+        borderRadius: radii.full,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: spacing.md,
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.inputBackground,
         paddingVertical: spacing.md,
-        borderRadius: 12,
+        borderRadius: radii.md,
         alignItems: 'center',
     },
     cancelButtonText: {
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
     confirmButton: {
         flex: 1,
         paddingVertical: spacing.md,
-        borderRadius: 12,
+        borderRadius: radii.md,
         alignItems: 'center',
     },
     fullWidthButton: {

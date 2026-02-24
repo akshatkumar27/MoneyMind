@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, View, ViewStyle } from 'react-native';
-import { colors, typography, spacing } from '../constants';
+import { colors, typography, spacing, borderWidths
+} from '../constants';
 
 
 
@@ -52,7 +53,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: spacing.md,
         marginBottom: spacing.md,
-        borderWidth: 2,
+        borderWidth: borderWidths.medium,
         borderColor: colors.border,
     },
     cardSelected: {
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 8,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: 'rgba(45, 127, 249, 0.2)',
     },
     amountText: {

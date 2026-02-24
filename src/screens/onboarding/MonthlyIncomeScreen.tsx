@@ -14,7 +14,8 @@ import Toast from 'react-native-toast-message';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackButton, Button, AnimatedMascot, Header } from '../../components';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, borderWidths
+} from '../../constants';
 import { globalStyles } from '../../styles';
 import { formatNumberInput } from '../../utils/formatNumber';
 
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
         minWidth: 20,
         maxWidth: 280,
         textAlign: 'left',
-        borderBottomWidth: 2,
+        borderBottomWidth: borderWidths.medium,
         borderBottomColor: colors.primary,
         paddingBottom: spacing.sm,
     },

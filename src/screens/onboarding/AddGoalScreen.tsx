@@ -16,7 +16,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { BackButton, Button, AnimatedMascot, Header } from '../../components';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
-import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { colors, typography, spacing, radii, ENDPOINTS, borderWidths
+} from '../../constants';
 import { api } from '../../services';
 import { formatCurrency } from '../../utils';
 import { formatNumberInput, formatNumber } from '../../utils/formatNumber';
@@ -411,9 +412,9 @@ const styles = StyleSheet.create({
     },
     textInput: {
         backgroundColor: colors.cardBackground,
-        borderWidth: 1.5,
+        borderWidth: borderWidths.base,
         borderColor: colors.border,
-        borderRadius: 12,
+        borderRadius: radii.md,
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.md,
         color: colors.textPrimary,
@@ -436,9 +437,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: colors.cardBackground,
-        borderWidth: 1.5,
+        borderWidth: borderWidths.base,
         borderColor: colors.border,
-        borderRadius: 10,
+        borderRadius: radii.sm,
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.sm + 2,
         minWidth: 120,
@@ -477,9 +478,9 @@ const styles = StyleSheet.create({
     durationOption: {
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.sm,
-        borderRadius: 20,
+        borderRadius: radii.full,
         backgroundColor: colors.cardBackground,
-        borderWidth: 1.5,
+        borderWidth: borderWidths.base,
         borderColor: colors.border,
     },
     durationOptionSelected: {
@@ -501,9 +502,9 @@ const styles = StyleSheet.create({
     },
     customMonthsInput: {
         backgroundColor: colors.cardBackground,
-        borderWidth: 1.5,
+        borderWidth: borderWidths.base,
         borderColor: colors.primary,
-        borderRadius: 10,
+        borderRadius: radii.sm,
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.sm,
         color: colors.textPrimary,
@@ -536,18 +537,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: colors.cardBackground,
-        borderRadius: 16,
+        borderRadius: radii.lg,
         padding: spacing.md,
         marginBottom: spacing.lg,
-        borderWidth: 1,
-        borderColor: 'rgba(34,197,94,0.3)',
-        marginHorizontal: spacing.lg, // Make it align with standard paddings
+        borderWidth: borderWidths.thin,
+        borderColor: colors.successSubtle,
+        marginHorizontal: spacing.lg,
     },
     budgetIconContainer: {
         width: 40,
         height: 40,
-        borderRadius: 20,
-        backgroundColor: 'rgba(34,197,94,0.15)',
+        borderRadius: radii.full,
+        backgroundColor: colors.successSubtle,
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: spacing.md,
@@ -564,7 +565,7 @@ const styles = StyleSheet.create({
         marginBottom: 2,
     },
     budgetAmount: {
-        color: '#22c55e',
+        color: colors.success,
         fontSize: typography.h3,
         fontWeight: typography.bold,
     },

@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
-import { colors, typography } from '../constants';
+import { colors, typography, borderWidths
+} from '../constants';
 
 
 
@@ -86,7 +87,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
     },
     optionSelected: {
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         borderRadius: 20,
         backgroundColor: colors.cardBackground,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
         marginRight: 8,
         marginBottom: 8,
@@ -148,7 +149,7 @@ const styles = StyleSheet.create({
         height: 48,
         borderRadius: 24,
         backgroundColor: colors.cardBackground,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
         justifyContent: 'center',
         alignItems: 'center',

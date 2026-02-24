@@ -7,7 +7,8 @@ import {
     Animated,
     Easing,
 } from 'react-native';
-import { colors, typography } from '../constants';
+import { colors, typography, borderWidths
+} from '../constants';
 import { ImageSourcePropType, StyleProp, ViewStyle } from 'react-native';
 
 
@@ -180,7 +181,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         backgroundColor: 'rgba(30, 30, 40, 0.95)',
         borderRadius: 16,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: 'rgba(255, 255, 255, 0.15)',
         paddingHorizontal: 18,
         paddingVertical: 14,

@@ -9,7 +9,7 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import { Card, AssetRow, AIInsightCard } from '../../components';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, radii } from '../../constants';
 import { globalStyles } from '../../styles';
 import { useCurrency } from '../../context/CurrencyContext';
 
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     iconButton: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: radii.full,
         backgroundColor: colors.cardBackground,
         justifyContent: 'center',
         alignItems: 'center',
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     avatarContainer: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: radii.full,
         backgroundColor: colors.primary,
         justifyContent: 'center',
         alignItems: 'center',
@@ -206,10 +206,10 @@ const styles = StyleSheet.create({
         fontWeight: typography.bold,
     },
     changePositiveBadge: {
-        backgroundColor: '#22c55e',
+        backgroundColor: colors.success,
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 6,
+        borderRadius: radii.xs,
         marginLeft: spacing.sm,
     },
     changePositiveText: {
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
         fontSize: typography.caption,
     },
     dayChangeValue: {
-        color: '#22c55e',
+        color: colors.success,
         fontSize: typography.caption,
         fontWeight: typography.medium,
         marginLeft: spacing.xs,
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
         fontWeight: typography.semibold,
     },
     optimizerCard: {
-        backgroundColor: '#1a2744',
+        backgroundColor: colors.cardBackground,
         marginBottom: spacing.lg,
     },
     optimizerHeader: {
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
         marginRight: spacing.xs,
     },
     optimizerTitle: {
-        color: '#22c55e',
+        color: colors.success,
         fontSize: typography.caption,
         fontWeight: typography.semibold,
         letterSpacing: 0.5,
@@ -268,8 +268,8 @@ const styles = StyleSheet.create({
         fontWeight: typography.medium,
     },
     rebalanceButton: {
-        backgroundColor: '#f59e0b',
-        borderRadius: 8,
+        backgroundColor: colors.warning,
+        borderRadius: radii.sm,
         paddingVertical: spacing.sm,
         alignItems: 'center',
     },
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
         right: spacing.lg,
         width: 56,
         height: 56,
-        borderRadius: 28,
+        borderRadius: radii.full,
         backgroundColor: colors.primary,
         justifyContent: 'center',
         alignItems: 'center',

@@ -15,7 +15,8 @@ import {
 import Toast from 'react-native-toast-message';
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { colors, typography, spacing, radii, ENDPOINTS, borderWidths
+} from '../../constants';
 import { globalStyles } from '../../styles';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import { BackButton, ConfirmationModal, SkeletonLoader, AnimatedMascot, Header } from '../../components';
@@ -526,9 +527,9 @@ export const ContributionsScreen: React.FC = () => {
                             <>
                                 {/* Already paid this month */}
                                 <View style={styles.upcomingHeader}>
-                                    <View style={[styles.timerBadge, { backgroundColor: 'rgba(34, 197, 94, 0.2)' }]}>
+                                    <View style={[styles.timerBadge, { backgroundColor: colors.successSubtle }]}>
                                         <Text style={styles.timerIcon}>✅</Text>
-                                        <Text style={[styles.timerText, { color: '#22c55e' }]}>Paid</Text>
+                                        <Text style={[styles.timerText, { color: colors.success }]}>Paid</Text>
                                     </View>
                                 </View>
 
@@ -737,7 +738,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: spacing.xl,
         marginBottom: spacing.lg,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: '#2a4a6a',
         alignItems: 'center',
         marginTop: spacing.md,
@@ -752,17 +753,17 @@ const styles = StyleSheet.create({
     timerBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(245, 158, 11, 0.2)',
+        backgroundColor: colors.warningSubtle,
         paddingHorizontal: spacing.sm,
         paddingVertical: spacing.xs,
-        borderRadius: 12,
+        borderRadius: radii.md,
     },
     timerIcon: {
         fontSize: 14,
         marginRight: 4,
     },
     timerText: {
-        color: '#f59e0b',
+        color: colors.warning,
         fontSize: typography.caption,
         fontWeight: typography.medium,
     },
@@ -784,7 +785,7 @@ const styles = StyleSheet.create({
     },
     nextPaymentInfo: {
         width: '100%',
-        borderTopWidth: 1,
+        borderTopWidth: borderWidths.thin,
         borderTopColor: 'rgba(255,255,255,0.1)',
         paddingTop: spacing.md,
         marginBottom: spacing.lg,
@@ -806,10 +807,10 @@ const styles = StyleSheet.create({
         fontSize: typography.bodySmall,
     },
     payButton: {
-        backgroundColor: '#22c55e',
+        backgroundColor: colors.success,
         paddingVertical: spacing.md,
         paddingHorizontal: spacing.xl * 2,
-        borderRadius: 12,
+        borderRadius: radii.md,
         width: '100%',
         alignItems: 'center',
     },
@@ -823,7 +824,7 @@ const styles = StyleSheet.create({
     },
     summaryCard: {
         backgroundColor: colors.cardBackground,
-        borderRadius: 16,
+        borderRadius: radii.lg,
         padding: spacing.lg,
         marginBottom: spacing.xl,
     },
@@ -878,7 +879,7 @@ const styles = StyleSheet.create({
     },
     progressBarFill: {
         height: '100%',
-        backgroundColor: '#22c55e',
+        backgroundColor: colors.success,
         borderRadius: 5,
     },
     progressAmounts: {
@@ -887,7 +888,7 @@ const styles = StyleSheet.create({
         marginTop: spacing.xs,
     },
     progressSaved: {
-        color: '#22c55e',
+        color: colors.success,
         fontSize: typography.caption,
         fontWeight: typography.medium,
     },
@@ -923,8 +924,8 @@ const styles = StyleSheet.create({
     historyDot: {
         width: 10,
         height: 10,
-        borderRadius: 5,
-        backgroundColor: '#22c55e',
+        borderRadius: radii.full,
+        backgroundColor: colors.success,
         marginTop: 4,
         marginRight: spacing.md,
         flexShrink: 0,
@@ -932,10 +933,10 @@ const styles = StyleSheet.create({
     historyContent: {
         flex: 1,
         backgroundColor: colors.cardBackground,
-        borderRadius: 12,
+        borderRadius: radii.md,
         padding: spacing.md,
-        borderWidth: 1,
-        borderColor: 'rgba(34,197,94,0.15)',
+        borderWidth: borderWidths.thin,
+        borderColor: colors.successSubtle,
     },
     historyRow: {
         flexDirection: 'row',
@@ -954,7 +955,7 @@ const styles = StyleSheet.create({
         fontWeight: typography.semibold,
     },
     historyAmount: {
-        color: '#22c55e',
+        color: colors.success,
         fontSize: typography.bodySmall,
         fontWeight: typography.bold,
     },
@@ -966,7 +967,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.sm,
         paddingVertical: 2,
         borderRadius: 8,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.primary + '60',
     },
     historyEditBtnText: {
@@ -979,7 +980,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 20,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: 'rgba(255, 255, 255, 0.15)',
     },
     editButtonText: {
@@ -993,7 +994,7 @@ const styles = StyleSheet.create({
     editorContainer: {
         marginTop: spacing.md,
         paddingTop: spacing.md,
-        borderTopWidth: 1,
+        borderTopWidth: borderWidths.thin,
         borderTopColor: colors.border,
         alignItems: 'center',
     },
@@ -1007,7 +1008,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: colors.inputBackground,
-        borderWidth: 1.5,
+        borderWidth: borderWidths.base,
         borderColor: colors.primary + '50',
         borderRadius: 12,
         paddingHorizontal: spacing.md,
@@ -1071,7 +1072,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: spacing.xl,
         alignItems: 'center',
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
     },
     modalTitle: {
@@ -1094,7 +1095,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.sm,
         marginBottom: spacing.sm,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
         width: '100%',
     },

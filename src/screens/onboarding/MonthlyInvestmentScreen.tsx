@@ -16,7 +16,8 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BackButton, Button, AnimatedMascot, Header } from '../../components';
-import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { colors, typography, spacing, radii, ENDPOINTS, borderWidths
+} from '../../constants';
 import { OnboardingStackParamList } from '../../navigation/OnboardingNavigator';
 import { api } from '../../services';
 import { formatCurrency } from '../../utils';
@@ -275,15 +276,15 @@ const styles = StyleSheet.create({
         minWidth: 20,
         maxWidth: 280,
         textAlign: 'left',
-        borderBottomWidth: 2,
+        borderBottomWidth: borderWidths.medium,
         borderBottomColor: colors.primary,
         paddingBottom: spacing.sm,
     },
     inputError: {
-        borderBottomColor: '#ef4444',
+        borderBottomColor: colors.danger,
     },
     errorText: {
-        color: '#ef4444',
+        color: colors.danger,
         fontSize: typography.bodySmall,
         textAlign: 'center',
         marginBottom: spacing.md,

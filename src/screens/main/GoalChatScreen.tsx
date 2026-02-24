@@ -12,7 +12,8 @@ import {
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
-import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { colors, typography, spacing, ENDPOINTS, borderWidths
+} from '../../constants';
 import { globalStyles } from '../../styles';
 import { Header } from '../../components';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
@@ -177,7 +178,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         width: '100%',
         alignItems: 'center',
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.primary,
     },
     joinedText: {

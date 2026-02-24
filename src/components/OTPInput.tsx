@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native';
-import { colors, typography } from '../constants';
+import { colors, typography, borderWidths
+} from '../constants';
 
 
 
@@ -63,7 +64,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 56,
         borderRadius: 12,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
         backgroundColor: colors.inputBackground,
         justifyContent: 'center',
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
     },
     boxActive: {
         borderColor: colors.primary,
-        borderWidth: 2,
+        borderWidth: borderWidths.medium,
     },
     boxFilled: {
         borderColor: colors.border,

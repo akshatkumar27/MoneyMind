@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
-import { colors, typography } from '../constants';
+import { colors, typography, borderWidths
+} from '../constants';
 
 
 
@@ -19,7 +20,7 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 8,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
         justifyContent: 'center',
         alignItems: 'center',

@@ -17,7 +17,8 @@ import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BackButton, AnimatedMascot, Header } from '../../components';
-import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { colors, typography, spacing, radii, ENDPOINTS, borderWidths
+} from '../../constants';
 import { globalStyles } from '../../styles';
 import { api } from '../../services/api';
 import { formatNumberInput } from '../../utils/formatNumber';
@@ -321,17 +322,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: colors.inputBackground,
-        borderRadius: 12,
+        borderRadius: radii.md,
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.sm,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
     },
     inputError: {
-        borderColor: '#ef4444',
+        borderColor: colors.danger,
     },
     errorText: {
-        color: '#ef4444',
+        color: colors.danger,
         fontSize: typography.caption,
         marginTop: 4,
     },
@@ -350,13 +351,13 @@ const styles = StyleSheet.create({
     },
     footer: {
         padding: spacing.lg,
-        borderTopWidth: 1,
+        borderTopWidth: borderWidths.thin,
         borderTopColor: colors.border,
         backgroundColor: colors.background,
     },
     saveButton: {
         backgroundColor: colors.primary,
-        borderRadius: 12,
+        borderRadius: radii.md,
         paddingVertical: spacing.md,
         alignItems: 'center',
     },

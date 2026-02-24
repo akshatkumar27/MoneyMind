@@ -14,7 +14,7 @@ import {
     AccountRow,
     AIInsightCard,
 } from '../../components';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, radii, categoryColors } from '../../constants';
 import { globalStyles } from '../../styles';
 import { useCurrency } from '../../context/CurrencyContext';
 
@@ -28,7 +28,7 @@ export const VaultScreen: React.FC = () => {
 
             {/* Header */}
             <View style={styles.header}>
-                <View style={styles.headerLeft}>
+                <View style={globalStyles.row}>
                     <View style={styles.logoIcon}>
                         <Text style={styles.logoText}>◀▶</Text>
                     </View>
@@ -39,12 +39,12 @@ export const VaultScreen: React.FC = () => {
                         </Text>
                     </View>
                 </View>
-                <View style={styles.headerRight}>
+                <View style={globalStyles.row}>
                     <TouchableOpacity
-                        style={styles.toggleButton}
+                        style={styles.iconButton}
                         onPress={() => setViewMode(viewMode === 'consolidated' ? 'manual' : 'consolidated')}
                     >
-                        <Text style={styles.toggleIcon}>⟳</Text>
+                        <Text style={styles.iconText}>⟳</Text>
                     </TouchableOpacity>
                     {viewMode === 'manual' && (
                         <TouchableOpacity style={styles.iconButton}>
@@ -60,7 +60,7 @@ export const VaultScreen: React.FC = () => {
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 {/* Total Balance */}
                 <View style={styles.balanceSection}>
-                    <Text style={styles.balanceLabel}>TOTAL LIQUID BALANCE</Text>
+                    <Text style={globalStyles.sectionLabel}>TOTAL LIQUID BALANCE</Text>
                     <View style={styles.balanceRow}>
                         <Text style={styles.rupeeSymbol}>{currencySymbol}</Text>
                         <Text style={styles.balanceValue}>12,45,600</Text>
@@ -74,7 +74,7 @@ export const VaultScreen: React.FC = () => {
                         <>
                             <StatCard label="AVAILABLE TO INVEST" value={`${currencySymbol}4.2L`} />
                             <View style={styles.statGap} />
-                            <StatCard label="MONTHLY YIELD" value={`${currencySymbol}8,420`} valueColor="#f59e0b" />
+                            <StatCard label="MONTHLY YIELD" value={`${currencySymbol}8,420`} valueColor={colors.warning} />
                         </>
                     ) : (
                         <>
@@ -89,12 +89,12 @@ export const VaultScreen: React.FC = () => {
                 </View>
 
                 {/* Accounts Section */}
-                <View style={styles.accountsSection}>
-                    <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>
+                <View style={styles.section}>
+                    <View style={globalStyles.sectionHeader}>
+                        <Text style={globalStyles.headingSmall}>
                             {viewMode === 'consolidated' ? 'Connected Accounts' : 'Manual Accounts'}
                         </Text>
-                        <Text style={styles.accountCount}>
+                        <Text style={globalStyles.caption}>
                             {viewMode === 'consolidated' ? '4 Active' : '3 Accounts'}
                         </Text>
                     </View>
@@ -106,40 +106,38 @@ export const VaultScreen: React.FC = () => {
                             subtitle={viewMode === 'consolidated' ? '•••• 5829' : 'UPDATED 2 DAYS AGO'}
                             amount={`${currencySymbol}8,24,500`}
                             badge={viewMode === 'consolidated' ? 'GPAY LINKED' : 'UPDATE'}
-                            badgeColor={viewMode === 'consolidated' ? '#22c55e' : '#f59e0b'}
+                            badgeVariant={viewMode === 'consolidated' ? 'success' : 'warning'}
                         />
-
                         <AccountRow
                             icon="💰"
                             name={viewMode === 'consolidated' ? 'ICICI Savings' : 'Cash in Hand'}
                             subtitle={viewMode === 'consolidated' ? '•••• 0042' : 'UPDATED 12 DAYS AGO'}
                             amount={viewMode === 'consolidated' ? `${currencySymbol}3,12,000` : `${currencySymbol}12,000`}
                             badge={viewMode === 'consolidated' ? 'LOW INTEREST' : 'UPDATE'}
-                            badgeColor={viewMode === 'consolidated' ? '#ef4444' : '#f59e0b'}
+                            badgeVariant={viewMode === 'consolidated' ? 'danger' : 'warning'}
                         />
-
                         <AccountRow
                             icon="📱"
                             name={viewMode === 'consolidated' ? 'Paytm Wallet' : 'Digital Wallet'}
                             subtitle={viewMode === 'consolidated' ? 'Mobile Wallet' : 'UPDATED TODAY'}
                             amount={`${currencySymbol}9,100`}
                             badge={viewMode === 'consolidated' ? 'GPAY LINKED' : 'UPDATE'}
-                            badgeColor={viewMode === 'consolidated' ? '#22c55e' : '#f59e0b'}
+                            badgeVariant={viewMode === 'consolidated' ? 'success' : 'warning'}
                         />
                     </Card>
                 </View>
 
                 {/* Monthly Spends */}
-                <View style={styles.spendsSection}>
-                    <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Monthly Spends</Text>
-                        <Text style={styles.spendsAmount}>{currencySymbol}42,800</Text>
+                <View style={styles.section}>
+                    <View style={globalStyles.sectionHeader}>
+                        <Text style={globalStyles.headingSmall}>Monthly Spends</Text>
+                        <Text style={globalStyles.headingSmall}>{currencySymbol}42,800</Text>
                     </View>
-                    <Text style={styles.spendsSubtitle}>
+                    <Text style={[globalStyles.caption, styles.spendsSubtitle]}>
                         {viewMode === 'consolidated' ? 'Smart Categorization' : 'Based on manual entries'}
                     </Text>
 
-                    <Card style={styles.spendsCard}>
+                    <Card>
                         <View style={styles.chartRow}>
                             <View style={styles.chartPlaceholder}>
                                 <View style={styles.chartCircle}>
@@ -147,21 +145,17 @@ export const VaultScreen: React.FC = () => {
                                 </View>
                             </View>
                             <View style={styles.chartLegend}>
-                                <View style={styles.legendItem}>
-                                    <View style={[styles.legendDot, { backgroundColor: '#22c55e' }]} />
-                                    <Text style={styles.legendLabel}>Shopping</Text>
-                                    <Text style={styles.legendValue}>35%</Text>
-                                </View>
-                                <View style={styles.legendItem}>
-                                    <View style={[styles.legendDot, { backgroundColor: '#3b82f6' }]} />
-                                    <Text style={styles.legendLabel}>Bills</Text>
-                                    <Text style={styles.legendValue}>30%</Text>
-                                </View>
-                                <View style={styles.legendItem}>
-                                    <View style={[styles.legendDot, { backgroundColor: '#f59e0b' }]} />
-                                    <Text style={styles.legendLabel}>Food</Text>
-                                    <Text style={styles.legendValue}>35%</Text>
-                                </View>
+                                {[
+                                    { label: 'Shopping', value: '35%', color: categoryColors.shopping },
+                                    { label: 'Bills', value: '30%', color: categoryColors.bills },
+                                    { label: 'Food', value: '35%', color: categoryColors.food },
+                                ].map(item => (
+                                    <View key={item.label} style={styles.legendItem}>
+                                        <View style={[styles.legendDot, { backgroundColor: item.color }]} />
+                                        <Text style={styles.legendLabel}>{item.label}</Text>
+                                        <Text style={styles.legendValue}>{item.value}</Text>
+                                    </View>
+                                ))}
                             </View>
                         </View>
                     </Card>
@@ -192,14 +186,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.lg,
         paddingVertical: spacing.md,
     },
-    headerLeft: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
     logoIcon: {
         width: 36,
         height: 36,
-        borderRadius: 10,
+        borderRadius: radii.sm,
         backgroundColor: colors.primary,
         justifyContent: 'center',
         alignItems: 'center',
@@ -220,43 +210,27 @@ const styles = StyleSheet.create({
         fontSize: 10,
         letterSpacing: 1,
     },
-    headerRight: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    toggleButton: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: colors.cardBackground,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: spacing.sm,
-    },
-    toggleIcon: {
-        color: colors.textPrimary,
-        fontSize: 16,
-    },
     iconButton: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: radii.full,
         backgroundColor: colors.cardBackground,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: spacing.sm,
+        marginLeft: spacing.sm,
     },
     iconText: {
         color: colors.textPrimary,
-        fontSize: 20,
+        fontSize: 18,
     },
     avatarContainer: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: radii.full,
         backgroundColor: colors.primary,
         justifyContent: 'center',
         alignItems: 'center',
+        marginLeft: spacing.sm,
     },
     avatarText: {
         fontSize: 16,
@@ -268,15 +242,10 @@ const styles = StyleSheet.create({
     balanceSection: {
         marginBottom: spacing.lg,
     },
-    balanceLabel: {
-        color: colors.textMuted,
-        fontSize: typography.caption,
-        letterSpacing: 1,
-        marginBottom: spacing.xs,
-    },
     balanceRow: {
         flexDirection: 'row',
         alignItems: 'baseline',
+        marginTop: spacing.xs,
     },
     rupeeSymbol: {
         color: colors.textPrimary,
@@ -303,8 +272,8 @@ const styles = StyleSheet.create({
     },
     lastUpdateBadge: {
         flex: 1,
-        backgroundColor: '#22c55e',
-        borderRadius: 8,
+        backgroundColor: colors.success,
+        borderRadius: radii.sm,
         padding: spacing.sm,
         alignItems: 'center',
         justifyContent: 'center',
@@ -319,39 +288,11 @@ const styles = StyleSheet.create({
         fontSize: typography.body,
         fontWeight: typography.semibold,
     },
-    accountsSection: {
+    section: {
         marginBottom: spacing.lg,
-    },
-    sectionHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: spacing.sm,
-    },
-    sectionTitle: {
-        color: colors.textPrimary,
-        fontSize: typography.body,
-        fontWeight: typography.semibold,
-    },
-    accountCount: {
-        color: colors.textMuted,
-        fontSize: typography.caption,
-    },
-    spendsSection: {
-        marginBottom: spacing.lg,
-    },
-    spendsAmount: {
-        color: colors.textPrimary,
-        fontSize: typography.body,
-        fontWeight: typography.semibold,
     },
     spendsSubtitle: {
-        color: colors.textMuted,
-        fontSize: typography.caption,
         marginBottom: spacing.sm,
-    },
-    spendsCard: {
-        padding: spacing.md,
     },
     chartRow: {
         flexDirection: 'row',
@@ -366,7 +307,7 @@ const styles = StyleSheet.create({
     chartCircle: {
         width: 80,
         height: 80,
-        borderRadius: 40,
+        borderRadius: radii.full,
         borderWidth: 12,
         borderColor: colors.primary,
         justifyContent: 'center',
@@ -387,7 +328,7 @@ const styles = StyleSheet.create({
     legendDot: {
         width: 10,
         height: 10,
-        borderRadius: 5,
+        borderRadius: radii.full,
         marginRight: spacing.sm,
     },
     legendLabel: {

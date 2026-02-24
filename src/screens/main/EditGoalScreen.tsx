@@ -18,7 +18,8 @@ import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
-import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { colors, typography, spacing, radii, ENDPOINTS, borderWidths
+} from '../../constants';
 import { globalStyles } from '../../styles';
 import { Header, Button, AnimatedMascot } from '../../components';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
@@ -320,10 +321,10 @@ export const EditGoalScreen: React.FC = () => {
                                 disabled={isLoading}
                             >
                                 <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-                                    <Path d="M3 6h18" stroke="#ef4444" strokeWidth={2} strokeLinecap="round" />
-                                    <Path d="M8 6V4h8v2" stroke="#ef4444" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                                    <Path d="M19 6l-1 14H6L5 6" stroke="#ef4444" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                                    <Path d="M10 11v6M14 11v6" stroke="#ef4444" strokeWidth={2} strokeLinecap="round" />
+                                    <Path d="M3 6h18" stroke={colors.danger} strokeWidth={2} strokeLinecap="round" />
+                                    <Path d="M8 6V4h8v2" stroke={colors.danger} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                                    <Path d="M19 6l-1 14H6L5 6" stroke={colors.danger} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                                    <Path d="M10 11v6M14 11v6" stroke={colors.danger} strokeWidth={2} strokeLinecap="round" />
                                 </Svg>
                             </TouchableOpacity>
                         }
@@ -511,7 +512,7 @@ const styles = StyleSheet.create({
     formCard: {
         // backgroundColor: colors.cardBackground,
         // borderRadius: 16,
-        // borderWidth: 1,
+        // borderWidth: borderWidths.thin,
         borderColor: colors.border,
         // padding: spacing.lg,
         marginTop: spacing.md,
@@ -530,9 +531,9 @@ const styles = StyleSheet.create({
     },
     textInput: {
         backgroundColor: 'transparent',
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
-        borderRadius: 8,
+        borderRadius: radii.sm,
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.sm,
         color: colors.textPrimary,
@@ -549,9 +550,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: colors.cardBackground,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
-        borderRadius: 8,
+        borderRadius: radii.sm,
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.sm,
         maxWidth: 150,
@@ -593,9 +594,9 @@ const styles = StyleSheet.create({
     durationOption: {
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.sm,
-        borderRadius: 20,
+        borderRadius: radii.full,
         backgroundColor: colors.cardBackground,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
     },
     durationOptionSelected: {
@@ -617,9 +618,9 @@ const styles = StyleSheet.create({
     },
     customMonthsInput: {
         backgroundColor: colors.cardBackground,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.primary,
-        borderRadius: 8,
+        borderRadius: radii.sm,
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.sm,
         color: colors.textPrimary,
@@ -645,10 +646,10 @@ const styles = StyleSheet.create({
     trashButton: {
         width: 36,
         height: 36,
-        borderRadius: 10,
-        backgroundColor: 'rgba(239, 68, 68, 0.12)',
-        borderWidth: 1,
-        borderColor: 'rgba(239, 68, 68, 0.3)',
+        borderRadius: radii.sm,
+        backgroundColor: colors.dangerSubtle,
+        borderWidth: borderWidths.thin,
+        borderColor: colors.danger + '4d',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -662,13 +663,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.xl,
     },
     modalCard: {
-        backgroundColor: '#1a1a2e',
-        borderRadius: 20,
+        backgroundColor: colors.cardBackground,
+        borderRadius: radii.xl,
         padding: spacing.xl,
         width: '100%',
         alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#2a2a4a',
+        borderWidth: borderWidths.thin,
+        borderColor: colors.border,
     },
     modalIcon: {
         fontSize: 40,
@@ -699,8 +700,8 @@ const styles = StyleSheet.create({
     modalCancelBtn: {
         flex: 1,
         paddingVertical: spacing.md,
-        borderRadius: 10,
-        borderWidth: 1,
+        borderRadius: radii.sm,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
         alignItems: 'center',
         backgroundColor: colors.cardBackground,
@@ -713,9 +714,9 @@ const styles = StyleSheet.create({
     modalDeleteBtn: {
         flex: 1,
         paddingVertical: spacing.md,
-        borderRadius: 10,
+        borderRadius: radii.sm,
         alignItems: 'center',
-        backgroundColor: '#ef4444',
+        backgroundColor: colors.danger,
     },
     modalDeleteText: {
         color: '#fff',

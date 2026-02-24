@@ -15,7 +15,8 @@ import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, CommonActions } from '@react-navigation/native';
 import { BackButton, Header } from '../../components';
-import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { colors, typography, spacing, radii, ENDPOINTS, borderWidths
+} from '../../constants';
 import { globalStyles } from '../../styles';
 import { formatCurrency } from '../../utils';
 import { api } from '../../services/api';
@@ -276,7 +277,7 @@ const styles = StyleSheet.create({
     },
     card: {
         backgroundColor: colors.cardBackground,
-        borderRadius: 16,
+        borderRadius: radii.lg,
         overflow: 'hidden',
     },
     infoRow: {
@@ -287,7 +288,7 @@ const styles = StyleSheet.create({
         paddingVertical: spacing.md,
     },
     infoRowBorder: {
-        borderBottomWidth: 0.3,
+        borderBottomWidth: borderWidths.hairline,
         borderBottomColor: colors.border,
     },
     infoLeft: {
@@ -315,17 +316,17 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.lg,
     },
     deleteButton: {
-        backgroundColor: '#fee2e2',
+        backgroundColor: colors.dangerSubtle,
         marginHorizontal: spacing.lg,
         paddingVertical: spacing.md,
-        borderRadius: 12,
+        borderRadius: radii.md,
         alignItems: 'center',
         marginBottom: spacing.xxl,
-        borderWidth: 1,
-        borderColor: '#fca5a5',
+        borderWidth: borderWidths.thin,
+        borderColor: colors.danger,
     },
     deleteButtonText: {
-        color: '#ef4444',
+        color: colors.danger,
         fontSize: typography.body,
         fontWeight: 'bold',
     },
@@ -338,7 +339,7 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
         backgroundColor: colors.cardBackground,
-        borderRadius: 20,
+        borderRadius: radii.xl,
         padding: spacing.xl,
         width: '100%',
         maxWidth: 320,
@@ -347,8 +348,8 @@ const styles = StyleSheet.create({
     modalIconContainer: {
         width: 60,
         height: 60,
-        borderRadius: 30,
-        backgroundColor: '#fee2e2',
+        borderRadius: radii.full,
+        backgroundColor: colors.dangerSubtle,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: spacing.md,
@@ -377,7 +378,7 @@ const styles = StyleSheet.create({
     modalCancelButton: {
         flex: 1,
         backgroundColor: colors.inputBackground,
-        borderRadius: 12,
+        borderRadius: radii.md,
         paddingVertical: spacing.md,
         alignItems: 'center',
     },
@@ -388,8 +389,8 @@ const styles = StyleSheet.create({
     },
     modalDeleteButton: {
         flex: 1,
-        backgroundColor: '#ef4444',
-        borderRadius: 12,
+        backgroundColor: colors.danger,
+        borderRadius: radii.md,
         paddingVertical: spacing.md,
         alignItems: 'center',
     },
@@ -406,7 +407,7 @@ const styles = StyleSheet.create({
         marginLeft: spacing.sm,
         padding: 4,
         backgroundColor: colors.inputBackground,
-        borderRadius: 8,
+        borderRadius: radii.sm,
     },
     editIconSmall: {
         fontSize: 14,

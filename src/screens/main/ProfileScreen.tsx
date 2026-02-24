@@ -13,7 +13,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, CommonActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BackButton } from '../../components';
-import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { colors, typography, spacing, radii, ENDPOINTS, borderWidths
+} from '../../constants';
 import { globalStyles } from '../../styles';
 import { notificationService } from '../../services/NotificationService';
 import api from '../../services/api';
@@ -235,7 +236,7 @@ const styles = StyleSheet.create({
     avatarLarge: {
         width: 80,
         height: 80,
-        borderRadius: 40,
+        borderRadius: radii.full,
         backgroundColor: colors.primary,
         justifyContent: 'center',
         alignItems: 'center',
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
     },
     menuSection: {
         backgroundColor: colors.cardBackground,
-        borderRadius: 16,
+        borderRadius: radii.lg,
         marginBottom: spacing.lg,
     },
     menuItem: {
@@ -264,7 +265,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.md,
-        borderBottomWidth: 0.3,
+        borderBottomWidth: borderWidths.hairline,
         borderBottomColor: colors.border,
     },
     menuIcon: {
@@ -282,15 +283,15 @@ const styles = StyleSheet.create({
     },
     logoutButton: {
         backgroundColor: colors.cardBackground,
-        borderRadius: 12,
+        borderRadius: radii.md,
         paddingVertical: spacing.md,
         alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#ef4444',
+        borderWidth: borderWidths.thin,
+        borderColor: colors.danger,
         marginBottom: spacing.lg,
     },
     logoutText: {
-        color: '#ef4444',
+        color: colors.danger,
         fontSize: typography.body,
         fontWeight: typography.medium,
     },
@@ -319,8 +320,8 @@ const styles = StyleSheet.create({
     modalIconContainer: {
         width: 60,
         height: 60,
-        borderRadius: 30,
-        backgroundColor: '#ef444420',
+        borderRadius: radii.full,
+        backgroundColor: colors.dangerSubtle,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: spacing.md,
@@ -349,7 +350,7 @@ const styles = StyleSheet.create({
     modalCancelButton: {
         flex: 1,
         backgroundColor: colors.inputBackground,
-        borderRadius: 12,
+        borderRadius: radii.md,
         paddingVertical: spacing.md,
         alignItems: 'center',
     },
@@ -360,8 +361,8 @@ const styles = StyleSheet.create({
     },
     modalLogoutButton: {
         flex: 1,
-        backgroundColor: '#ef4444',
-        borderRadius: 12,
+        backgroundColor: colors.danger,
+        borderRadius: radii.md,
         paddingVertical: spacing.md,
         alignItems: 'center',
     },

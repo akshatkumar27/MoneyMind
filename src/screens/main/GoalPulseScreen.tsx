@@ -22,7 +22,8 @@ import {
     AnimatedMascot,
     MascotLoader,
 } from '../../components';
-import { colors, typography, spacing, ENDPOINTS } from '../../constants';
+import { colors, typography, spacing, radii, ENDPOINTS, borderWidths
+} from '../../constants';
 import { globalStyles } from '../../styles';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import Toast from 'react-native-toast-message';
@@ -92,7 +93,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
     progress,
     size = 160,
     strokeWidth = 14,
-    progressColor = '#22c55e',
+    progressColor = colors.success,
     trackColor = colors.cardBackground,
 }) => {
     const radius = (size - strokeWidth) / 2;
@@ -369,7 +370,7 @@ export const GoalPulseScreen: React.FC = () => {
                                     achieveInMonths={goal.achieve_in_months}
                                     targetAmount={typeof goal.target_amount === 'string' ? parseFloat(goal.target_amount) : goal.target_amount}
                                     savedAmount={goal.saved_amount}
-                                    color="#22c55e"
+                                    color={colors.success}
                                     suggestionTitle="AI suggestions"
                                     suggestionDescription="Track your progress and stay on target for this goal."
                                     onCardPress={() => navigation.navigate('Contributions', {
@@ -539,7 +540,7 @@ const styles = StyleSheet.create({
     iconButton: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: radii.full,
         backgroundColor: colors.cardBackground,
         justifyContent: 'center',
         alignItems: 'center',
@@ -551,7 +552,7 @@ const styles = StyleSheet.create({
     avatarContainer: {
         width: 36,
         height: 36,
-        borderRadius: 18,
+        borderRadius: radii.full,
         backgroundColor: colors.primary,
         justifyContent: 'center',
         alignItems: 'center',
@@ -560,7 +561,7 @@ const styles = StyleSheet.create({
     userIconHead: {
         width: 12,
         height: 12,
-        borderRadius: 6,
+        borderRadius: radii.full,
         backgroundColor: colors.textPrimary,
         marginBottom: 2,
     },
@@ -585,7 +586,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: spacing.xl,
         alignItems: 'center',
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: '#2a4a6a',
     },
     pulseCardTitle: {
@@ -611,9 +612,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: 180,
         height: 180,
-        borderRadius: 90,
-        backgroundColor: 'rgba(34, 197, 94, 0.15)',
-        shadowColor: '#22c55e',
+        borderRadius: radii.full,
+        backgroundColor: colors.successSubtle,
+        shadowColor: colors.success,
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 0.5,
         shadowRadius: 30,
@@ -646,7 +647,7 @@ const styles = StyleSheet.create({
         right: spacing.lg,
         width: 56,
         height: 56,
-        borderRadius: 28,
+        borderRadius: radii.full,
         backgroundColor: colors.primary,
         justifyContent: 'center',
         alignItems: 'center',
@@ -702,13 +703,13 @@ const styles = StyleSheet.create({
         paddingBottom: spacing.sm,
     },
     budgetBadge: {
-        color: '#22c55e',
+        color: colors.success,
         fontSize: typography.caption,
         fontWeight: typography.semibold,
-        backgroundColor: 'rgba(34,197,94,0.12)',
+        backgroundColor: colors.successSubtle,
         paddingHorizontal: spacing.sm,
         paddingVertical: 3,
-        borderRadius: 20,
+        borderRadius: radii.full,
         overflow: 'hidden',
         marginTop: spacing.md,
         marginBottom: spacing.xs,
@@ -716,11 +717,11 @@ const styles = StyleSheet.create({
     suggestionCard: {
         width: 180,
         backgroundColor: colors.cardBackground,
-        borderRadius: 16,
+        borderRadius: radii.lg,
         padding: spacing.md,
         marginRight: spacing.md,
-        borderWidth: 1,
-        borderColor: colors.primary + '30',
+        borderWidth: borderWidths.thin,
+        borderColor: colors.primarySubtle,
     },
     suggestionIcon: {
         fontSize: 28,
@@ -753,7 +754,7 @@ const styles = StyleSheet.create({
     },
     suggestionAddBtn: {
         backgroundColor: colors.primary,
-        borderRadius: 8,
+        borderRadius: radii.sm,
         paddingVertical: spacing.sm,
         alignItems: 'center',
     },

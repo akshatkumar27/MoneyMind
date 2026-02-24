@@ -14,7 +14,8 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BackButton, Header } from '../../components';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, borderWidths
+} from '../../constants';
 import { globalStyles } from '../../styles';
 
 // Enable LayoutAnimation for Android
@@ -127,7 +128,7 @@ const styles = StyleSheet.create({
         marginTop: spacing.md,
         marginBottom: spacing.xl,
         alignItems: 'center',
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
     },
     contactTitle: {
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     faqItem: {
-        borderBottomWidth: 1,
+        borderBottomWidth: borderWidths.thin,
         borderBottomColor: colors.border,
     },
     faqHeader: {

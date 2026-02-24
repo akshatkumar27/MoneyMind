@@ -12,7 +12,8 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BackButton, Header } from '../../components';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, radii, borderWidths
+} from '../../constants';
 import { globalStyles } from '../../styles';
 import { notificationService } from '../../services/NotificationService';
 import Toast from 'react-native-toast-message';
@@ -81,7 +82,7 @@ export const NotificationSettingsScreen: React.FC = () => {
                 <View style={[styles.card, styles.masterCard]}>
                     <View style={styles.settingRow}>
                         <View style={styles.rowLeft}>
-                            <View style={[styles.iconContainer, { backgroundColor: '#ef444420' }]}>
+                            <View style={[styles.iconContainer, { backgroundColor: colors.dangerSubtle }]}>
                                 <Text style={styles.iconText}>🔕</Text>
                             </View>
                             <View>
@@ -200,7 +201,7 @@ const styles = StyleSheet.create({
     },
     card: {
         backgroundColor: colors.cardBackground,
-        borderRadius: 16,
+        borderRadius: radii.lg,
         overflow: 'hidden',
     },
     masterCard: {
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
     iconContainer: {
         width: 40,
         height: 40,
-        borderRadius: 20,
+        borderRadius: radii.full,
         backgroundColor: colors.inputBackground,
         justifyContent: 'center',
         alignItems: 'center',
@@ -267,10 +268,10 @@ const styles = StyleSheet.create({
         backgroundColor: colors.inputBackground,
         marginHorizontal: spacing.lg,
         paddingVertical: spacing.md,
-        borderRadius: 12,
+        borderRadius: radii.md,
         alignItems: 'center',
         marginBottom: spacing.xxl,
-        borderWidth: 1,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
     },
     testButtonText: {

@@ -11,7 +11,8 @@
  */
 
 import { StyleSheet } from 'react-native';
-import { colors, typography, spacing } from '../constants';
+import { colors, typography, spacing, radii, borderWidths
+} from '../constants';
 
 export const globalStyles = StyleSheet.create({
     // ─── Root ───────────────────────────────────────────────────────────────────
@@ -44,14 +45,14 @@ export const globalStyles = StyleSheet.create({
     /** Base dark card */
     card: {
         backgroundColor: colors.cardBackground,
-        borderRadius: 16,
+        borderRadius: radii.lg,
         overflow: 'hidden',
     },
 
     /** Card with padding */
     cardPadded: {
         backgroundColor: colors.cardBackground,
-        borderRadius: 16,
+        borderRadius: radii.lg,
         padding: spacing.md,
     },
 
@@ -135,7 +136,7 @@ export const globalStyles = StyleSheet.create({
         backgroundColor: colors.primary,
         paddingVertical: 16,
         paddingHorizontal: 24,
-        borderRadius: 12,
+        borderRadius: radii.md,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -154,9 +155,9 @@ export const globalStyles = StyleSheet.create({
 
     /** Danger/destructive button */
     dangerButton: {
-        backgroundColor: '#ef4444',
+        backgroundColor: colors.danger,
         paddingVertical: spacing.md,
-        borderRadius: 12,
+        borderRadius: radii.md,
         alignItems: 'center',
     },
 
@@ -173,8 +174,8 @@ export const globalStyles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: colors.inputBackground,
-        borderRadius: 12,
-        borderWidth: 1,
+        borderRadius: radii.md,
+        borderWidth: borderWidths.thin,
         borderColor: colors.border,
         paddingHorizontal: spacing.md,
     },
@@ -237,7 +238,7 @@ export const globalStyles = StyleSheet.create({
     footer: {
         paddingHorizontal: spacing.lg,
         paddingBottom: spacing.lg,
-        borderTopWidth: 1,
+        borderTopWidth: borderWidths.thin,
         borderTopColor: colors.border,
         backgroundColor: colors.background,
     },
@@ -261,7 +262,7 @@ export const globalStyles = StyleSheet.create({
     /** White/card modal container */
     modalCard: {
         backgroundColor: colors.cardBackground,
-        borderRadius: 20,
+        borderRadius: radii.xl,
         padding: spacing.xl,
         width: '100%',
         maxWidth: 320,

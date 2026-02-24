@@ -5,19 +5,30 @@ import {
     ActivityIndicator,
     ViewStyle,
     TextStyle,
+    StyleSheet,
 } from 'react-native';
-import { colors } from '../constants';
-import { globalStyles } from '../styles';
+import { colors, radii, typography, spacing, borderWidths
+} from '../constants';
 
+export type ButtonVariant = 'primary' | 'outline' | 'ghost';
 
-
-import { ButtonProps } from './types';
+export interface ButtonProps {
+    title: string;
+    onPress: () => void;
+    loading?: boolean;
+    disabled?: boolean;
+    variant?: ButtonVariant;
+    style?: ViewStyle;
+    textStyle?: TextStyle;
+    showArrow?: boolean;
+}
 
 export const Button: React.FC<ButtonProps> = ({
     title,
     onPress,
     loading = false,
     disabled = false,
+    variant = 'primary',
     style,
     textStyle,
     showArrow = true,
@@ -25,8 +36,9 @@ export const Button: React.FC<ButtonProps> = ({
     return (
         <TouchableOpacity
             style={[
-                globalStyles.primaryButton,
-                (disabled || loading) && globalStyles.buttonDisabled,
+                styles.base,
+                styles[variant],
+                (disabled || loading) && styles.disabled,
                 style,
             ]}
             onPress={onPress}
@@ -34,9 +46,9 @@ export const Button: React.FC<ButtonProps> = ({
             activeOpacity={0.8}
         >
             {loading ? (
-                <ActivityIndicator color={colors.textPrimary} />
+                <ActivityIndicator color={variant === 'primary' ? colors.textPrimary : colors.primary} />
             ) : (
-                <Text style={[globalStyles.primaryButtonText, textStyle]}>
+                <Text style={[styles.baseText, styles[`${variant}Text`], textStyle]}>
                     {title} {showArrow && '→'}
                 </Text>
             )}
@@ -44,4 +56,46 @@ export const Button: React.FC<ButtonProps> = ({
     );
 };
 
-
+const styles = StyleSheet.create({
+    base: {
+        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.lg,
+        borderRadius: radii.md,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: borderWidths.thin,
+        borderColor: 'transparent',
+    },
+    // ─── Variants ─────────────────────────────────────────────────────────────
+    primary: {
+        backgroundColor: colors.primary,
+        borderColor: colors.primary,
+    },
+    outline: {
+        backgroundColor: 'transparent',
+        borderColor: colors.border,
+    },
+    ghost: {
+        backgroundColor: 'transparent',
+        borderColor: 'transparent',
+        paddingVertical: spacing.sm,
+    },
+    // ─── Text ─────────────────────────────────────────────────────────────────
+    baseText: {
+        fontSize: typography.body,
+        fontWeight: typography.semibold,
+    },
+    primaryText: {
+        color: colors.textPrimary,
+    },
+    outlineText: {
+        color: colors.textPrimary,
+    },
+    ghostText: {
+        color: colors.primary,
+    },
+    // ─── State ────────────────────────────────────────────────────────────────
+    disabled: {
+        opacity: 0.5,
+    },
+});

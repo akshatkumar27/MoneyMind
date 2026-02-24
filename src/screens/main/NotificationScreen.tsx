@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BackButton, Header } from '../../components';
-import { colors, typography, spacing } from '../../constants';
+import { colors, typography, spacing, radii } from '../../constants';
 import { globalStyles } from '../../styles';
 import { useCurrency } from '../../context/CurrencyContext';
 
@@ -42,11 +42,11 @@ const getNotificationIcon = (type: string) => {
 const getNotificationColor = (type: string) => {
     switch (type) {
         case 'suggestion':
-            return '#f59e0b';
+            return colors.warning;
         case 'alert':
-            return '#ef4444';
+            return colors.danger;
         case 'update':
-            return '#22c55e';
+            return colors.success;
         case 'achievement':
             return '#8b5cf6';
         default:
@@ -226,11 +226,11 @@ const styles = StyleSheet.create({
     },
     settingsIcon: { fontSize: 24 },
     unreadBadge: {
-        backgroundColor: colors.primary + '20',
+        backgroundColor: colors.primarySubtle,
         marginHorizontal: spacing.lg,
         paddingVertical: spacing.sm,
         paddingHorizontal: spacing.md,
-        borderRadius: 8,
+        borderRadius: radii.sm,
         marginBottom: spacing.md,
     },
     unreadText: {
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     notificationCard: {
         flexDirection: 'row',
         backgroundColor: colors.cardBackground,
-        borderRadius: 12,
+        borderRadius: radii.md,
         padding: spacing.md,
         marginBottom: spacing.sm,
     },
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     iconContainer: {
         width: 40,
         height: 40,
-        borderRadius: 10,
+        borderRadius: radii.sm,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: spacing.md,
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     unreadDot: {
         width: 8,
         height: 8,
-        borderRadius: 4,
+        borderRadius: radii.full,
         backgroundColor: colors.primary,
     },
     notificationDescription: {
