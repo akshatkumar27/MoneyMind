@@ -7,13 +7,13 @@ import {
     StatusBar,
     ScrollView,
     TouchableOpacity,
-    Modal,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, CommonActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { BackButton } from '../../components';
-import { colors, typography, spacing, radii, ENDPOINTS, borderWidths
+import { BackButton, AppModal } from '../../components';
+import {
+    colors, typography, spacing, radii, ENDPOINTS, borderWidths
 } from '../../constants';
 import { globalStyles } from '../../styles';
 import { notificationService } from '../../services/NotificationService';
@@ -97,39 +97,18 @@ export const ProfileScreen: React.FC = () => {
         <SafeAreaView style={globalStyles.container}>
             <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
-            {/* Logout Confirmation Modal */}
-            <Modal
-                animationType="fade"
-                transparent={true}
+            <AppModal
                 visible={logoutModalVisible}
-                onRequestClose={() => setLogoutModalVisible(false)}
-            >
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContainer}>
-                        <View style={styles.modalIconContainer}>
-                            <Text style={styles.modalIcon}>👋</Text>
-                        </View>
-                        <Text style={styles.modalTitle}>Log Out</Text>
-                        <Text style={styles.modalMessage}>
-                            Are you sure you want to log out of your account?
-                        </Text>
-                        <View style={styles.modalButtons}>
-                            <TouchableOpacity
-                                style={styles.modalCancelButton}
-                                onPress={() => setLogoutModalVisible(false)}
-                            >
-                                <Text style={styles.modalCancelText}>Cancel</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.modalLogoutButton}
-                                onPress={handleLogout}
-                            >
-                                <Text style={styles.modalLogoutText}>Log Out</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
+                type="warning"
+                customIcon="👋"
+                title="Log Out"
+                message="Are you sure you want to log out of your account?"
+                confirmText="Log Out"
+                cancelText="Cancel"
+                showCancelButton
+                onConfirm={handleLogout}
+                onCancel={() => setLogoutModalVisible(false)}
+            />
 
             {/* Header */}
             <View style={styles.header}>

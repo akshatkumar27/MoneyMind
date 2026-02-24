@@ -18,10 +18,11 @@ import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
-import { colors, typography, spacing, radii, ENDPOINTS, borderWidths
+import {
+    colors, typography, spacing, radii, ENDPOINTS, borderWidths
 } from '../../constants';
 import { globalStyles } from '../../styles';
-import { Header, Button, AnimatedMascot } from '../../components';
+import { Header, Button, AnimatedMascot, AppModal } from '../../components';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import { api } from '../../services';
 import { formatNumberInput } from '../../utils/formatNumber';
@@ -458,44 +459,19 @@ export const EditGoalScreen: React.FC = () => {
                 </ScrollView>
             </KeyboardAvoidingView>
 
-            {/* Delete Confirmation Modal */}
-            <Modal
+            <AppModal
                 visible={showDeleteModal}
-                transparent
-                animationType="fade"
-                onRequestClose={() => setShowDeleteModal(false)}
-            >
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalCard}>
-                        <Text style={styles.modalIcon}>🗑️</Text>
-                        <Text style={styles.modalTitle}>Delete Goal</Text>
-                        <Text style={styles.modalMessage}>
-                            Are you sure you want to delete{' '}
-                            <Text style={styles.modalGoalName}>{name}</Text>?
-                            {' '}This action cannot be undone.
-                        </Text>
-                        <View style={styles.modalActions}>
-                            <TouchableOpacity
-                                style={styles.modalCancelBtn}
-                                onPress={() => setShowDeleteModal(false)}
-                                disabled={isDeleting}
-                            >
-                                <Text style={styles.modalCancelText}>Cancel</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.modalDeleteBtn}
-                                onPress={confirmDelete}
-                                disabled={isDeleting}
-                            >
-                                {isDeleting
-                                    ? <ActivityIndicator size="small" color="#fff" />
-                                    : <Text style={styles.modalDeleteText}>Delete</Text>
-                                }
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
+                type="danger"
+                customIcon="🗑️"
+                title="Delete Goal"
+                message={`Are you sure you want to delete ${name}? This action cannot be undone.`}
+                confirmText="Delete"
+                cancelText="Cancel"
+                showCancelButton
+                confirmLoading={isDeleting}
+                onConfirm={confirmDelete}
+                onCancel={() => setShowDeleteModal(false)}
+            />
         </SafeAreaView>
     );
 };

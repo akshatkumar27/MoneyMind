@@ -10,6 +10,7 @@ export { FooterLinks } from './FooterLinks';
 export { AnimatedMascot } from './AnimatedMascot';
 export { SkeletonLoader } from './SkeletonLoader';
 export { ConfirmationModal } from './ConfirmationModal';
+export { AppModal } from './AppModal';
 export { MascotLoader } from './MascotLoader';
 export * from './Header';
 

@@ -8,14 +8,14 @@ import {
     ScrollView,
     ActivityIndicator,
     TouchableOpacity,
-    Modal,
     TextInput,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, CommonActions } from '@react-navigation/native';
-import { BackButton, Header } from '../../components';
-import { colors, typography, spacing, radii, ENDPOINTS, borderWidths
+import { BackButton, Header, AppModal } from '../../components';
+import {
+    colors, typography, spacing, radii, ENDPOINTS, borderWidths
 } from '../../constants';
 import { globalStyles } from '../../styles';
 import { formatCurrency } from '../../utils';
@@ -220,44 +220,18 @@ export const PersonalInfoScreen: React.FC = () => {
                 </TouchableOpacity>
             </ScrollView>
 
-            <Modal
-                transparent={true}
+            <AppModal
                 visible={deleteModalVisible}
-                animationType="fade"
-                onRequestClose={() => setDeleteModalVisible(false)}
-            >
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContainer}>
-                        <View style={styles.modalIconContainer}>
-                            <Text style={styles.modalIcon}>⚠️</Text>
-                        </View>
-                        <Text style={styles.modalTitle}>Delete Account</Text>
-                        <Text style={styles.modalMessage}>
-                            Are you sure you want to permanently delete your account? This action cannot be undone and all your data will be lost.
-                        </Text>
-                        <View style={styles.modalButtons}>
-                            <TouchableOpacity
-                                style={styles.modalCancelButton}
-                                onPress={() => setDeleteModalVisible(false)}
-                                disabled={isDeleting}
-                            >
-                                <Text style={styles.modalCancelText}>Cancel</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.modalDeleteButton}
-                                onPress={handleConfirmDelete}
-                                disabled={isDeleting}
-                            >
-                                {isDeleting ? (
-                                    <ActivityIndicator size="small" color="#fff" />
-                                ) : (
-                                    <Text style={styles.modalDeleteText}>Delete</Text>
-                                )}
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
+                type="danger"
+                title="Delete Account"
+                message="Are you sure you want to permanently delete your account? This action cannot be undone and all your data will be lost."
+                confirmText="Delete"
+                cancelText="Cancel"
+                showCancelButton
+                confirmLoading={isDeleting}
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setDeleteModalVisible(false)}
+            />
 
 
 

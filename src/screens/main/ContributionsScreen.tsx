@@ -9,17 +9,17 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     TextInput,
-    Modal,
     DeviceEventEmitter,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { colors, typography, spacing, radii, ENDPOINTS, borderWidths
+import {
+    colors, typography, spacing, radii, ENDPOINTS, borderWidths
 } from '../../constants';
 import { globalStyles } from '../../styles';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
-import { BackButton, ConfirmationModal, SkeletonLoader, AnimatedMascot, Header } from '../../components';
+import { BackButton, ConfirmationModal, SkeletonLoader, AnimatedMascot, Header, AppModal } from '../../components';
 import api from '../../services/api';
 import { formatCurrency } from '../../utils';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -422,65 +422,40 @@ export const ContributionsScreen: React.FC = () => {
                 onCancel={closeModal}
             />
 
-            {/* Edit Contribution Modal */}
-            <Modal
+            <AppModal
                 visible={editModalVisible}
-                transparent={true}
-                animationType="fade"
-                onRequestClose={handleCloseEditModal}
+                title="Edit Contribution"
+                subtitle={`Enter a new amount for ${selectedContribution?.monthKey}`}
+                confirmText="Save"
+                cancelText="Cancel"
+                showCancelButton
+                confirmLoading={isSaving}
+                confirmVariant="primary"
+                onConfirm={handleSaveEdit}
+                onCancel={handleCloseEditModal}
             >
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>Edit Contribution</Text>
-                        <Text style={styles.modalSubtitle}>
-                            Enter a new amount for {selectedContribution?.monthKey}
-                        </Text>
-
-                        <View style={styles.modalInputContainer}>
-                            <Text style={styles.modalCurrencyPrefix}>{currencySymbol}</Text>
-                            <TextInput
-                                style={styles.modalInput}
-                                value={editModalValue}
-                                onChangeText={(text) => {
-                                    setEditModalValue(text);
-                                    setEditError('');
-                                }}
-                                keyboardType="number-pad"
-                                autoFocus
-                                placeholder="0"
-                                placeholderTextColor={colors.textMuted}
-                            />
-                        </View>
-
-                        {editError ? (
-                            <Text style={styles.modalErrorText}>{editError}</Text>
-                        ) : null}
-
-                        <Text style={styles.modalHintText}>
-                            Max allowed: {formatCurrency(monthlyContribution, currencySymbol)}
-                        </Text>
-
-                        <View style={styles.modalButtons}>
-                            <TouchableOpacity
-                                style={[styles.modalButton, styles.modalButtonCancel]}
-                                onPress={handleCloseEditModal}
-                            >
-                                <Text style={styles.modalButtonTextCancel}>Cancel</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={[styles.modalButton, styles.modalButtonSave]}
-                                onPress={handleSaveEdit}
-                            >
-                                {isSaving ? (
-                                    <ActivityIndicator size="small" color="#fff" />
-                                ) : (
-                                    <Text style={styles.modalButtonTextSave}>Save</Text>
-                                )}
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+                <View style={styles.modalInputContainer}>
+                    <Text style={styles.modalCurrencyPrefix}>{currencySymbol}</Text>
+                    <TextInput
+                        style={styles.modalInput}
+                        value={editModalValue}
+                        onChangeText={(text) => {
+                            setEditModalValue(text);
+                            setEditError('');
+                        }}
+                        keyboardType="number-pad"
+                        autoFocus
+                        placeholder="0"
+                        placeholderTextColor={colors.textMuted}
+                    />
                 </View>
-            </Modal>
+                {editError ? (
+                    <Text style={styles.modalErrorText}>{editError}</Text>
+                ) : null}
+                <Text style={styles.modalHintText}>
+                    Max allowed: {formatCurrency(monthlyContribution, currencySymbol)}
+                </Text>
+            </AppModal>
 
 
             {/* Header */}

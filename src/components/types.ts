@@ -36,17 +36,33 @@ export interface ButtonProps {
     showArrow?: boolean;
 }
 
-export interface ConfirmationModalProps {
+export interface AppModalProps {
     visible: boolean;
     title: string;
-    message: string;
+    /** Main descriptive paragraph below the title (for alert/confirm modals). */
+    message?: string;
+    /** Secondary line below the title, rendered smaller (for form modals). */
+    subtitle?: string;
     confirmText?: string;
     cancelText?: string;
     onConfirm: () => void;
     onCancel: () => void;
-    type?: 'success' | 'error' | 'warning' | 'info';
+    /** Controls the icon and default confirm-button colour. */
+    type?: 'success' | 'error' | 'warning' | 'info' | 'danger';
+    /** Overrides the confirm-button colour only. */
+    confirmVariant?: 'primary' | 'danger';
+    /** Override the auto-selected emoji icon. */
+    customIcon?: string;
     showCancelButton?: boolean;
+    /** Shows a spinner on the confirm button during async actions. */
+    confirmLoading?: boolean;
+    /** Arbitrary form content rendered between subtitle and buttons. */
+    children?: React.ReactNode;
 }
+
+/** @deprecated Use AppModalProps instead */
+export type ConfirmationModalProps = AppModalProps;
+
 
 export interface CardProps {
     children: React.ReactNode;
