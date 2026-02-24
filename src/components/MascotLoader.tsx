@@ -2,9 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import { View, Image, StyleSheet, Animated, Easing } from 'react-native';
 import { colors } from '../constants';
 
-interface MascotLoaderProps {
-    size?: number;
-}
+
+
+import { MascotLoaderProps } from './types';
 
 export const MascotLoader: React.FC<MascotLoaderProps> = ({ size = 120 }) => {
     const floatAnim = useRef(new Animated.Value(0)).current;

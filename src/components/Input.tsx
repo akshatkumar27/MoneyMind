@@ -10,12 +10,9 @@ import {
 import { colors, typography } from '../constants';
 import { globalStyles } from '../styles';
 
-interface InputProps extends TextInputProps {
-    label?: string;
-    icon?: React.ReactNode;
-    containerStyle?: ViewStyle;
-    error?: string;
-}
+
+
+import { InputProps } from './types';
 
 export const Input: React.FC<InputProps> = ({
     label,

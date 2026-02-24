@@ -2,10 +2,9 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
 import { colors, typography } from '../constants';
 
-interface BackButtonProps {
-    onPress: () => void;
-    style?: ViewStyle;
-}
+
+
+import { BackButtonProps } from './types';
 
 export const BackButton: React.FC<BackButtonProps> = ({ onPress, style }) => {
     return (

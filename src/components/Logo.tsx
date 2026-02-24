@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { colors, typography } from '../constants';
 
-interface LogoProps {
-    size?: 'small' | 'medium' | 'large';
-}
+
+
+import { LogoProps } from './types';
 
 export const Logo: React.FC<LogoProps> = ({ size = 'medium' }) => {
     const iconSize = size === 'small' ? 48 : size === 'large' ? 80 : 64;

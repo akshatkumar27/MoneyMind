@@ -4,14 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { BackButton } from './BackButton';
 import { colors, typography, spacing } from '../constants';
 
-interface HeaderProps {
-    title?: string;
-    titleStyle?: TextStyle;
-    rightElement?: React.ReactNode;
-    onBack?: () => void;
-    style?: ViewStyle;
-    showBackButton?: boolean;
-}
+import { HeaderProps } from './types';
 
 export const Header: React.FC<HeaderProps> = ({
     title,

@@ -2,17 +2,11 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, View, ViewStyle } from 'react-native';
 import { colors, typography, spacing } from '../constants';
 
-interface GoalCardProps {
-    icon: string;
-    title: string;
-    description: string;
-    selected: boolean;
-    onPress: () => void;
-    style?: ViewStyle;
-    highlightedAmount?: string;
-}
 
-export const GoalCard: React.FC<GoalCardProps> = ({
+
+import { SelectableGoalCardProps } from './types';
+
+export const GoalCard: React.FC<SelectableGoalCardProps> = ({
     icon,
     title,
     description,

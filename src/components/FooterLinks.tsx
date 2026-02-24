@@ -2,11 +2,9 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { colors, typography } from '../constants';
 
-interface FooterLinksProps {
-    showAuthLink?: boolean;
-    authLinkType?: 'login' | 'signup';
-    onAuthLinkPress?: () => void;
-}
+
+
+import { FooterLinksProps } from './types';
 
 export const FooterLinks: React.FC<FooterLinksProps> = ({
     showAuthLink = true,

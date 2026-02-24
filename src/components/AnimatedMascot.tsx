@@ -10,15 +10,9 @@ import {
 import { colors, typography } from '../constants';
 import { ImageSourcePropType, StyleProp, ViewStyle } from 'react-native';
 
-interface AnimatedMascotProps {
-    text?: string;
-    mascotImage?: ImageSourcePropType;
-    mascotWidth?: number;
-    mascotHeight?: number;
-    /** Fraction of mascotHeight where the arrow should point (0=top, 1=bottom). Default 0.40 targets Fino's mouth. */
-    arrowTopRatio?: number;
-    customTooltipStyle?: StyleProp<ViewStyle>;
-}
+
+
+import { AnimatedMascotProps } from './types';
 
 export const AnimatedMascot: React.FC<AnimatedMascotProps> = ({
     text = "Hi I'm Fino. Your smart financial assistant",

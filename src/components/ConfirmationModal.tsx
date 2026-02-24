@@ -10,19 +10,11 @@ import {
 } from 'react-native';
 import { colors, typography, spacing } from '../constants';
 
+import { ConfirmationModalProps } from './types';
+
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-interface ConfirmationModalProps {
-    visible: boolean;
-    title: string;
-    message: string;
-    confirmText?: string;
-    cancelText?: string;
-    onConfirm: () => void;
-    onCancel: () => void;
-    type?: 'success' | 'error' | 'warning' | 'info';
-    showCancelButton?: boolean;
-}
+
 
 export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     visible,

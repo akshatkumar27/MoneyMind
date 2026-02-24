@@ -2,12 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated, DimensionValue, ViewStyle } from 'react-native';
 import { colors } from '../constants';
 
-interface SkeletonLoaderProps {
-    width?: DimensionValue;
-    height?: DimensionValue;
-    borderRadius?: number;
-    style?: ViewStyle;
-}
+
+
+import { SkeletonLoaderProps } from './types';
 
 export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
     width = '100%',

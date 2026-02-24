@@ -2,11 +2,9 @@ import React, { useRef } from 'react';
 import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native';
 import { colors, typography } from '../constants';
 
-interface OTPInputProps {
-    value: string;
-    onChangeText: (text: string) => void;
-    length?: number;
-}
+
+
+import { OTPInputProps } from './types';
 
 export const OTPInput: React.FC<OTPInputProps> = ({
     value,

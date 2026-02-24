@@ -2,14 +2,9 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
 import { colors, typography } from '../constants';
 
-interface SelectOptionProps {
-    icon?: string;
-    label: string;
-    sublabel?: string;
-    selected: boolean;
-    onPress: () => void;
-    style?: ViewStyle;
-}
+
+
+import { SelectOptionProps, ChipOptionProps, CounterProps } from './types';
 
 export const SelectOption: React.FC<SelectOptionProps> = ({
     icon,
@@ -35,11 +30,7 @@ export const SelectOption: React.FC<SelectOptionProps> = ({
     );
 };
 
-interface ChipOptionProps {
-    label: string;
-    selected: boolean;
-    onPress: () => void;
-}
+
 
 export const ChipOption: React.FC<ChipOptionProps> = ({
     label,
@@ -57,13 +48,7 @@ export const ChipOption: React.FC<ChipOptionProps> = ({
     );
 };
 
-interface CounterProps {
-    value: number;
-    onIncrement: () => void;
-    onDecrement: () => void;
-    min?: number;
-    max?: number;
-}
+
 
 export const Counter: React.FC<CounterProps> = ({
     value,

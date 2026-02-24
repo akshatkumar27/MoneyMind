@@ -9,15 +9,9 @@ import {
 import { colors } from '../constants';
 import { globalStyles } from '../styles';
 
-interface ButtonProps {
-    title: string;
-    onPress: () => void;
-    loading?: boolean;
-    disabled?: boolean;
-    style?: ViewStyle;
-    textStyle?: TextStyle;
-    showArrow?: boolean;
-}
+
+
+import { ButtonProps } from './types';
 
 export const Button: React.FC<ButtonProps> = ({
     title,

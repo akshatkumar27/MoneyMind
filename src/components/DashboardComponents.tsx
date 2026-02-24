@@ -3,11 +3,9 @@ import { View, Text, StyleSheet, ViewStyle, TouchableOpacity } from 'react-nativ
 import { colors, typography, spacing } from '../constants';
 import { useCurrency } from '../context/CurrencyContext';
 
-interface CardProps {
-    children: React.ReactNode;
-    style?: ViewStyle;
-    gradient?: boolean;
-}
+
+
+import { CardProps, ProgressBarProps, StatCardProps, AccountRowProps, GoalCardProps, GoalCardWithSuggestionProps, AIInsightCardProps, AssetRowProps } from './types';
 
 export const Card: React.FC<CardProps> = ({ children, style, gradient = false }) => {
     return (
@@ -17,12 +15,7 @@ export const Card: React.FC<CardProps> = ({ children, style, gradient = false })
     );
 };
 
-interface ProgressBarProps {
-    progress: number; // 0-100
-    color?: string;
-    backgroundColor?: string;
-    height?: number;
-}
+
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({
     progress,
@@ -42,12 +35,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     );
 };
 
-interface StatCardProps {
-    label: string;
-    value: string;
-    valueColor?: string;
-    small?: boolean;
-}
+
 
 export const StatCard: React.FC<StatCardProps> = ({
     label,
@@ -65,14 +53,7 @@ export const StatCard: React.FC<StatCardProps> = ({
     );
 };
 
-interface AccountRowProps {
-    icon: string;
-    name: string;
-    subtitle?: string;
-    amount: string;
-    badge?: string;
-    badgeColor?: string;
-}
+
 
 export const AccountRow: React.FC<AccountRowProps> = ({
     icon,
@@ -103,13 +84,7 @@ export const AccountRow: React.FC<AccountRowProps> = ({
     );
 };
 
-interface GoalCardProps {
-    icon: string;
-    title: string;
-    progress: number;
-    subtitle: string;
-    color?: string;
-}
+
 
 export const GoalCard: React.FC<GoalCardProps> = ({
     icon,
@@ -137,22 +112,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({
     );
 };
 
-interface GoalCardWithSuggestionProps {
-    icon?: string;
-    title: string;
-    progress: number;
-    subtitle?: string;
-    color?: string;
-    suggestionTitle?: string;
-    suggestionDescription?: string;
-    suggestionHighlight?: string;
-    achieveInMonths?: number;
-    targetAmount?: number;
-    savedAmount?: number;
-    onEditPress?: () => void;
-    onAskAiPress?: () => void;
-    onCardPress?: () => void;
-}
+
 
 export const GoalCardWithSuggestion: React.FC<GoalCardWithSuggestionProps> = ({
     title,
@@ -240,12 +200,7 @@ export const GoalCardWithSuggestion: React.FC<GoalCardWithSuggestionProps> = ({
     );
 };
 
-interface AIInsightCardProps {
-    type: 'suggestion' | 'strategy' | 'insight';
-    title: string;
-    description: string;
-    highlight?: string;
-}
+
 
 export const AIInsightCard: React.FC<AIInsightCardProps> = ({
     type,
@@ -276,14 +231,7 @@ export const AIInsightCard: React.FC<AIInsightCardProps> = ({
     );
 };
 
-interface AssetRowProps {
-    icon: string;
-    name: string;
-    subtitle: string;
-    value: string;
-    change: string;
-    isPositive: boolean;
-}
+
 
 export const AssetRow: React.FC<AssetRowProps> = ({
     icon,
