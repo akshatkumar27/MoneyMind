@@ -3,6 +3,9 @@ export const colors = {
   background: '#0a0a14',
   cardBackground: '#12121f',
   inputBackground: '#1a1a2e',
+  mascotBackground: 'rgba(30, 30, 40, 0.95)',
+  pulseCardBackground: '#1a2a3a',
+  dashboardCardBackground: '#1a2744',
 
   // ─── Primary ──────────────────────────────────────────────────────────────
   primary: '#2d7ff9',
@@ -13,11 +16,14 @@ export const colors = {
   textPrimary: '#ffffff',
   textSecondary: '#8a8a9a',
   textMuted: '#cacadbff',
+  white: '#ffffff',
+  black: '#000000',
 
   // ─── Borders ──────────────────────────────────────────────────────────────
   border: '#2a2a3e',
   borderFocused: '#2d7ff9',
   lightloder: '#aca7a7ff', // keep for backward-compat
+  pulseCardBorder: '#2a4a6a',
 
   // ─── Semantic ─────────────────────────────────────────────────────────────
   success: '#22c55e',
@@ -28,6 +34,15 @@ export const colors = {
   infoSubtle: 'rgba(59,130,246,0.12)',
   danger: '#ef4444',
   dangerSubtle: 'rgba(239,68,68,0.12)',
+  notificationPurple: '#8b5cf6',
+
+  // --- Transparent ------------------------------------------------------------
+  transparentWhite: 'rgba(255, 255, 255, 0.2)',
+  transparentWhite10: 'rgba(255, 255, 255, 0.1)',
+  transparentWhite15: 'rgba(255, 255, 255, 0.15)',
+  transparentWhite25: 'rgba(255, 255, 255, 0.25)',
+  transparentWhite05: 'rgba(255, 255, 255, 0.05)',
+  transparentBlack72: 'rgba(0,0,0,0.72)',
 
   // ─── Misc (aliases kept for backward-compat) ───────────────────────────────
   link: '#2d7ff9',
@@ -86,14 +101,14 @@ export const borderWidths = {
 /** Shadow presets (use with spread: `...shadows.sm`) */
 export const shadows = {
   sm: {
-    shadowColor: '#000',
+    shadowColor: '#000000',
     shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.15,
     shadowRadius: 3,
     elevation: 2,
   },
   md: {
-    shadowColor: '#000',
+    shadowColor: '#000000',
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.2,
     shadowRadius: 8,

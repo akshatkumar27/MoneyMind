@@ -28,6 +28,6 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   gradientCard: {
-    backgroundColor: '#1a2744',
+    backgroundColor: colors.dashboardCardBackground,
   },
 });

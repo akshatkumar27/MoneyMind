@@ -1,5 +1,6 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {colors} from '../constants/theme';
 import {MonthlyIncomeScreen} from '../screens/onboarding/MonthlyIncomeScreen';
 import {MonthlyExpensesScreen} from '../screens/onboarding/MonthlyExpensesScreen';
 import {MonthlyEMIScreen} from '../screens/onboarding/MonthlyEMIScreen';
@@ -42,7 +43,7 @@ export const OnboardingNavigator: React.FC = () => {
       initialRouteName="MonthlyIncome"
       screenOptions={{
         headerShown: false,
-        contentStyle: {backgroundColor: '#0a0a14'},
+        contentStyle: {backgroundColor: colors.background},
         animation: 'slide_from_right',
       }}>
       <Stack.Screen name="MonthlyIncome" component={MonthlyIncomeScreen} />

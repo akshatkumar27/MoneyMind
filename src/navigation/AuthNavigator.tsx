@@ -1,5 +1,6 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {colors} from '../constants/theme';
 import {LoginScreen} from '../screens/auth/LoginScreen';
 import {SignupScreen} from '../screens/auth/SignupScreen';
 import {OTPVerificationScreen} from '../screens/auth/OTPVerificationScreen';
@@ -26,7 +27,7 @@ export const AuthNavigator: React.FC = () => {
       initialRouteName="Login"
       screenOptions={{
         headerShown: false,
-        contentStyle: {backgroundColor: '#0a0a14'},
+        contentStyle: {backgroundColor: colors.background},
         animation: 'slide_from_right',
       }}>
       <Stack.Screen name="Login" component={LoginScreen} />

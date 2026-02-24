@@ -860,7 +860,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   upcomingCard: {
-    backgroundColor: '#1a2a3a',
+    backgroundColor: colors.pulseCardBackground,
     borderRadius: 20,
     padding: spacing.xl,
     marginBottom: spacing.lg,
