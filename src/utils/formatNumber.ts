@@ -10,7 +10,7 @@
  * @param decimals - Number of decimal places (default: 1)
  * @returns Formatted string with metric suffix
  */
-export const formatNumber = (num: number, decimals: number = 1): string => {
+export const formatNumber = (num: number, decimals: number = 0): string => {
     if (num === 0) return '0';
 
     const absNum = Math.abs(num);
@@ -18,17 +18,17 @@ export const formatNumber = (num: number, decimals: number = 1): string => {
 
     if (absNum >= 1_000_000_000) {
         const value = absNum / 1_000_000_000;
-        return sign + (value % 1 === 0 ? value.toFixed(0) : value.toFixed(decimals)) + 'B';
+        return sign + parseFloat(value.toFixed(3)).toString() + 'B';
     }
 
     if (absNum >= 1_000_000) {
         const value = absNum / 1_000_000;
-        return sign + (value % 1 === 0 ? value.toFixed(0) : value.toFixed(decimals)) + 'M';
+        return sign + parseFloat(value.toFixed(3)).toString() + 'M';
     }
 
     if (absNum >= 1_000) {
         const value = absNum / 1_000;
-        return sign + (value % 1 === 0 ? value.toFixed(0) : value.toFixed(decimals)) + 'k';
+        return sign + parseFloat(value.toFixed(3)).toString() + 'k';
     }
 
     return sign + absNum.toString();

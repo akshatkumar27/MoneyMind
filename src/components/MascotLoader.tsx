@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 20,
+        paddingTop: 20,
     },
     imageContainer: {
         zIndex: 2,
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     shadow: {
         backgroundColor: colors.primary,
         borderRadius: 100,
-        marginTop: 10,
+        // marginTop: 10,
         zIndex: 1,
     },
 });

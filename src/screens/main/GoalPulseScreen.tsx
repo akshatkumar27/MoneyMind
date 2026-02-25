@@ -146,7 +146,7 @@ const circularStyles = StyleSheet.create({
     },
     scoreText: {
         color: '#22c55e',
-        fontSize: 42,
+        fontSize: 32,
         fontWeight: '700',
     },
 });
@@ -327,73 +327,35 @@ export const GoalPulseScreen: React.FC = () => {
                     {goals.length > 0 && (
                         <View style={styles.pulseCard}>
                             <View style={styles.pulseCardGradient}>
-                                <Text style={styles.pulseCardTitle}>Monthly Progress Score</Text>
-                                <Text style={styles.pulseCardSubtitle}>Your overall goal achievement</Text>
+                                <View style={styles.pulseHeaderRow}>
+                                    <View style={styles.pulseScoreContainer}>
+                                        <View style={styles.glowEffect} />
+                                        <CircularProgress progress={averageAchievement} size={80} strokeWidth={8} />
+                                    </View>
 
-                                <View style={styles.pulseScoreContainer}>
-                                    <View style={styles.glowEffect} />
-                                    <CircularProgress progress={averageAchievement} size={160} strokeWidth={14} />
+                                    <View style={styles.pulseTitleContainer}>
+                                        <Text style={styles.pulseCardTitle}>Progress Score</Text>
+                                        <Text style={styles.pulseCardSubtitle}>Your overall goal achievement</Text>
+                                    </View>
                                 </View>
 
-                                <Text style={styles.encourageText}>
-                                    {averageAchievement >= 75 ? '🚀 Outstanding progress! Keep it up!' :
-                                        averageAchievement >= 50 ? '💪 Great job! You\'re on track!' :
-                                            averageAchievement >= 25 ? '📈 Good start! Keep pushing!' :
-                                                '🌱 Start your journey to financial freedom!'}
-                                </Text>
+                                <View style={styles.pulseFooterContainer}>
+                                    <Text style={styles.encourageText}>
+                                        {averageAchievement >= 75 ? '🚀 Outstanding progress! Keep it up!' :
+                                            averageAchievement >= 50 ? '💪 Great job! You\'re on track!' :
+                                                averageAchievement >= 25 ? '📈 Good start! Keep pushing!' :
+                                                    '🌱 Start your journey!'}
+                                    </Text>
 
-                                {availableBudget > 0 && (
-                                    <View style={{ marginTop: spacing.xs, alignItems: 'center' }}>
-                                        <Text style={[styles.budgetBadge, { fontSize: typography.body, paddingVertical: 6, paddingHorizontal: spacing.md }]}>
-                                            {currencySymbol}{formatNumber(availableBudget, 1)} available for goals
-                                        </Text>
-                                    </View>
-                                )}
+                                    {availableBudget > 0 && (
+                                        <View style={{ marginTop: spacing.xs }}>
+                                            <Text style={[styles.budgetBadge, { fontSize: typography.bodySmall, paddingVertical: 6, paddingHorizontal: spacing.md, textAlign: 'center', alignSelf: 'stretch' }]}>
+                                                {currencySymbol}{formatNumber(availableBudget, 1)} available to invest
+                                            </Text>
+                                        </View>
+                                    )}
+                                </View>
                             </View>
-                        </View>
-                    )}
-
-                    {/* Financial Goals — only shown when goals exist */}
-                    {goals.length > 0 && (
-                        <View style={styles.goalsSection}>
-                            <View style={styles.sectionHeader}>
-                                <Text style={styles.sectionTitle}>💵 Financial Goals</Text>
-                            </View>
-
-                            {goals.map((goal) => (
-                                <GoalCardWithSuggestion
-                                    key={goal.id}
-                                    title={goal.name}
-                                    progress={goal.progress}
-                                    achieveInMonths={goal.achieve_in_months}
-                                    targetAmount={typeof goal.target_amount === 'string' ? parseFloat(goal.target_amount) : goal.target_amount}
-                                    savedAmount={goal.saved_amount}
-                                    color="#22c55e"
-                                    suggestionTitle="AI suggestions"
-                                    suggestionDescription="Track your progress and stay on target for this goal."
-                                    onCardPress={() => navigation.navigate('Contributions', {
-                                        goalId: goal.id,
-                                        goalName: goal.name,
-                                        targetAmount: goal.target_amount,
-                                        monthlyContribution: goal.monthly_contribution,
-                                        achieveInMonths: goal.achieve_in_months,
-                                        goalCreatedAt: goal.created_at,
-                                    })}
-                                    onEditPress={() => navigation.navigate('EditGoal', {
-                                        goalId: goal.id,
-                                        name: goal.name,
-                                        target: goal.target_amount,
-                                        achieveIn: goal.achieve_in_months,
-                                        monthlyContribution: goal.monthly_contribution,
-                                        savedAmount: goal.saved_amount,
-                                        availableForNewGoals: goalBudget?.availableForNewGoals,
-                                    })}
-                                    onAskAiPress={() => navigation.navigate('GoalChat', {
-                                        goalTitle: goal.name,
-                                        initialSuggestion: 'How can I achieve this goal faster?',
-                                    })}
-                                />
-                            ))}
                         </View>
                     )}
 
@@ -459,6 +421,50 @@ export const GoalPulseScreen: React.FC = () => {
                                     })}
                                 </ScrollView>
                             ) : null}
+                        </View>
+                    )}
+
+                    {/* Financial Goals — only shown when goals exist */}
+                    {goals.length > 0 && (
+                        <View style={styles.goalsSection}>
+                            <View style={styles.sectionHeader}>
+                                <Text style={styles.sectionTitle}>💵 Smart Goals</Text>
+                            </View>
+
+                            {goals.map((goal) => (
+                                <GoalCardWithSuggestion
+                                    key={goal.id}
+                                    title={goal.name}
+                                    progress={goal.progress}
+                                    achieveInMonths={goal.achieve_in_months}
+                                    targetAmount={typeof goal.target_amount === 'string' ? parseFloat(goal.target_amount) : goal.target_amount}
+                                    savedAmount={goal.saved_amount}
+                                    color="#22c55e"
+                                    // suggestionTitle="AI suggestions"
+                                    // suggestionDescription="Track your progress and stay on target for this goal."
+                                    onCardPress={() => navigation.navigate('Contributions', {
+                                        goalId: goal.id,
+                                        goalName: goal.name,
+                                        targetAmount: goal.target_amount,
+                                        monthlyContribution: goal.monthly_contribution,
+                                        achieveInMonths: goal.achieve_in_months,
+                                        goalCreatedAt: goal.created_at,
+                                    })}
+                                    onEditPress={() => navigation.navigate('EditGoal', {
+                                        goalId: goal.id,
+                                        name: goal.name,
+                                        target: goal.target_amount,
+                                        achieveIn: goal.achieve_in_months,
+                                        monthlyContribution: goal.monthly_contribution,
+                                        savedAmount: goal.saved_amount,
+                                        availableForNewGoals: goalBudget?.availableForNewGoals,
+                                    })}
+                                    onAskAiPress={() => navigation.navigate('GoalChat', {
+                                        goalTitle: goal.name,
+                                        initialSuggestion: 'How can I achieve this goal faster?',
+                                    })}
+                                />
+                            ))}
                         </View>
                     )}
 
@@ -661,7 +667,7 @@ const styles = StyleSheet.create({
         marginBottom: spacing.lg,
     },
     pulseCard: {
-        marginBottom: spacing.xl,
+        marginBottom: spacing.md,
         marginHorizontal: spacing.lg,
         borderRadius: 20,
         overflow: 'hidden',
@@ -669,35 +675,51 @@ const styles = StyleSheet.create({
     pulseCardGradient: {
         backgroundColor: '#1a2a3a',
         borderRadius: 20,
-        padding: spacing.xl,
-        alignItems: 'center',
+        padding: spacing.lg,
         borderWidth: 1,
         borderColor: '#2a4a6a',
+        width: '100%',
+    },
+    pulseHeaderRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: spacing.md,
+    },
+    pulseTitleContainer: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    pulseFooterContainer: {
+        width: '100%',
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        padding: spacing.sm,
+        borderRadius: 12,
+        marginTop: spacing.md,
     },
     pulseCardTitle: {
         color: colors.textPrimary,
         fontSize: typography.h3,
         fontWeight: typography.bold,
         marginBottom: spacing.xs,
-        textAlign: 'center',
+        textAlign: 'left',
     },
     pulseCardSubtitle: {
         color: colors.textMuted,
         fontSize: typography.bodySmall,
-        marginBottom: spacing.lg,
-        textAlign: 'center',
+        marginBottom: spacing.xs,
+        textAlign: 'left',
     },
     pulseScoreContainer: {
         position: 'relative',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: spacing.lg,
+        marginRight: spacing.lg,
     },
     glowEffect: {
         position: 'absolute',
-        width: 180,
-        height: 180,
-        borderRadius: 90,
+        width: 100,
+        height: 100,
+        borderRadius: 50,
         backgroundColor: 'rgba(34, 197, 94, 0.15)',
         shadowColor: '#22c55e',
         shadowOffset: { width: 0, height: 0 },
@@ -852,7 +874,7 @@ const styles = StyleSheet.create({
     },
     // AI Suggestions
     suggestionsSection: {
-        marginBottom: spacing.xxl,
+        marginBottom: spacing.sm,
     },
     suggestionsContent: {
         paddingHorizontal: spacing.lg,

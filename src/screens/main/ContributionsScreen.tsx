@@ -79,7 +79,6 @@ export const ContributionsScreen: React.FC = () => {
     });
 
     const STEP_AMOUNT = 500;
-    const MIN_CONTRIBUTION = 50;
 
     // Recalculate months when contribution changes
     const effectiveMonths = editedContribution > 0
@@ -102,20 +101,22 @@ export const ContributionsScreen: React.FC = () => {
     const handleContributionInputChange = (text: string) => {
         const value = parseInt(text.replace(/[^0-9]/g, ''), 10);
         if (!isNaN(value)) {
-            // Clamp: can't exceed original, can't go below MIN
-            setEditedContribution(Math.max(MIN_CONTRIBUTION, Math.min(value, monthlyContribution)));
+            // Clamp: can't exceed original
+            setEditedContribution(Math.max(0, Math.min(value, monthlyContribution)));
+        } else if (text === '') {
+            setEditedContribution(0);
         }
     };
 
     const handleContributionBlur = () => {
-        if (editedContribution < MIN_CONTRIBUTION) {
-            setEditedContribution(MIN_CONTRIBUTION);
+        if (editedContribution < 0) {
+            setEditedContribution(0);
         }
     };
 
     const handleConfirmContribution = () => {
-        if (editedContribution < MIN_CONTRIBUTION) {
-            setEditedContribution(MIN_CONTRIBUTION);
+        if (editedContribution < 0) {
+            setEditedContribution(0);
         }
         setIsEditing(false);
     };
@@ -520,62 +521,71 @@ export const ContributionsScreen: React.FC = () => {
             ) : (
                 <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                     {/* Payment Card - Dynamic based on paid state */}
-                    <View style={styles.upcomingCard}>
+                    <View style={styles.upcomingCardPulse}>
+                        <View style={styles.pulseGlowEffect} />
                         {hasPaidThisMonth ? (
-                            <>
-                                {/* Already paid this month */}
-                                <View style={styles.upcomingHeader}>
-                                    <View style={[styles.timerBadge, { backgroundColor: 'rgba(34, 197, 94, 0.2)' }]}>
+                            <View style={styles.pulseRow}>
+                                <View style={styles.pulseLeftCol}>
+                                    <View style={[styles.timerBadge, { backgroundColor: 'rgba(34, 197, 94, 0.2)', marginBottom: 8 }]}>
                                         <Text style={styles.timerIcon}>✅</Text>
                                         <Text style={[styles.timerText, { color: '#22c55e' }]}>Paid</Text>
                                     </View>
+                                    <Text style={styles.pulseTitle}>Last Payment</Text>
+                                    <Text style={styles.pulseSubtitle}>
+                                        {contributions.filter(c => c.status === 'paid').slice(-1)[0]?.date || ''}
+                                    </Text>
                                 </View>
-
-                                <Text style={styles.upcomingLabel}>Last Payment</Text>
-                                <Text style={styles.upcomingAmount}>
-                                    {formatCurrency(contributions.filter(c => c.status === 'paid').slice(-1)[0]?.amount || editedContribution, currencySymbol)}
-                                </Text>
-                                <Text style={styles.upcomingDate}>
-                                    {contributions.filter(c => c.status === 'paid').slice(-1)[0]?.date || ''}
-                                </Text>
-
-                                {/* Next upcoming payment info */}
-                                {upcomingPayment && (
-                                    <View style={styles.nextPaymentInfo}>
-                                        <Text style={styles.nextPaymentLabel}>Upcoming Payment</Text>
-                                        <Text style={styles.nextPaymentAmount}>{formatCurrency(editedContribution, currencySymbol)}</Text>
-                                        <Text style={styles.nextPaymentDate}>Due: {upcomingPayment.date}</Text>
-                                    </View>
-                                )}
-
-
-                            </>
+                                <View style={styles.pulseRightCol}>
+                                    <Text style={styles.pulseAmount}>
+                                        {formatCurrency(contributions.filter(c => c.status === 'paid').slice(-1)[0]?.amount || editedContribution, currencySymbol)}
+                                    </Text>
+                                    {upcomingPayment && (
+                                        <Text style={styles.pulseNextDueText}>
+                                            Next: {formatCurrency(editedContribution, currencySymbol)} on {upcomingPayment.date}
+                                        </Text>
+                                    )}
+                                </View>
+                            </View>
                         ) : (
-                            <>
-                                {/* Not yet paid this month */}
-                                <View style={styles.upcomingHeader}>
-                                    <View style={styles.timerBadge}>
-                                        <Text style={styles.timerIcon}>⏰</Text>
-                                        <Text style={styles.timerText}>{daysUntilPayment} days left</Text>
+                            <View>
+                                <View style={styles.pulseRow}>
+                                    <View style={styles.pulseLeftCol}>
+                                        <View style={[styles.timerBadge, { marginBottom: 8 }]}>
+                                            <Text style={styles.timerIcon}>⏰</Text>
+                                            <Text style={styles.timerText}>{daysUntilPayment} days left</Text>
+                                        </View>
+                                        <Text style={styles.pulseTitle}>Upcoming Due</Text>
+                                        <Text style={styles.pulseSubtitle}>{upcomingPayment?.date}</Text>
                                     </View>
-                                    <TouchableOpacity
-                                        style={styles.editButton}
-                                        onPress={() => setIsEditing(!isEditing)}
-                                        activeOpacity={0.7}
-                                    >
-                                        <Text style={styles.editButtonText}>Edit</Text>
-                                    </TouchableOpacity>
-                                </View>
 
-                                <Text style={styles.upcomingLabel}>Upcoming Payment</Text>
-                                <Text style={styles.upcomingAmount}>{formatCurrency(editedContribution, currencySymbol)}</Text>
-                                <Text style={styles.upcomingDate}>Due: {upcomingPayment?.date}</Text>
+                                    <View style={styles.pulseRightCol}>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                            <Text style={styles.pulseAmount}>{formatCurrency(editedContribution, currencySymbol)}</Text>
+                                            <TouchableOpacity onPress={() => setIsEditing(!isEditing)} activeOpacity={0.7} style={{ marginLeft: 8, marginTop: -4 }}>
+                                                <Text style={styles.editIconBtn}>✎</Text>
+                                            </TouchableOpacity>
+                                        </View>
+
+                                        {!isEditing && (
+                                            <TouchableOpacity
+                                                style={[styles.pulsePayBtn, (!paymentEnabled || isSaving) && styles.pulsePayBtnDisabled]}
+                                                onPress={handleSaveContribution}
+                                            >
+                                                {isSaving ? (
+                                                    <ActivityIndicator size="small" color={colors.background} />
+                                                ) : (
+                                                    <Text style={styles.pulsePayBtnText}>
+                                                        {paymentEnabled ? 'Pay Now' : 'Not Due'}
+                                                    </Text>
+                                                )}
+                                            </TouchableOpacity>
+                                        )}
+                                    </View>
+                                </View>
 
                                 {/* Inline contribution editor */}
                                 {isEditing && (
-                                    <View style={styles.editorContainer}>
-                                        <Text style={styles.editorTitle}>Adjust This Month's Contribution</Text>
-
+                                    <View style={styles.pulseEditorContainer}>
                                         <View style={styles.contributionInputContainer}>
                                             <Text style={styles.currencyPrefix}>{currencySymbol}</Text>
                                             <TextInput
@@ -588,98 +598,69 @@ export const ContributionsScreen: React.FC = () => {
                                                 autoFocus
                                             />
                                         </View>
-
-                                        <View style={styles.editorInfo}>
-                                            <Text style={styles.editorInfoText}>
-                                                Goal achieved in{' '}
-                                                <Text style={styles.editorHighlight}>{effectiveMonths} {effectiveMonths === 1 ? 'month' : 'months'}</Text>
-                                            </Text>
-                                            {editedContribution < monthlyContribution && (
-                                                <Text style={styles.editorHint}>
-                                                    Original: {formatCurrency(monthlyContribution, currencySymbol)}/mo ({achieveInMonths} {achieveInMonths === 1 ? 'month' : 'months'})
-                                                </Text>
-                                            )}
-                                        </View>
-
-                                        <TouchableOpacity
-                                            style={styles.confirmButton}
-                                            onPress={handleConfirmContribution}
-                                            activeOpacity={0.7}
-                                        >
-                                            <Text style={styles.confirmButtonText}>Confirm</Text>
+                                        <TouchableOpacity style={styles.pulseConfirmBtn} onPress={handleConfirmContribution}>
+                                            <Text style={styles.pulseConfirmBtnText}>Done</Text>
                                         </TouchableOpacity>
                                     </View>
                                 )}
-
-                                <TouchableOpacity
-                                    style={[styles.payButton, (!paymentEnabled || isSaving) && styles.payButtonDisabled]}
-                                    onPress={handleSaveContribution}
-                                >
-                                    {isSaving ? (
-                                        <ActivityIndicator color={colors.background} />
-                                    ) : (
-                                        <Text style={styles.payButtonText}>
-                                            {paymentEnabled ? 'Save Now' : 'Not Due Yet'}
-                                        </Text>
-                                    )}
-                                </TouchableOpacity>
-
-                            </>
+                            </View>
                         )}
                     </View>
 
-                    {editedContribution <= MIN_CONTRIBUTION && (
-                        <View style={{}}>
-                            <AnimatedMascot
-                                text={`Since you can't save less than ${currencySymbol}50, try to save at least this amount to keep your goal ongoing! 🚀`}
-                                mascotWidth={60}
-                                mascotHeight={100}
 
-                            />
-                        </View>
-                    )}
 
-                    {/* Progress Summary */}
-                    <View style={styles.summaryCard}>
-                        {/* Progress Bar */}
-                        <View style={styles.progressSection}>
-                            <View style={styles.progressHeader}>
-                                <Text style={styles.progressLabel}>Progress</Text>
+                    <View style={styles.pulseSummaryCard}>
+                        <View style={styles.summaryGlowEffect} />
+                        {/* Progress Header */}
+                        <View style={styles.progressHeader}>
+                            <View style={styles.progressTitleGroup}>
+                                <View style={styles.progressIconBadge}>
+                                    <Text style={styles.progressIcon}>🎯</Text>
+                                </View>
+                                <Text style={styles.progressLabel}>Goal Progress</Text>
+                            </View>
+                            <View style={styles.progressPercentBadge}>
                                 <Text style={styles.progressPercent}>
                                     {targetAmount > 0 ? Math.min(100, Math.round((totalPaid / targetAmount) * 100)) : 0}%
                                 </Text>
                             </View>
+                        </View>
+
+                        {/* Progress Bar Container */}
+                        <View style={styles.pulseProgressSection}>
                             <View style={styles.progressBarBackground}>
                                 <View
                                     style={[
-                                        styles.progressBarFill,
+                                        styles.pulseProgressBarFill,
                                         { width: `${targetAmount > 0 ? Math.min(100, (totalPaid / targetAmount) * 100) : 0}%` },
                                     ]}
                                 />
                             </View>
                             <View style={styles.progressAmounts}>
                                 <Text style={styles.progressSaved}>{formatCurrency(totalPaid, currencySymbol)} saved</Text>
-                                <Text style={styles.progressTarget}>of {formatCurrency(targetAmount, currencySymbol)}</Text>
+                                <Text style={styles.progressTarget}>Goal: {formatCurrency(targetAmount, currencySymbol)}</Text>
                             </View>
-                            <Text style={styles.completionDate}>📅 Completes by {completionDate}</Text>
                         </View>
 
                         <View style={styles.summaryDividerHorizontal} />
 
+                        {/* Stats Details Row */}
                         <View style={styles.summaryRow}>
-                            <View style={styles.summaryItem}>
+                            <View style={styles.summaryGlassItem}>
+                                <Text style={styles.summaryValue}>{completionDate}</Text>
+                                <Text style={styles.summaryLabel}>Completion</Text>
+                            </View>
+                            <View style={styles.summaryGlassItem}>
                                 <Text style={styles.summaryValue}>{formatCurrency(targetAmount, currencySymbol)}</Text>
                                 <Text style={styles.summaryLabel}>Target</Text>
                             </View>
-                            <View style={styles.summaryDivider} />
-                            <View style={styles.summaryItem}>
+                            <View style={styles.summaryGlassItem}>
                                 <Text style={[styles.summaryValue, editedContribution !== monthlyContribution && styles.editedValue]}>
                                     {effectiveMonths}
                                 </Text>
-                                <Text style={styles.summaryLabel}>Months</Text>
+                                <Text style={styles.summaryLabel}>Months Left</Text>
                             </View>
-                            <View style={styles.summaryDivider} />
-                            <View style={styles.summaryItem}>
+                            <View style={styles.summaryGlassItem}>
                                 <Text style={[styles.summaryValue, editedContribution !== monthlyContribution && styles.editedValue]}>
                                     {formatCurrency(editedContribution, currencySymbol)}
                                 </Text>
@@ -696,7 +677,9 @@ export const ContributionsScreen: React.FC = () => {
                                 const canEdit = isCurrentMonth(item.rawDate);
                                 return (
                                     <View key={item.id} style={styles.historyItem}>
-                                        <View style={styles.historyDot} />
+                                        <View style={styles.historyDot}>
+                                            <Text style={{ fontSize: 16 }}>💳</Text>
+                                        </View>
                                         <View style={styles.historyContent}>
                                             <View style={styles.historyRow}>
                                                 <Text style={styles.historyMonth}>{item.monthKey}</Text>
@@ -751,114 +734,165 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: spacing.lg,
     },
-    upcomingCard: {
+    // Pulse Style Card
+    upcomingCardPulse: {
         backgroundColor: '#1a2a3a',
         borderRadius: 20,
-        padding: spacing.xl,
+        padding: spacing.lg,
         marginBottom: spacing.lg,
         borderWidth: 1,
         borderColor: '#2a4a6a',
-        alignItems: 'center',
         marginTop: spacing.md,
+        overflow: 'hidden',
+        position: 'relative',
     },
-    upcomingHeader: {
-        width: '100%',
+    pulseGlowEffect: {
+        position: 'absolute',
+        width: 150,
+        height: 150,
+        borderRadius: 75,
+        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+        top: -50,
+        right: -30,
+        zIndex: -1,
+    },
+    pulseRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: spacing.md,
+    },
+    pulseLeftCol: {
+        flex: 1,
+        alignItems: 'flex-start',
+    },
+    pulseRightCol: {
+        alignItems: 'flex-end',
+        justifyContent: 'center',
     },
     timerBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(245, 158, 11, 0.2)',
+        backgroundColor: colors.primary + '33', // 20% opacity primary color
         paddingHorizontal: spacing.sm,
         paddingVertical: spacing.xs,
         borderRadius: 12,
+        alignSelf: 'flex-start',
     },
     timerIcon: {
-        fontSize: 14,
+        fontSize: 12,
         marginRight: 4,
     },
     timerText: {
-        color: '#f59e0b',
-        fontSize: typography.caption,
-        fontWeight: typography.medium,
-    },
-    upcomingLabel: {
-        color: colors.textMuted,
-        fontSize: typography.bodySmall,
-        marginBottom: spacing.xs,
-    },
-    upcomingAmount: {
-        color: colors.textPrimary,
-        fontSize: 36,
-        fontWeight: typography.bold,
-        marginBottom: spacing.xs,
-    },
-    upcomingDate: {
-        color: colors.textSecondary,
-        fontSize: typography.bodySmall,
-        marginBottom: spacing.lg,
-    },
-    nextPaymentInfo: {
-        width: '100%',
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(255,255,255,0.1)',
-        paddingTop: spacing.md,
-        marginBottom: spacing.lg,
-        alignItems: 'center',
-    },
-    nextPaymentLabel: {
-        color: colors.textMuted,
-        fontSize: typography.caption,
-        marginBottom: spacing.xs,
-    },
-    nextPaymentAmount: {
         color: colors.primary,
-        fontSize: typography.h3,
+        fontSize: 11,
         fontWeight: typography.bold,
-        marginBottom: spacing.xs,
     },
-    nextPaymentDate: {
+    pulseTitle: {
+        color: colors.textMuted,
+        fontSize: typography.caption,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+        marginBottom: 2,
+    },
+    pulseSubtitle: {
         color: colors.textSecondary,
         fontSize: typography.bodySmall,
     },
-    payButton: {
+    pulseAmount: {
+        color: colors.textPrimary,
+        fontSize: 32,
+        fontWeight: typography.bold,
+        letterSpacing: -1,
+    },
+    editIconBtn: {
+        fontSize: 20,
+        color: colors.primary,
+        opacity: 0.8,
+    },
+    pulseNextDueText: {
+        color: colors.textMuted,
+        fontSize: typography.caption,
+        marginTop: 4,
+    },
+    pulsePayBtn: {
         backgroundColor: '#22c55e',
-        paddingVertical: spacing.md,
-        paddingHorizontal: spacing.xl * 2,
+        paddingVertical: 10,
+        paddingHorizontal: spacing.lg,
         borderRadius: 12,
-        width: '100%',
-        alignItems: 'center',
+        marginTop: spacing.sm,
+        shadowColor: '#22c55e',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 3,
     },
-    payButtonDisabled: {
-        opacity: 0.7,
+    pulsePayBtnDisabled: {
+        opacity: 0.6,
+        shadowOpacity: 0,
+        elevation: 0,
     },
-    payButtonText: {
-        color: colors.background,
-        fontSize: typography.body,
+    pulsePayBtnText: {
+        color: '#fff',
+        fontSize: typography.bodySmall,
         fontWeight: typography.bold,
     },
-    summaryCard: {
-        backgroundColor: colors.cardBackground,
-        borderRadius: 16,
+    pulseEditorContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: spacing.lg,
+        paddingTop: spacing.md,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255,255,255,0.05)',
+    },
+    pulseConfirmBtn: {
+        backgroundColor: colors.primary,
+        borderRadius: 10,
+        paddingVertical: 10,
+        paddingHorizontal: spacing.xl,
+        marginLeft: spacing.md,
+    },
+    pulseConfirmBtnText: {
+        color: colors.background,
+        fontSize: typography.bodySmall,
+        fontWeight: typography.bold,
+    },
+
+    // Sub-Pulse Summary Card
+    pulseSummaryCard: {
+        backgroundColor: '#1a2a3a',
+        borderRadius: 20,
         padding: spacing.lg,
         marginBottom: spacing.xl,
+        borderWidth: 1,
+        borderColor: '#2a4a6a',
+        overflow: 'hidden',
+        position: 'relative',
+    },
+    summaryGlowEffect: {
+        position: 'absolute',
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        backgroundColor: 'rgba(34, 197, 94, 0.08)',
+        bottom: -40,
+        left: -40,
+        zIndex: -1,
     },
     summaryRow: {
         flexDirection: 'row',
+        flexWrap: 'wrap',
         justifyContent: 'space-between',
         alignItems: 'center',
+        gap: spacing.sm,
     },
-    summaryItem: {
-        flex: 1,
+    summaryGlassItem: {
+        width: '48%',
         alignItems: 'center',
-    },
-    summaryDivider: {
-        width: 1,
-        height: 40,
-        backgroundColor: colors.border,
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        borderRadius: 12,
+        paddingVertical: spacing.sm,
+        paddingHorizontal: spacing.xs,
+        marginBottom: spacing.xs,
     },
     summaryValue: {
         color: colors.textPrimary,
@@ -877,53 +911,72 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: spacing.sm,
+        marginBottom: spacing.lg,
+    },
+    progressTitleGroup: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    progressIconBadge: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: 'rgba(255,255,255,0.08)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: spacing.sm,
+    },
+    progressIcon: {
+        fontSize: 14,
     },
     progressLabel: {
-        color: colors.textSecondary,
-        fontSize: typography.bodySmall,
-        fontWeight: typography.medium,
-    },
-    progressPercent: {
-        color: colors.primary,
+        color: colors.textPrimary,
         fontSize: typography.body,
         fontWeight: typography.bold,
     },
+    progressPercentBadge: {
+        backgroundColor: 'rgba(34, 197, 94, 0.15)',
+        paddingHorizontal: spacing.sm,
+        paddingVertical: 4,
+        borderRadius: 12,
+    },
+    progressPercent: {
+        color: '#22c55e',
+        fontSize: typography.bodySmall,
+        fontWeight: typography.bold,
+    },
+    pulseProgressSection: {
+        marginBottom: spacing.md,
+    },
     progressBarBackground: {
-        height: 10,
-        backgroundColor: colors.inputBackground,
-        borderRadius: 5,
+        height: 12,
+        backgroundColor: 'rgba(255,255,255,0.06)',
+        borderRadius: 6,
         overflow: 'hidden',
     },
-    progressBarFill: {
+    pulseProgressBarFill: {
         height: '100%',
         backgroundColor: '#22c55e',
-        borderRadius: 5,
+        borderRadius: 6,
     },
     progressAmounts: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: spacing.xs,
+        marginTop: spacing.sm,
     },
     progressSaved: {
         color: '#22c55e',
-        fontSize: typography.caption,
-        fontWeight: typography.medium,
+        fontSize: typography.bodySmall,
+        fontWeight: typography.bold,
     },
     progressTarget: {
-        color: colors.textMuted,
+        color: colors.textSecondary,
         fontSize: typography.caption,
-    },
-    completionDate: {
-        color: colors.textMuted,
-        fontSize: typography.caption,
-        marginTop: spacing.xs,
-        textAlign: 'right',
     },
     summaryDividerHorizontal: {
         height: 1,
-        backgroundColor: colors.border,
-        marginBottom: spacing.md,
+        backgroundColor: 'rgba(255,255,255,0.06)',
+        marginVertical: spacing.lg,
     },
     // History section
     historySection: {
@@ -937,25 +990,25 @@ const styles = StyleSheet.create({
     },
     historyItem: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
-        marginBottom: spacing.md,
+        alignItems: 'center',
+        marginBottom: spacing.sm,
+        backgroundColor: "rgba(255,255,255,0.02)",
+        borderRadius: 16,
+        padding: spacing.md,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.04)',
     },
     historyDot: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        backgroundColor: '#22c55e',
-        marginTop: 4,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(34, 197, 94, 0.1)',
         marginRight: spacing.md,
-        flexShrink: 0,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     historyContent: {
         flex: 1,
-        backgroundColor: colors.cardBackground,
-        borderRadius: 12,
-        padding: spacing.md,
-        borderWidth: 1,
-        borderColor: 'rgba(34,197,94,0.15)',
     },
     historyRow: {
         flexDirection: 'row',
@@ -1028,21 +1081,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     editorTitle: {
-        color: colors.textSecondary,
-        fontSize: typography.bodySmall,
-        fontWeight: typography.medium,
-        marginBottom: spacing.sm,
+        display: 'none',
     },
     contributionInputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: colors.inputBackground,
+        backgroundColor: "rgba(0,0,0,0.2)",
         borderWidth: 1.5,
-        borderColor: colors.primary + '50',
+        borderColor: colors.primary + '30',
         borderRadius: 12,
         paddingHorizontal: spacing.md,
-        paddingVertical: spacing.sm,
-        // minWidth: 150,
+        paddingVertical: 8,
+        flex: 1,
     },
     currencyPrefix: {
         color: colors.primary,
@@ -1055,39 +1105,26 @@ const styles = StyleSheet.create({
         fontSize: typography.h3,
         fontWeight: typography.bold,
         flex: 1,
-        textAlign: 'center',
+        textAlign: 'left',
         paddingVertical: 0,
     },
     editorInfo: {
-        marginTop: spacing.sm,
-        alignItems: 'center',
+        display: 'none',
     },
     editorInfoText: {
-        color: colors.textSecondary,
-        fontSize: typography.bodySmall,
+        display: 'none',
     },
     editorHighlight: {
-        color: colors.primary,
-        fontWeight: typography.semibold,
+        display: 'none',
     },
     editorHint: {
-        color: colors.textMuted,
-        fontSize: typography.caption,
-        marginTop: spacing.xs,
+        display: 'none',
     },
     confirmButton: {
-        backgroundColor: colors.primary,
-        borderRadius: 10,
-        paddingVertical: spacing.sm,
-        paddingHorizontal: spacing.xl,
-        margin: spacing.md,
-        width: '100%',
-        alignItems: 'center',
+        display: 'none',
     },
     confirmButtonText: {
-        color: colors.background,
-        fontSize: typography.body,
-        fontWeight: typography.bold,
+        display: 'none',
     },
     inlineEditContainer: {
         flexDirection: 'row',

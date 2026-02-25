@@ -222,12 +222,12 @@ export const GoalCardWithSuggestion: React.FC<GoalCardWithSuggestionProps> = ({
             </View>
 
             {/* AI Suggestion Section */}
-            <View style={styles.aiSuggestionSection}>
+            {/* <View style={styles.aiSuggestionSection}>
                 <Text style={styles.aiSuggestionLabel}>{suggestionTitle || 'Ai suggestions'}</Text>
                 <Text style={styles.aiSuggestionText}>
                     {suggestionDescription || 'No suggestions available at the moment.'}
                 </Text>
-            </View>
+            </View> */}
 
             {/* Ask AI Button */}
             <TouchableOpacity style={styles.askAiButton} onPress={(e) => {
