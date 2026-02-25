@@ -1,7 +1,8 @@
 import React from 'react';
 import {View, Text, StyleSheet, Image} from 'react-native';
 import {ToastConfig} from 'react-native-toast-message';
-import {colors, typography, spacing} from '../constants/theme';
+import {typography, spacing} from '../constants/theme';
+import { useThemeColors } from "../context/ThemeContext";
 
 const ToastMessage = ({
   type,
@@ -12,6 +13,7 @@ const ToastMessage = ({
   text1?: string;
   text2?: string;
 }) => {
+    const colors = useThemeColors();
   const isError = type === 'error';
   const isSuccess = type === 'success';
 
@@ -31,7 +33,7 @@ const ToastMessage = ({
   }
 
   return (
-    <View style={[styles.container, {borderLeftColor: borderColor}]}>
+    <View style={[styles.container, {borderLeftColor: borderColor}, { backgroundColor: colors.cardBackground }]}>
       <View style={styles.mascotContainer}>
         <Image
           source={mascotSource}
@@ -40,8 +42,8 @@ const ToastMessage = ({
         />
       </View>
       <View style={styles.textContainer}>
-        {text1 && <Text style={styles.title}>{text1}</Text>}
-        {text2 && <Text style={styles.message}>{text2}</Text>}
+        {text1 && <Text style={[styles.title, { color: colors.textPrimary }]}>{text1}</Text>}
+        {text2 && <Text style={[styles.message, { color: colors.textSecondary }]}>{text2}</Text>}
       </View>
     </View>
   );
@@ -63,7 +65,6 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.cardBackground,
     width: '90%',
     borderRadius: 16,
     padding: spacing.md,
@@ -89,13 +90,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: 'bold',
     marginBottom: 2,
   },
   message: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     lineHeight: 18,
   },

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,25 +9,26 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation, CommonActions} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {notificationService} from '../../services/NotificationService';
+import { useNavigation, CommonActions } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { notificationService } from '../../services/NotificationService';
 import api from '../../services/api';
-import {MainStackParamList} from '../../navigation/MainTabNavigator';
-import {useAppDispatch} from '../../store/hooks';
-import {clearFinancialData} from '../../store/slices/financialDataSlice';
-import {BackButton} from '../../components/BackButton';
-import {AppModal} from '../../components/AppModal';
+import { MainStackParamList } from '../../navigation/MainTabNavigator';
+import { useAppDispatch } from '../../store/hooks';
+import { clearFinancialData } from '../../store/slices/financialDataSlice';
+import { BackButton } from '../../components/BackButton';
+import { AppModal } from '../../components/AppModal';
 import {
-  colors,
   typography,
   spacing,
   radii,
   borderWidths,
 } from '../../constants/theme';
-import {ENDPOINTS} from '../../constants/endpoints';
-import {globalStyles} from '../../styles/globalStyles';
-import {STORAGE_KEYS} from '../../constants/storage';
+import { ENDPOINTS } from '../../constants/endpoints';
+import { useGlobalStyles } from '../../styles/globalStyles';
+import { STORAGE_KEYS } from '../../constants/storage';
+import { useTheme } from '../../context/ThemeContext';
+import { ThemeMode } from '../../constants/theme';
 
 type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
@@ -37,6 +38,10 @@ export const ProfileScreen: React.FC = () => {
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [userName, setUserName] = useState('');
   const [userEmail, setUserEmail] = useState('');
+  const { colors, themeMode, setThemeMode } = useTheme();
+
+  // Use dynamic global styles
+  const globalStyles = useGlobalStyles();
 
   useEffect(() => {
     loadUserData();
@@ -62,7 +67,7 @@ export const ProfileScreen: React.FC = () => {
       const fcmToken = await notificationService.getFCMToken();
       if (fcmToken) {
         await api.delete(ENDPOINTS.NOTIFICATIONS.UNREGISTER_TOKEN, {
-          data: {fcm_token: fcmToken},
+          data: { fcm_token: fcmToken },
         });
       }
 
@@ -85,7 +90,7 @@ export const ProfileScreen: React.FC = () => {
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{name: 'Auth'}],
+        routes: [{ name: 'Auth' }],
       }),
     );
   };
@@ -122,29 +127,63 @@ export const ProfileScreen: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <BackButton onPress={() => navigation.goBack()} />
-        <Text style={styles.headerTitle}>Profile</Text>
+        <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Profile</Text>
         <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Profile Card */}
         <View style={styles.profileCard}>
-          <View style={styles.avatarLarge}>
+          <View style={[styles.avatarLarge, { backgroundColor: colors.primary }]}>
             <Text style={styles.avatarText}>{getInitials()}</Text>
           </View>
-          <Text style={styles.userName}>{userName || 'User'}</Text>
-          <Text style={styles.userEmail}>{userEmail || ''}</Text>
+          <Text style={[styles.userName, { color: colors.textPrimary }]}>{userName || 'User'}</Text>
+          <Text style={[styles.userEmail, { color: colors.textSecondary }]}>{userEmail || ''}</Text>
         </View>
 
         {/* Menu Items */}
-        <View style={styles.menuSection}>
+        <View style={[styles.menuSection, { backgroundColor: colors.cardBackground }]}>
           <TouchableOpacity
-            style={styles.menuItem}
+            style={[styles.menuItem, { borderBottomColor: colors.border }]}
             onPress={() => navigation.navigate('PersonalInfo' as never)}>
             <Text style={styles.menuIcon}>👤</Text>
-            <Text style={styles.menuText}>Personal Information</Text>
-            <Text style={styles.menuArrow}>›</Text>
+            <Text style={[styles.menuText, { color: colors.textPrimary }]}>Personal Information</Text>
+            <Text style={[styles.menuArrow, { color: colors.textMuted }]}>›</Text>
           </TouchableOpacity>
+
+          {/* Theme Toggle Section */}
+          <View style={[styles.menuItem, { borderBottomColor: colors.border, flexDirection: 'column', alignItems: 'flex-start', paddingVertical: spacing.lg }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: spacing.md }}>
+              <Text style={styles.menuIcon}>🎨</Text>
+              <Text style={[styles.menuText, { color: colors.textPrimary }]}>App Theme</Text>
+            </View>
+
+            <View style={styles.themeToggleContainer}>
+              {(['system', 'light', 'dark'] as ThemeMode[]).map((mode) => (
+                <TouchableOpacity
+                  key={mode}
+                  style={[
+                    styles.themeOption,
+                    {
+                      backgroundColor: themeMode === mode ? colors.primarySubtle : colors.inputBackground,
+                      borderColor: themeMode === mode ? colors.primary : colors.border
+                    }
+                  ]}
+                  onPress={() => setThemeMode(mode)}
+                >
+                  <Text style={[
+                    styles.themeOptionText,
+                    {
+                      color: themeMode === mode ? colors.primary : colors.textSecondary,
+                      fontWeight: themeMode === mode ? typography.bold : typography.medium,
+                    }
+                  ]}>
+                    {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
 
           {/* <TouchableOpacity style={styles.menuItem}>
                         <Text style={styles.menuIcon}>🏦</Text>
@@ -153,40 +192,40 @@ export const ProfileScreen: React.FC = () => {
                     </TouchableOpacity> */}
 
           <TouchableOpacity
-            style={styles.menuItem}
+            style={[styles.menuItem, { borderBottomColor: colors.border }]}
             onPress={() =>
               navigation.navigate('NotificationSettings' as never)
             }>
             <Text style={styles.menuIcon}>⚙️</Text>
-            <Text style={styles.menuText}>Notification Settings</Text>
-            <Text style={styles.menuArrow}>›</Text>
+            <Text style={[styles.menuText, { color: colors.textPrimary }]}>Notification Settings</Text>
+            <Text style={[styles.menuArrow, { color: colors.textMuted }]}>›</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.menuItem}
+            style={[styles.menuItem, { borderBottomColor: colors.border }]}
             onPress={() => navigation.navigate('PrivacySecurity' as never)}>
             <Text style={styles.menuIcon}>🔒</Text>
-            <Text style={styles.menuText}>Privacy & Security</Text>
-            <Text style={styles.menuArrow}>›</Text>
+            <Text style={[styles.menuText, { color: colors.textPrimary }]}>Privacy & Security</Text>
+            <Text style={[styles.menuArrow, { color: colors.textMuted }]}>›</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.menuItem}
+            style={[styles.menuItem, { borderBottomColor: colors.border }]}
             onPress={() => navigation.navigate('HelpSupport' as never)}>
             <Text style={styles.menuIcon}>❓</Text>
-            <Text style={styles.menuText}>Help & Support</Text>
-            <Text style={styles.menuArrow}>›</Text>
+            <Text style={[styles.menuText, { color: colors.textPrimary }]}>Help & Support</Text>
+            <Text style={[styles.menuArrow, { color: colors.textMuted }]}>›</Text>
           </TouchableOpacity>
         </View>
 
         {/* Logout Button */}
         <TouchableOpacity
-          style={styles.logoutButton}
+          style={[styles.logoutButton, { backgroundColor: colors.cardBackground, borderColor: colors.danger }]}
           onPress={() => setLogoutModalVisible(true)}>
-          <Text style={styles.logoutText}>Log Out</Text>
+          <Text style={[styles.logoutText, { color: colors.danger }]}>Log Out</Text>
         </TouchableOpacity>
 
-        <Text style={styles.version}>Finova AI v1.0.0</Text>
+        <Text style={[styles.version, { color: colors.textMuted }]}>Finova AI v1.0.0</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -201,7 +240,6 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
-    color: colors.textPrimary,
     fontSize: typography.h3,
     fontWeight: typography.bold,
     textAlign: 'center',
@@ -222,7 +260,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: radii.full,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.md,
@@ -231,17 +268,14 @@ const styles = StyleSheet.create({
     fontSize: 36,
   },
   userName: {
-    color: colors.textPrimary,
     fontSize: typography.h3,
     fontWeight: typography.semibold,
     marginBottom: spacing.xs,
   },
   userEmail: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
   },
   menuSection: {
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.lg,
     marginBottom: spacing.lg,
   },
@@ -251,37 +285,48 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
     borderBottomWidth: borderWidths.hairline,
-    borderBottomColor: colors.border,
+  },
+  themeToggleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: spacing.xs,
+  },
+  themeOption: {
+    flex: 1,
+    paddingVertical: spacing.sm,
+    marginHorizontal: spacing.xs,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  themeOptionText: {
+    fontSize: typography.bodySmall,
   },
   menuIcon: {
     fontSize: 20,
     marginRight: spacing.md,
   },
   menuText: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     flex: 1,
   },
   menuArrow: {
-    color: colors.textMuted,
     fontSize: 20,
   },
   logoutButton: {
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.md,
     paddingVertical: spacing.md,
     alignItems: 'center',
     borderWidth: borderWidths.thin,
-    borderColor: colors.danger,
     marginBottom: spacing.lg,
   },
   logoutText: {
-    color: colors.danger,
     fontSize: typography.body,
     fontWeight: typography.medium,
   },
   version: {
-    color: colors.textMuted,
     fontSize: typography.caption,
     textAlign: 'center',
     marginBottom: spacing.xxl,

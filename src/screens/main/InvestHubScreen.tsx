@@ -8,15 +8,17 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import {useCurrency} from '../../context/CurrencyContext';
-import {Card} from '../../components/dashboard/Card';
-import {AssetRow} from '../../components/dashboard/AssetRow';
-import {AIInsightCard} from '../../components/dashboard/AIInsightCard';
-import {colors, typography, spacing, radii} from '../../constants/theme';
-import {globalStyles} from '../../styles/globalStyles';
+import { useCurrency } from '../../context/CurrencyContext';
+import { Card } from '../../components/dashboard/Card';
+import { AssetRow } from '../../components/dashboard/AssetRow';
+import { AIInsightCard } from '../../components/dashboard/AIInsightCard';
+import { typography, spacing, radii } from '../../constants/theme';
+import { globalStyles } from '../../styles/globalStyles';
+import { useThemeColors } from "../../context/ThemeContext";
 
 export const InvestHubScreen: React.FC = () => {
-  const {currencySymbol} = useCurrency();
+  const colors = useThemeColors();
+  const { currencySymbol } = useCurrency();
   return (
     <SafeAreaView style={globalStyles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.background} />
@@ -24,19 +26,19 @@ export const InvestHubScreen: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <View style={styles.logoIcon}>
-            <Text style={styles.logoText}>◀▶</Text>
+          <View style={[styles.logoIcon, { backgroundColor: colors.primary }]}>
+            <Text style={[styles.logoText, { color: colors.textPrimary }]}>◀▶</Text>
           </View>
           <View>
-            <Text style={styles.headerTitle}>Invest Hub</Text>
-            <Text style={styles.headerSubtitle}>SMART PORTFOLIO</Text>
+            <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Invest Hub</Text>
+            <Text style={[styles.headerSubtitle, { color: colors.textMuted }]}>SMART PORTFOLIO</Text>
           </View>
         </View>
         <View style={styles.headerRight}>
-          <TouchableOpacity style={styles.iconButton}>
+          <TouchableOpacity style={[styles.iconButton, { backgroundColor: colors.cardBackground }]}>
             <Text style={styles.iconText}>🔍</Text>
           </TouchableOpacity>
-          <View style={styles.avatarContainer}>
+          <View style={[styles.avatarContainer, { backgroundColor: colors.primary }]}>
             <Text style={styles.avatarText}>👤</Text>
           </View>
         </View>
@@ -45,42 +47,42 @@ export const InvestHubScreen: React.FC = () => {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Portfolio Value */}
         <View style={styles.portfolioSection}>
-          <Text style={styles.portfolioLabel}>Total Portfolio Value</Text>
+          <Text style={[styles.portfolioLabel, { color: colors.textMuted }]}>Total Portfolio Value</Text>
           <View style={styles.portfolioRow}>
-            <Text style={styles.rupeeSymbol}>{currencySymbol}</Text>
-            <Text style={styles.portfolioValue}>24,85,420</Text>
-            <View style={styles.changePositiveBadge}>
-              <Text style={styles.changePositiveText}>+1.2%</Text>
+            <Text style={[styles.rupeeSymbol, { color: colors.textPrimary }]}>{currencySymbol}</Text>
+            <Text style={[styles.portfolioValue, { color: colors.textPrimary }]}>24,85,420</Text>
+            <View style={[styles.changePositiveBadge, { backgroundColor: colors.success }]}>
+              <Text style={[styles.changePositiveText, { color: colors.textPrimary }]}>+1.2%</Text>
             </View>
           </View>
           <View style={styles.dayChangeRow}>
-            <Text style={styles.dayChangeLabel}>24h Change:</Text>
-            <Text style={styles.dayChangeValue}>+{currencySymbol}28,620</Text>
+            <Text style={[styles.dayChangeLabel, { color: colors.textMuted }]}>24h Change:</Text>
+            <Text style={[styles.dayChangeValue, { color: colors.success }]}>+{currencySymbol}28,620</Text>
             <TouchableOpacity>
-              <Text style={styles.historyLink}>HISTORY</Text>
+              <Text style={[styles.historyLink, { color: colors.primary }]}>HISTORY</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* AI Portfolio Optimizer */}
-        <Card style={styles.optimizerCard}>
+        <Card style={StyleSheet.flatten([styles.optimizerCard, { backgroundColor: colors.cardBackground }])}>
           <View style={styles.optimizerHeader}>
             <Text style={styles.optimizerIcon}>✨</Text>
-            <Text style={styles.optimizerTitle}>AI PORTFOLIO OPTIMIZER</Text>
+            <Text style={[styles.optimizerTitle, { color: colors.success }]}>AI PORTFOLIO OPTIMIZER</Text>
           </View>
-          <Text style={styles.optimizerText}>
+          <Text style={[styles.optimizerText, { color: colors.textSecondary }]}>
             Move {currencySymbol}10,000 from Savings to{' '}
-            <Text style={styles.highlightText}>Index Fund</Text> for better
+            <Text style={[styles.highlightText, { color: colors.primary }]}>Index Fund</Text> for better
             long-term growth.
           </Text>
-          <TouchableOpacity style={styles.rebalanceButton}>
+          <TouchableOpacity style={[styles.rebalanceButton, { backgroundColor: colors.warning }]}>
             <Text style={styles.rebalanceButtonText}>Apply Rebalance</Text>
           </TouchableOpacity>
         </Card>
 
         {/* Asset Allocation */}
         <View style={styles.assetSection}>
-          <Text style={styles.sectionTitle}>Asset Allocation</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Asset Allocation</Text>
 
           <AssetRow
             icon="📈"
@@ -112,8 +114,8 @@ export const InvestHubScreen: React.FC = () => {
       </ScrollView>
 
       {/* FAB */}
-      <TouchableOpacity style={styles.fab}>
-        <Text style={styles.fabText}>+</Text>
+      <TouchableOpacity style={[styles.fab, { backgroundColor: colors.primary }]}>
+        <Text style={[styles.fabText, { color: colors.textPrimary }]}>+</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -135,23 +137,19 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.sm,
   },
   logoText: {
-    color: colors.textPrimary,
     fontSize: 12,
     fontWeight: typography.bold,
   },
   headerTitle: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
   },
   headerSubtitle: {
-    color: colors.textMuted,
     fontSize: 10,
     letterSpacing: 1,
   },
@@ -163,7 +161,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: radii.full,
-    backgroundColor: colors.cardBackground,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.sm,
@@ -175,7 +172,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: radii.full,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -190,7 +186,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   portfolioLabel: {
-    color: colors.textMuted,
     fontSize: typography.caption,
     marginBottom: spacing.xs,
   },
@@ -199,25 +194,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   rupeeSymbol: {
-    color: colors.textPrimary,
     fontSize: typography.h1,
     fontWeight: typography.bold,
     marginRight: 4,
   },
   portfolioValue: {
-    color: colors.textPrimary,
     fontSize: 32,
     fontWeight: typography.bold,
   },
   changePositiveBadge: {
-    backgroundColor: colors.success,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: radii.xs,
     marginLeft: spacing.sm,
   },
   changePositiveText: {
-    color: colors.textPrimary,
     fontSize: typography.caption,
     fontWeight: typography.semibold,
   },
@@ -227,23 +218,19 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   dayChangeLabel: {
-    color: colors.textMuted,
     fontSize: typography.caption,
   },
   dayChangeValue: {
-    color: colors.success,
     fontSize: typography.caption,
     fontWeight: typography.medium,
     marginLeft: spacing.xs,
     flex: 1,
   },
   historyLink: {
-    color: colors.primary,
     fontSize: typography.caption,
     fontWeight: typography.semibold,
   },
   optimizerCard: {
-    backgroundColor: colors.cardBackground,
     marginBottom: spacing.lg,
   },
   optimizerHeader: {
@@ -256,23 +243,19 @@ const styles = StyleSheet.create({
     marginRight: spacing.xs,
   },
   optimizerTitle: {
-    color: colors.success,
     fontSize: typography.caption,
     fontWeight: typography.semibold,
     letterSpacing: 0.5,
   },
   optimizerText: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     lineHeight: 20,
     marginBottom: spacing.md,
   },
   highlightText: {
-    color: colors.primary,
     fontWeight: typography.medium,
   },
   rebalanceButton: {
-    backgroundColor: colors.warning,
     borderRadius: radii.sm,
     paddingVertical: spacing.sm,
     alignItems: 'center',
@@ -286,7 +269,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xxl,
   },
   sectionTitle: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
     marginBottom: spacing.md,
@@ -298,17 +280,15 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: radii.full,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
   },
   fabText: {
-    color: colors.textPrimary,
     fontSize: 28,
     fontWeight: '300',
   },

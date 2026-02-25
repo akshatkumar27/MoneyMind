@@ -14,15 +14,16 @@ import {StatCard} from '../../components/dashboard/StatCard';
 import {AccountRow} from '../../components/dashboard/AccountRow';
 import {AIInsightCard} from '../../components/dashboard/AIInsightCard';
 import {
-  colors,
   typography,
   spacing,
   radii,
   categoryColors,
 } from '../../constants/theme';
 import {globalStyles} from '../../styles/globalStyles';
+import { useThemeColors } from "../../context/ThemeContext";
 
 export const VaultScreen: React.FC = () => {
+    const colors = useThemeColors();
   const [viewMode, setViewMode] = useState<'consolidated' | 'manual'>(
     'consolidated',
   );
@@ -35,12 +36,12 @@ export const VaultScreen: React.FC = () => {
       {/* Header */}
       <View style={styles.header}>
         <View style={globalStyles.row}>
-          <View style={styles.logoIcon}>
-            <Text style={styles.logoText}>◀▶</Text>
+          <View style={[styles.logoIcon, { backgroundColor: colors.primary }]}>
+            <Text style={[styles.logoText, { color: colors.textPrimary }]}>◀▶</Text>
           </View>
           <View>
-            <Text style={styles.headerTitle}>Vault</Text>
-            <Text style={styles.headerSubtitle}>
+            <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Vault</Text>
+            <Text style={[styles.headerSubtitle, { color: colors.textMuted }]}>
               {viewMode === 'consolidated'
                 ? 'CONSOLIDATED VIEW'
                 : 'MANUAL TRACKING HUB'}
@@ -49,20 +50,20 @@ export const VaultScreen: React.FC = () => {
         </View>
         <View style={globalStyles.row}>
           <TouchableOpacity
-            style={styles.iconButton}
+            style={[styles.iconButton, { backgroundColor: colors.cardBackground }]}
             onPress={() =>
               setViewMode(
                 viewMode === 'consolidated' ? 'manual' : 'consolidated',
               )
             }>
-            <Text style={styles.iconText}>⟳</Text>
+            <Text style={[styles.iconText, { color: colors.textPrimary }]}>⟳</Text>
           </TouchableOpacity>
           {viewMode === 'manual' && (
-            <TouchableOpacity style={styles.iconButton}>
-              <Text style={styles.iconText}>+</Text>
+            <TouchableOpacity style={[styles.iconButton, { backgroundColor: colors.cardBackground }]}>
+              <Text style={[styles.iconText, { color: colors.textPrimary }]}>+</Text>
             </TouchableOpacity>
           )}
-          <View style={styles.avatarContainer}>
+          <View style={[styles.avatarContainer, { backgroundColor: colors.primary }]}>
             <Text style={styles.avatarText}>👤</Text>
           </View>
         </View>
@@ -73,9 +74,9 @@ export const VaultScreen: React.FC = () => {
         <View style={styles.balanceSection}>
           <Text style={globalStyles.sectionLabel}>TOTAL LIQUID BALANCE</Text>
           <View style={styles.balanceRow}>
-            <Text style={styles.rupeeSymbol}>{currencySymbol}</Text>
-            <Text style={styles.balanceValue}>12,45,600</Text>
-            <Text style={styles.balanceDecimal}>
+            <Text style={[styles.rupeeSymbol, { color: colors.textPrimary }]}>{currencySymbol}</Text>
+            <Text style={[styles.balanceValue, { color: colors.textPrimary }]}>12,45,600</Text>
+            <Text style={[styles.balanceDecimal, { color: colors.textMuted }]}>
               .{viewMode === 'consolidated' ? '42' : '00'}
             </Text>
           </View>
@@ -103,9 +104,9 @@ export const VaultScreen: React.FC = () => {
                 value={`${currencySymbol}12.4L`}
               />
               <View style={styles.statGap} />
-              <View style={styles.lastUpdateBadge}>
-                <Text style={styles.lastUpdateLabel}>LAST UPDATE</Text>
-                <Text style={styles.lastUpdateValue}>Today</Text>
+              <View style={[styles.lastUpdateBadge, { backgroundColor: colors.success }]}>
+                <Text style={[styles.lastUpdateLabel, { color: colors.textPrimary }]}>LAST UPDATE</Text>
+                <Text style={[styles.lastUpdateValue, { color: colors.textPrimary }]}>Today</Text>
               </View>
             </>
           )}
@@ -187,7 +188,7 @@ export const VaultScreen: React.FC = () => {
           <Card>
             <View style={styles.chartRow}>
               <View style={styles.chartPlaceholder}>
-                <View style={styles.chartCircle}>
+                <View style={[styles.chartCircle, { borderColor: colors.primary }]}>
                   <Text style={styles.chartIcon}>📊</Text>
                 </View>
               </View>
@@ -205,8 +206,8 @@ export const VaultScreen: React.FC = () => {
                     <View
                       style={[styles.legendDot, {backgroundColor: item.color}]}
                     />
-                    <Text style={styles.legendLabel}>{item.label}</Text>
-                    <Text style={styles.legendValue}>{item.value}</Text>
+                    <Text style={[styles.legendLabel, { color: colors.textSecondary }]}>{item.label}</Text>
+                    <Text style={[styles.legendValue, { color: colors.textPrimary }]}>{item.value}</Text>
                   </View>
                 ))}
               </View>
@@ -243,23 +244,19 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: radii.sm,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.sm,
   },
   logoText: {
-    color: colors.textPrimary,
     fontSize: 12,
     fontWeight: typography.bold,
   },
   headerTitle: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
   },
   headerSubtitle: {
-    color: colors.textMuted,
     fontSize: 10,
     letterSpacing: 1,
   },
@@ -267,20 +264,17 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: radii.full,
-    backgroundColor: colors.cardBackground,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: spacing.sm,
   },
   iconText: {
-    color: colors.textPrimary,
     fontSize: 18,
   },
   avatarContainer: {
     width: 36,
     height: 36,
     borderRadius: radii.full,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: spacing.sm,
@@ -301,18 +295,15 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   rupeeSymbol: {
-    color: colors.textPrimary,
     fontSize: typography.h1,
     fontWeight: typography.bold,
     marginRight: 4,
   },
   balanceValue: {
-    color: colors.textPrimary,
     fontSize: 36,
     fontWeight: typography.bold,
   },
   balanceDecimal: {
-    color: colors.textMuted,
     fontSize: typography.h3,
     fontWeight: typography.medium,
   },
@@ -325,19 +316,16 @@ const styles = StyleSheet.create({
   },
   lastUpdateBadge: {
     flex: 1,
-    backgroundColor: colors.success,
     borderRadius: radii.sm,
     padding: spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
   lastUpdateLabel: {
-    color: colors.textPrimary,
     fontSize: 10,
     opacity: 0.8,
   },
   lastUpdateValue: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
   },
@@ -362,7 +350,6 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: radii.full,
     borderWidth: 12,
-    borderColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -385,12 +372,10 @@ const styles = StyleSheet.create({
     marginRight: spacing.sm,
   },
   legendLabel: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     flex: 1,
   },
   legendValue: {
-    color: colors.textPrimary,
     fontSize: typography.bodySmall,
     fontWeight: typography.medium,
   },

@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,32 +11,32 @@ import {
   Image,
   RefreshControl,
 } from 'react-native';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import Svg, {Circle} from 'react-native-svg';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Svg, { Circle } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {MainStackParamList} from '../../navigation/MainTabNavigator';
+import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import Toast from 'react-native-toast-message';
-import {formatNumber} from '../../utils/formatNumber';
-import {useCurrency} from '../../context/CurrencyContext';
-import {useAppDispatch, useAppSelector} from '../../store/hooks';
-import {setFinancialData} from '../../store/slices/financialDataSlice';
-import {DeviceEventEmitter} from 'react-native';
-import {Card} from '../../components/dashboard/Card';
-import {GoalCardWithSuggestion} from '../../components/dashboard/GoalCardWithSuggestion';
-import {ProgressBar} from '../../components/dashboard/ProgressBar';
-import {AnimatedMascot} from '../../components/AnimatedMascot';
-import {MascotLoader} from '../../components/MascotLoader';
+import { formatNumber } from '../../utils/formatNumber';
+import { useCurrency } from '../../context/CurrencyContext';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { setFinancialData } from '../../store/slices/financialDataSlice';
+import { DeviceEventEmitter } from 'react-native';
+import { Card } from '../../components/dashboard/Card';
+import { GoalCardWithSuggestion } from '../../components/dashboard/GoalCardWithSuggestion';
+import { ProgressBar } from '../../components/dashboard/ProgressBar';
+import { AnimatedMascot } from '../../components/AnimatedMascot';
+import { MascotLoader } from '../../components/MascotLoader';
 import {
-  colors,
   typography,
   spacing,
   radii,
   borderWidths,
 } from '../../constants/theme';
-import {ENDPOINTS} from '../../constants/endpoints';
-import {globalStyles} from '../../styles/globalStyles';
-import {api} from '../../services/api';
+import { ENDPOINTS } from '../../constants/endpoints';
+import { globalStyles } from '../../styles/globalStyles';
+import { api } from '../../services/api';
+import { useThemeColors } from "../../context/ThemeContext";
 
 type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
@@ -79,9 +79,9 @@ interface Insight {
 const parseInsightTitle = (title: string) => {
   const emojiMatch = title.match(/^(\p{Emoji}+)\s*/u);
   if (emojiMatch) {
-    return {icon: emojiMatch[1], text: title.replace(emojiMatch[0], '').trim()};
+    return { icon: emojiMatch[1], text: title.replace(emojiMatch[0], '').trim() };
   }
-  return {icon: '🎯', text: title};
+  return { icon: '🎯', text: title };
 };
 
 // Circular Progress Component using SVG
@@ -97,9 +97,12 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
   progress,
   size = 160,
   strokeWidth = 14,
-  progressColor = colors.success,
-  trackColor = colors.cardBackground,
+  progressColor,
+  trackColor,
 }) => {
+  const colors = useThemeColors();
+  const activeProgressColor = progressColor || colors.success;
+  const activeTrackColor = trackColor || colors.cardBackground;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const clampedProgress = Math.min(100, Math.max(0, progress));
@@ -114,7 +117,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={trackColor}
+          stroke={activeTrackColor}
           strokeWidth={strokeWidth}
           fill="none"
         />
@@ -123,7 +126,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={progressColor}
+          stroke={activeProgressColor}
           strokeWidth={strokeWidth}
           fill="none"
           strokeDasharray={circumference}
@@ -154,13 +157,13 @@ const circularStyles = StyleSheet.create({
     alignItems: 'center',
   },
   scoreText: {
-    color: colors.textPrimary,
     fontSize: typography.h2,
     fontWeight: typography.bold,
   },
 });
 
 export const GoalPulseScreen: React.FC = () => {
+  const colors = useThemeColors();
   const navigation = useNavigation<NavigationProp>();
   const dispatch = useAppDispatch();
   const financialData = useAppSelector(state => state.financialData);
@@ -172,12 +175,12 @@ export const GoalPulseScreen: React.FC = () => {
   const [insights, setInsights] = useState<Insight[]>([]);
   const [insightsLoading, setInsightsLoading] = useState(false);
   const [onboardingInvestment, setOnboardingInvestment] = useState(0);
-  const {currencySymbol} = useCurrency();
+  const { currencySymbol } = useCurrency();
 
   useEffect(() => {
     const fetchData = async () => {
       const profileData = await checkAndFetchFinancialProfile();
-      const {goals: currentGoals, goalBudget: currentBudget} =
+      const { goals: currentGoals, goalBudget: currentBudget } =
         await fetchGoals();
       await fetchInsights(profileData, currentGoals, currentBudget);
       console.log('goalsd');
@@ -250,10 +253,10 @@ export const GoalPulseScreen: React.FC = () => {
           goalBudget: response.data.goalBudget,
         };
       }
-      return {goals: [], goalBudget: null};
+      return { goals: [], goalBudget: null };
     } catch (error) {
       console.error('Failed to fetch goals:', error);
-      return {goals: [], goalBudget: null};
+      return { goals: [], goalBudget: null };
     } finally {
       if (showLoader) {
         setIsLoading(false);
@@ -324,8 +327,8 @@ export const GoalPulseScreen: React.FC = () => {
             style={styles.logoImage}
           />
           <View>
-            <Text style={styles.headerTitle}>Finova Pulse</Text>
-            <Text style={styles.headerSubtitle}>AI POWERED</Text>
+            <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Finova Pulse</Text>
+            <Text style={[styles.headerSubtitle, { color: colors.textMuted }]}>AI POWERED</Text>
           </View>
         </View>
         <View style={styles.headerRight}>
@@ -336,10 +339,10 @@ export const GoalPulseScreen: React.FC = () => {
                         <Text style={styles.iconText}>🔔</Text>
                     </TouchableOpacity> */}
           <TouchableOpacity
-            style={styles.avatarContainer}
+            style={[styles.avatarContainer, { backgroundColor: colors.primary }]}
             onPress={() => navigation.navigate('Profile')}>
-            <View style={styles.userIconHead} />
-            <View style={styles.userIconBody} />
+            <View style={[styles.userIconHead, { backgroundColor: colors.textPrimary }]} />
+            <View style={[styles.userIconBody, { backgroundColor: colors.textPrimary }]} />
           </TouchableOpacity>
         </View>
       </View>
@@ -370,16 +373,16 @@ export const GoalPulseScreen: React.FC = () => {
           {/* Monthly Pulse Score - only show when there are goals */}
           {goals.length > 0 && (
             <View style={styles.pulseCard}>
-              <View style={styles.pulseCardGradient}>
-                <Text style={styles.pulseCardTitle}>
+              <View style={[styles.pulseCardGradient, { backgroundColor: colors.pulseCardBackground }]}>
+                <Text style={[styles.pulseCardTitle, { color: colors.textPrimary }]}>
                   Monthly Progress Score
                 </Text>
-                <Text style={styles.pulseCardSubtitle}>
+                <Text style={[styles.pulseCardSubtitle, { color: colors.textMuted }]}>
                   Your overall goal achievement
                 </Text>
 
                 <View style={styles.pulseScoreContainer}>
-                  <View style={styles.glowEffect} />
+                  <View style={[styles.glowEffect, { backgroundColor: colors.successSubtle, shadowColor: colors.success }]} />
                   <CircularProgress
                     progress={averageAchievement}
                     size={160}
@@ -387,22 +390,24 @@ export const GoalPulseScreen: React.FC = () => {
                   />
                 </View>
 
-                <Text style={styles.encourageText}>
+                <Text style={[styles.encourageText, { color: colors.textSecondary }]}>
                   {averageAchievement >= 75
                     ? '🚀 Outstanding progress! Keep it up!'
                     : averageAchievement >= 50
-                    ? "💪 Great job! You're on track!"
-                    : averageAchievement >= 25
-                    ? '📈 Good start! Keep pushing!'
-                    : '🌱 Start your journey to financial freedom!'}
+                      ? "💪 Great job! You're on track!"
+                      : averageAchievement >= 25
+                        ? '📈 Good start! Keep pushing!'
+                        : '🌱 Start your journey to financial freedom!'}
                 </Text>
 
                 {availableBudget > 0 && (
-                  <View style={{marginTop: spacing.xs, alignItems: 'center'}}>
+                  <View style={{ marginTop: spacing.xs, alignItems: 'center' }}>
                     <Text
                       style={[
                         styles.budgetBadge,
                         {
+                          color: colors.success,
+                          backgroundColor: colors.successSubtle,
                           fontSize: typography.body,
                           paddingVertical: 6,
                           paddingHorizontal: spacing.md,
@@ -421,7 +426,7 @@ export const GoalPulseScreen: React.FC = () => {
           {goals.length > 0 && (
             <View style={styles.goalsSection}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>💵 Financial Goals</Text>
+                <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>💵 Financial Goals</Text>
               </View>
 
               {goals.map(goal => (
@@ -475,10 +480,10 @@ export const GoalPulseScreen: React.FC = () => {
           {availableBudget > 0 && (
             <View style={styles.suggestionsSection}>
               <View
-                style={[styles.sectionHeader, {paddingHorizontal: spacing.lg}]}>
-                <Text style={styles.sectionTitle}>✨ AI Suggested Goals</Text>
+                style={[styles.sectionHeader, { paddingHorizontal: spacing.lg }]}>
+                <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>✨ AI Suggested Goals</Text>
                 {goals.length === 0 && (
-                  <Text style={styles.budgetBadge}>
+                  <Text style={[styles.budgetBadge, { color: colors.success, backgroundColor: colors.successSubtle }]}>
                     {currencySymbol}
                     {formatNumber(availableBudget, 1)} available for goals
                   </Text>
@@ -495,7 +500,7 @@ export const GoalPulseScreen: React.FC = () => {
                       <ActivityIndicator
                         size="small"
                         color={colors.primary}
-                        style={{marginVertical: 20}}
+                        style={{ marginVertical: 20 }}
                       />
                     </View>
                   ))}
@@ -506,26 +511,26 @@ export const GoalPulseScreen: React.FC = () => {
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.suggestionsContent}>
                   {insights.map((insight, idx) => {
-                    const {icon, text} = parseInsightTitle(insight.title);
+                    const { icon, text } = parseInsightTitle(insight.title);
                     return (
-                      <View key={idx} style={styles.suggestionCard}>
+                      <View key={idx} style={[styles.suggestionCard, { backgroundColor: colors.cardBackground, borderColor: colors.primarySubtle }]}>
                         <Text style={styles.suggestionIcon}>{icon}</Text>
-                        <Text style={styles.suggestionName} numberOfLines={2}>
+                        <Text style={[styles.suggestionName, { color: colors.textPrimary }]} numberOfLines={2}>
                           {text}
                         </Text>
-                        <Text style={styles.suggestionAmount}>
+                        <Text style={[styles.suggestionAmount, { color: colors.primary }]}>
                           {currencySymbol}
                           {insight.amount.toLocaleString()}
                         </Text>
-                        <Text style={styles.suggestionMonths}>
+                        <Text style={[styles.suggestionMonths, { color: colors.textMuted }]}>
                           {insight.target_months}{' '}
                           {insight.target_months === 1 ? 'month' : 'months'}
                         </Text>
-                        <Text style={styles.suggestionDesc} numberOfLines={2}>
+                        <Text style={[styles.suggestionDesc, { color: colors.textSecondary }]} numberOfLines={2}>
                           {insight.description}
                         </Text>
                         <TouchableOpacity
-                          style={styles.suggestionAddBtn}
+                          style={[styles.suggestionAddBtn, { backgroundColor: colors.primary }]}
                           onPress={() =>
                             navigation.navigate('AddGoal', {
                               availableForNewGoals: availableBudget,
@@ -554,8 +559,8 @@ export const GoalPulseScreen: React.FC = () => {
                 source={require('../../asset/happymascot.png')}
                 style={styles.emptyStateMascot}
               />
-              <Text style={styles.emptyStateTitle}>Hi, I'm Fino! 👋</Text>
-              <Text style={styles.emptyStateDesc}>
+              <Text style={[styles.emptyStateTitle, { color: colors.textPrimary }]}>Hi, I'm Fino! 👋</Text>
+              <Text style={[styles.emptyStateDesc, { color: colors.textSecondary }]}>
                 You haven't added any goals yet. Start your financial journey by
                 adding a goal from the + button below or pick one from our
                 suggestions.
@@ -568,7 +573,7 @@ export const GoalPulseScreen: React.FC = () => {
       {/* FAB */}
       {
         <TouchableOpacity
-          style={styles.fab}
+          style={[styles.fab, { backgroundColor: colors.primary }]}
           onPress={() => {
             if (availableBudget > 0) {
               navigation.navigate('AddGoal', {
@@ -582,7 +587,7 @@ export const GoalPulseScreen: React.FC = () => {
               });
             }
           }}>
-          <Text style={styles.fabText}>+</Text>
+          <Text style={[styles.fabText, { color: colors.textPrimary }]}>+</Text>
         </TouchableOpacity>
       }
     </SafeAreaView>
@@ -608,12 +613,10 @@ const styles = StyleSheet.create({
     marginRight: spacing.sm,
   },
   headerTitle: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
   },
   headerSubtitle: {
-    color: colors.textMuted,
     fontSize: 10,
     letterSpacing: 1,
   },
@@ -625,7 +628,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: radii.full,
-    backgroundColor: colors.cardBackground,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.sm,
@@ -637,7 +639,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: radii.full,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
@@ -646,7 +647,6 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: radii.full,
-    backgroundColor: colors.textPrimary,
     marginBottom: 2,
   },
   userIconBody: {
@@ -654,7 +654,6 @@ const styles = StyleSheet.create({
     height: 10,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
-    backgroundColor: colors.textPrimary,
   },
   content: {
     flex: 1,
@@ -666,7 +665,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   pulseCardGradient: {
-    backgroundColor: colors.pulseCardBackground,
     borderRadius: 20,
     padding: spacing.xl,
     alignItems: 'center',
@@ -674,14 +672,12 @@ const styles = StyleSheet.create({
     borderColor: '#2a4a6a',
   },
   pulseCardTitle: {
-    color: colors.textPrimary,
     fontSize: typography.h3,
     fontWeight: typography.bold,
     marginBottom: spacing.xs,
     textAlign: 'center',
   },
   pulseCardSubtitle: {
-    color: colors.textMuted,
     fontSize: typography.bodySmall,
     marginBottom: spacing.lg,
     textAlign: 'center',
@@ -697,14 +693,11 @@ const styles = StyleSheet.create({
     width: 180,
     height: 180,
     borderRadius: radii.full,
-    backgroundColor: colors.successSubtle,
-    shadowColor: colors.success,
-    shadowOffset: {width: 0, height: 0},
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
     shadowRadius: 30,
   },
   encourageText: {
-    color: colors.textSecondary,
     fontSize: typography.body,
     textAlign: 'center',
     fontWeight: typography.medium,
@@ -716,7 +709,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   sectionTitle: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
     marginTop: spacing.md,
@@ -732,17 +724,15 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: radii.full,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
   },
   fabText: {
-    color: colors.textPrimary,
     fontSize: 28,
     fontWeight: '300',
   },
@@ -760,20 +750,17 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   emptyStateTitle: {
-    color: colors.textPrimary,
     fontSize: typography.h2,
     fontWeight: typography.bold,
     marginBottom: spacing.sm,
     textAlign: 'center',
   },
   emptyStateDesc: {
-    color: colors.textSecondary,
     fontSize: typography.body,
     textAlign: 'center',
     lineHeight: 24,
   },
   emptyState: {
-    backgroundColor: colors.cardBackground,
     borderRadius: 12,
     padding: spacing.xl,
     alignItems: 'center',
@@ -787,10 +774,8 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.sm,
   },
   budgetBadge: {
-    color: colors.success,
     fontSize: typography.caption,
     fontWeight: typography.semibold,
-    backgroundColor: colors.successSubtle,
     paddingHorizontal: spacing.sm,
     paddingVertical: 3,
     borderRadius: radii.full,
@@ -800,44 +785,37 @@ const styles = StyleSheet.create({
   },
   suggestionCard: {
     width: 180,
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.lg,
     padding: spacing.md,
     marginRight: spacing.md,
     borderWidth: borderWidths.thin,
-    borderColor: colors.primarySubtle,
   },
   suggestionIcon: {
     fontSize: 28,
     marginBottom: spacing.sm,
   },
   suggestionName: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
     marginBottom: spacing.xs,
     lineHeight: 20,
   },
   suggestionAmount: {
-    color: colors.primary,
     fontSize: typography.h3,
     fontWeight: typography.bold,
     marginBottom: 2,
   },
   suggestionMonths: {
-    color: colors.textMuted,
     fontSize: typography.caption,
     marginBottom: spacing.sm,
   },
   suggestionDesc: {
-    color: colors.textSecondary,
     fontSize: typography.caption,
     lineHeight: 16,
     marginBottom: spacing.md,
     flex: 1,
   },
   suggestionAddBtn: {
-    backgroundColor: colors.primary,
     borderRadius: radii.sm,
     paddingVertical: spacing.sm,
     alignItems: 'center',

@@ -10,16 +10,18 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {BackButton} from '../../components/BackButton';
 import {Header} from '../../components/Header';
-import {colors, typography, spacing} from '../../constants/theme';
+import {typography, spacing} from '../../constants/theme';
 import {globalStyles} from '../../styles/globalStyles';
+import { useThemeColors } from "../../context/ThemeContext";
 
 export const PrivacySecurityScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation();
 
   const Section = ({title, content}: {title: string; content: string}) => (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      <Text style={styles.sectionContent}>{content}</Text>
+      <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{title}</Text>
+      <Text style={[styles.sectionContent, { color: colors.textSecondary }]}>{content}</Text>
     </View>
   );
 
@@ -30,7 +32,7 @@ export const PrivacySecurityScreen: React.FC = () => {
       <Header title="Privacy & Security" />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.mainDescription}>
+        <Text style={[styles.mainDescription, { color: colors.textSecondary }]}>
           At Finova AI, we take your privacy and security seriously. This
           document outlines how we protect your data and your rights as a user.
         </Text>
@@ -60,7 +62,7 @@ export const PrivacySecurityScreen: React.FC = () => {
           content="We may update this privacy policy from time to time. We will notify you of any significant changes through the app or via email."
         />
 
-        <Text style={styles.footer}>Last updated: February 2026</Text>
+        <Text style={[styles.footer, { color: colors.textMuted }]}>Last updated: February 2026</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -73,7 +75,6 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
   },
   mainDescription: {
-    color: colors.textSecondary,
     fontSize: typography.body,
     lineHeight: 24,
     marginBottom: spacing.xl,
@@ -82,18 +83,15 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   sectionTitle: {
-    color: colors.textPrimary,
     fontSize: typography.h3,
     fontWeight: typography.bold,
     marginBottom: spacing.xs,
   },
   sectionContent: {
-    color: colors.textSecondary,
     fontSize: typography.body,
     lineHeight: 24,
   },
   footer: {
-    color: colors.textMuted,
     fontSize: typography.caption,
     textAlign: 'center',
     marginTop: spacing.lg,

@@ -23,7 +23,6 @@ import {MainStackParamList} from '../../navigation/MainTabNavigator';
 import api from '../../services/api';
 import {useCurrency} from '../../context/CurrencyContext';
 import {
-  colors,
   typography,
   spacing,
   radii,
@@ -38,6 +37,7 @@ import {SkeletonLoader} from '../../components/SkeletonLoader';
 import {AnimatedMascot} from '../../components/AnimatedMascot';
 import {Header} from '../../components/Header';
 import {formatCurrency} from '../../utils/formatNumber';
+import { useThemeColors } from "../../context/ThemeContext";
 
 type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
 type ContributionsRouteProp = RouteProp<MainStackParamList, 'Contributions'>;
@@ -63,6 +63,7 @@ interface ModalState {
 }
 
 export const ContributionsScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<ContributionsRouteProp>();
   const {currencySymbol} = useCurrency();
@@ -510,10 +511,10 @@ export const ContributionsScreen: React.FC = () => {
         confirmVariant="primary"
         onConfirm={handleSaveEdit}
         onCancel={handleCloseEditModal}>
-        <View style={styles.modalInputContainer}>
-          <Text style={styles.modalCurrencyPrefix}>{currencySymbol}</Text>
+        <View style={[styles.modalInputContainer, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+          <Text style={[styles.modalCurrencyPrefix, { color: colors.primary }]}>{currencySymbol}</Text>
           <TextInput
-            style={styles.modalInput}
+            style={[styles.modalInput, { color: colors.textPrimary }]}
             value={editModalValue}
             onChangeText={text => {
               setEditModalValue(text);
@@ -526,9 +527,9 @@ export const ContributionsScreen: React.FC = () => {
           />
         </View>
         {editError ? (
-          <Text style={styles.modalErrorText}>{editError}</Text>
+          <Text style={[styles.modalErrorText, { color: colors.error }]}>{editError}</Text>
         ) : null}
-        <Text style={styles.modalHintText}>
+        <Text style={[styles.modalHintText, { color: colors.textMuted }]}>
           Max allowed: {formatCurrency(monthlyContribution, currencySymbol)}
         </Text>
       </AppModal>
@@ -585,32 +586,32 @@ export const ContributionsScreen: React.FC = () => {
       ) : (
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {/* Payment Card - Dynamic based on paid state */}
-          <View style={styles.upcomingCard}>
+          <View style={[styles.upcomingCard, { backgroundColor: colors.pulseCardBackground }]}>
             {hasPaidThisMonth ? (
               <>
                 {/* Already paid this month */}
                 <View style={styles.upcomingHeader}>
                   <View
                     style={[
-                      styles.timerBadge,
-                      {backgroundColor: colors.successSubtle},
-                    ]}>
+                                                                                                      styles.timerBadge,
+                                                                                                      {backgroundColor: colors.successSubtle},
+                                                                                                    , { backgroundColor: colors.warningSubtle }]}>
                     <Text style={styles.timerIcon}>✅</Text>
-                    <Text style={[styles.timerText, {color: colors.success}]}>
+                    <Text style={[styles.timerText, {color: colors.success}, { color: colors.warning }]}>
                       Paid
                     </Text>
                   </View>
                 </View>
 
-                <Text style={styles.upcomingLabel}>Last Payment</Text>
-                <Text style={styles.upcomingAmount}>
+                <Text style={[styles.upcomingLabel, { color: colors.textMuted }]}>Last Payment</Text>
+                <Text style={[styles.upcomingAmount, { color: colors.textPrimary }]}>
                   {formatCurrency(
                     contributions.filter(c => c.status === 'paid').slice(-1)[0]
                       ?.amount || editedContribution,
                     currencySymbol,
                   )}
                 </Text>
-                <Text style={styles.upcomingDate}>
+                <Text style={[styles.upcomingDate, { color: colors.textSecondary }]}>
                   {contributions.filter(c => c.status === 'paid').slice(-1)[0]
                     ?.date || ''}
                 </Text>
@@ -618,13 +619,13 @@ export const ContributionsScreen: React.FC = () => {
                 {/* Next upcoming payment info */}
                 {upcomingPayment && (
                   <View style={styles.nextPaymentInfo}>
-                    <Text style={styles.nextPaymentLabel}>
+                    <Text style={[styles.nextPaymentLabel, { color: colors.textMuted }]}>
                       Upcoming Payment
                     </Text>
-                    <Text style={styles.nextPaymentAmount}>
+                    <Text style={[styles.nextPaymentAmount, { color: colors.primary }]}>
                       {formatCurrency(editedContribution, currencySymbol)}
                     </Text>
-                    <Text style={styles.nextPaymentDate}>
+                    <Text style={[styles.nextPaymentDate, { color: colors.textSecondary }]}>
                       Due: {upcomingPayment.date}
                     </Text>
                   </View>
@@ -634,9 +635,9 @@ export const ContributionsScreen: React.FC = () => {
               <>
                 {/* Not yet paid this month */}
                 <View style={styles.upcomingHeader}>
-                  <View style={styles.timerBadge}>
+                  <View style={[styles.timerBadge, { backgroundColor: colors.warningSubtle }]}>
                     <Text style={styles.timerIcon}>⏰</Text>
-                    <Text style={styles.timerText}>
+                    <Text style={[styles.timerText, { color: colors.warning }]}>
                       {daysUntilPayment} days left
                     </Text>
                   </View>
@@ -644,31 +645,31 @@ export const ContributionsScreen: React.FC = () => {
                     style={styles.editButton}
                     onPress={() => setIsEditing(!isEditing)}
                     activeOpacity={0.7}>
-                    <Text style={styles.editButtonText}>Edit</Text>
+                    <Text style={[styles.editButtonText, { color: colors.primary }]}>Edit</Text>
                   </TouchableOpacity>
                 </View>
 
-                <Text style={styles.upcomingLabel}>Upcoming Payment</Text>
-                <Text style={styles.upcomingAmount}>
+                <Text style={[styles.upcomingLabel, { color: colors.textMuted }]}>Upcoming Payment</Text>
+                <Text style={[styles.upcomingAmount, { color: colors.textPrimary }]}>
                   {formatCurrency(editedContribution, currencySymbol)}
                 </Text>
-                <Text style={styles.upcomingDate}>
+                <Text style={[styles.upcomingDate, { color: colors.textSecondary }]}>
                   Due: {upcomingPayment?.date}
                 </Text>
 
                 {/* Inline contribution editor */}
                 {isEditing && (
-                  <View style={styles.editorContainer}>
-                    <Text style={styles.editorTitle}>
+                  <View style={[styles.editorContainer, { borderTopColor: colors.border }]}>
+                    <Text style={[styles.editorTitle, { color: colors.textSecondary }]}>
                       Adjust This Month's Contribution
                     </Text>
 
-                    <View style={styles.contributionInputContainer}>
-                      <Text style={styles.currencyPrefix}>
+                    <View style={[styles.contributionInputContainer, { backgroundColor: colors.inputBackground, borderColor: colors.primary + '50' }]}>
+                      <Text style={[styles.currencyPrefix, { color: colors.primary }]}>
                         {currencySymbol}
                       </Text>
                       <TextInput
-                        style={styles.contributionInput}
+                        style={[styles.contributionInput, { color: colors.textPrimary }]}
                         value={
                           editedContribution > 0
                             ? editedContribution.toString()
@@ -683,15 +684,15 @@ export const ContributionsScreen: React.FC = () => {
                     </View>
 
                     <View style={styles.editorInfo}>
-                      <Text style={styles.editorInfoText}>
+                      <Text style={[styles.editorInfoText, { color: colors.textSecondary }]}>
                         Goal achieved in{' '}
-                        <Text style={styles.editorHighlight}>
+                        <Text style={[styles.editorHighlight, { color: colors.primary }]}>
                           {effectiveMonths}{' '}
                           {effectiveMonths === 1 ? 'month' : 'months'}
                         </Text>
                       </Text>
                       {editedContribution < monthlyContribution && (
-                        <Text style={styles.editorHint}>
+                        <Text style={[styles.editorHint, { color: colors.textMuted }]}>
                           Original:{' '}
                           {formatCurrency(monthlyContribution, currencySymbol)}
                           /mo ({achieveInMonths}{' '}
@@ -701,24 +702,24 @@ export const ContributionsScreen: React.FC = () => {
                     </View>
 
                     <TouchableOpacity
-                      style={styles.confirmButton}
+                      style={[styles.confirmButton, { backgroundColor: colors.primary }]}
                       onPress={handleConfirmContribution}
                       activeOpacity={0.7}>
-                      <Text style={styles.confirmButtonText}>Confirm</Text>
+                      <Text style={[styles.confirmButtonText, { color: colors.background }]}>Confirm</Text>
                     </TouchableOpacity>
                   </View>
                 )}
 
                 <TouchableOpacity
                   style={[
-                    styles.payButton,
-                    (!paymentEnabled || isSaving) && styles.payButtonDisabled,
-                  ]}
+                                                                                                    styles.payButton,
+                                                                                                    (!paymentEnabled || isSaving) && styles.payButtonDisabled,
+                                                                                                  , { backgroundColor: colors.success }]}
                   onPress={handleSaveContribution}>
                   {isSaving ? (
                     <ActivityIndicator color={colors.background} />
                   ) : (
-                    <Text style={styles.payButtonText}>
+                    <Text style={[styles.payButtonText, { color: colors.background }]}>
                       {paymentEnabled ? 'Save Now' : 'Not Due Yet'}
                     </Text>
                   )}
@@ -738,12 +739,12 @@ export const ContributionsScreen: React.FC = () => {
           )}
 
           {/* Progress Summary */}
-          <View style={styles.summaryCard}>
+          <View style={[styles.summaryCard, { backgroundColor: colors.cardBackground }]}>
             {/* Progress Bar */}
             <View style={styles.progressSection}>
               <View style={styles.progressHeader}>
-                <Text style={styles.progressLabel}>Progress</Text>
-                <Text style={styles.progressPercent}>
+                <Text style={[styles.progressLabel, { color: colors.textSecondary }]}>Progress</Text>
+                <Text style={[styles.progressPercent, { color: colors.primary }]}>
                   {targetAmount > 0
                     ? Math.min(
                         100,
@@ -753,65 +754,65 @@ export const ContributionsScreen: React.FC = () => {
                   %
                 </Text>
               </View>
-              <View style={styles.progressBarBackground}>
+              <View style={[styles.progressBarBackground, { backgroundColor: colors.inputBackground }]}>
                 <View
                   style={[
-                    styles.progressBarFill,
-                    {
-                      width: `${
-                        targetAmount > 0
-                          ? Math.min(100, (totalPaid / targetAmount) * 100)
-                          : 0
-                      }%`,
-                    },
-                  ]}
+                                                                                            styles.progressBarFill,
+                                                                                            {
+                                                                                              width: `${
+                                                                                                targetAmount > 0
+                                                                                                  ? Math.min(100, (totalPaid / targetAmount) * 100)
+                                                                                                  : 0
+                                                                                              }%`,
+                                                                                            },
+                                                                                          , { backgroundColor: colors.success }]}
                 />
               </View>
               <View style={styles.progressAmounts}>
-                <Text style={styles.progressSaved}>
+                <Text style={[styles.progressSaved, { color: colors.success }]}>
                   {formatCurrency(totalPaid, currencySymbol)} saved
                 </Text>
-                <Text style={styles.progressTarget}>
+                <Text style={[styles.progressTarget, { color: colors.textMuted }]}>
                   of {formatCurrency(targetAmount, currencySymbol)}
                 </Text>
               </View>
-              <Text style={styles.completionDate}>
+              <Text style={[styles.completionDate, { color: colors.textMuted }]}>
                 📅 Completes by {completionDate}
               </Text>
             </View>
 
-            <View style={styles.summaryDividerHorizontal} />
+            <View style={[styles.summaryDividerHorizontal, { backgroundColor: colors.border }]} />
 
             <View style={styles.summaryRow}>
               <View style={styles.summaryItem}>
-                <Text style={styles.summaryValue}>
+                <Text style={[styles.summaryValue, { color: colors.textPrimary }]}>
                   {formatCurrency(targetAmount, currencySymbol)}
                 </Text>
-                <Text style={styles.summaryLabel}>Target</Text>
+                <Text style={[styles.summaryLabel, { color: colors.textMuted }]}>Target</Text>
               </View>
-              <View style={styles.summaryDivider} />
+              <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
               <View style={styles.summaryItem}>
                 <Text
                   style={[
-                    styles.summaryValue,
-                    editedContribution !== monthlyContribution &&
-                      styles.editedValue,
-                  ]}>
+                                                                                            styles.summaryValue,
+                                                                                            editedContribution !== monthlyContribution &&
+                                                                                              styles.editedValue,
+                                                                                          , { color: colors.textPrimary }, { color: colors.primary }]}>
                   {effectiveMonths}
                 </Text>
-                <Text style={styles.summaryLabel}>Months</Text>
+                <Text style={[styles.summaryLabel, { color: colors.textMuted }]}>Months</Text>
               </View>
-              <View style={styles.summaryDivider} />
+              <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
               <View style={styles.summaryItem}>
                 <Text
                   style={[
-                    styles.summaryValue,
-                    editedContribution !== monthlyContribution &&
-                      styles.editedValue,
-                  ]}>
+                                                                                            styles.summaryValue,
+                                                                                            editedContribution !== monthlyContribution &&
+                                                                                              styles.editedValue,
+                                                                                          , { color: colors.textPrimary }, { color: colors.primary }]}>
                   {formatCurrency(editedContribution, currencySymbol)}
                 </Text>
-                <Text style={styles.summaryLabel}>Monthly</Text>
+                <Text style={[styles.summaryLabel, { color: colors.textMuted }]}>Monthly</Text>
               </View>
             </View>
           </View>
@@ -819,26 +820,26 @@ export const ContributionsScreen: React.FC = () => {
           {/* Contribution History */}
           {paidHistory.length > 0 && (
             <View style={styles.historySection}>
-              <Text style={styles.sectionTitle}>Contribution History</Text>
+              <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Contribution History</Text>
               {paidHistory.map(item => {
                 const canEdit = isCurrentMonth(item.rawDate);
                 return (
                   <View key={item.id} style={styles.historyItem}>
-                    <View style={styles.historyDot} />
-                    <View style={styles.historyContent}>
+                    <View style={[styles.historyDot, { backgroundColor: colors.success }]} />
+                    <View style={[styles.historyContent, { backgroundColor: colors.cardBackground, borderColor: colors.successSubtle }]}>
                       <View style={styles.historyRow}>
-                        <Text style={styles.historyMonth}>{item.monthKey}</Text>
-                        <Text style={styles.historyAmount}>
+                        <Text style={[styles.historyMonth, { color: colors.textPrimary }]}>{item.monthKey}</Text>
+                        <Text style={[styles.historyAmount, { color: colors.success }]}>
                           {formatCurrency(item.amount, currencySymbol)}
                         </Text>
                       </View>
                       <View style={styles.historyRowSub}>
-                        <Text style={styles.historyDate}>{item.date}</Text>
+                        <Text style={[styles.historyDate, { color: colors.textMuted }]}>{item.date}</Text>
                         {canEdit && (
                           <TouchableOpacity
                             onPress={() => handleOpenEditModal(item)}
-                            style={styles.historyEditBtn}>
-                            <Text style={styles.historyEditBtnText}>Edit</Text>
+                            style={[styles.historyEditBtn, { borderColor: colors.primary + '60' }]}>
+                            <Text style={[styles.historyEditBtnText, { color: colors.primary }]}>Edit</Text>
                           </TouchableOpacity>
                         )}
                       </View>
@@ -860,7 +861,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   upcomingCard: {
-    backgroundColor: colors.pulseCardBackground,
     borderRadius: 20,
     padding: spacing.xl,
     marginBottom: spacing.lg,
@@ -879,7 +879,6 @@ const styles = StyleSheet.create({
   timerBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.warningSubtle,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: radii.md,
@@ -889,23 +888,19 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   timerText: {
-    color: colors.warning,
     fontSize: typography.caption,
     fontWeight: typography.medium,
   },
   upcomingLabel: {
-    color: colors.textMuted,
     fontSize: typography.bodySmall,
     marginBottom: spacing.xs,
   },
   upcomingAmount: {
-    color: colors.textPrimary,
     fontSize: 36,
     fontWeight: typography.bold,
     marginBottom: spacing.xs,
   },
   upcomingDate: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     marginBottom: spacing.lg,
   },
@@ -918,22 +913,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   nextPaymentLabel: {
-    color: colors.textMuted,
     fontSize: typography.caption,
     marginBottom: spacing.xs,
   },
   nextPaymentAmount: {
-    color: colors.primary,
     fontSize: typography.h3,
     fontWeight: typography.bold,
     marginBottom: spacing.xs,
   },
   nextPaymentDate: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
   },
   payButton: {
-    backgroundColor: colors.success,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl * 2,
     borderRadius: radii.md,
@@ -944,12 +935,10 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   payButtonText: {
-    color: colors.background,
     fontSize: typography.body,
     fontWeight: typography.bold,
   },
   summaryCard: {
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.lg,
     padding: spacing.lg,
     marginBottom: spacing.xl,
@@ -965,17 +954,14 @@ const styles = StyleSheet.create({
   },
   summaryDivider: {
     width: 1,
-    height: 40,
-    backgroundColor: colors.border,
+    height: 40
   },
   summaryValue: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.bold,
     marginBottom: 4,
   },
   summaryLabel: {
-    color: colors.textMuted,
     fontSize: typography.caption,
   },
   progressSection: {
@@ -988,24 +974,20 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   progressLabel: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     fontWeight: typography.medium,
   },
   progressPercent: {
-    color: colors.primary,
     fontSize: typography.body,
     fontWeight: typography.bold,
   },
   progressBarBackground: {
     height: 10,
-    backgroundColor: colors.inputBackground,
     borderRadius: 5,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: colors.success,
     borderRadius: 5,
   },
   progressAmounts: {
@@ -1014,30 +996,25 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   progressSaved: {
-    color: colors.success,
     fontSize: typography.caption,
     fontWeight: typography.medium,
   },
   progressTarget: {
-    color: colors.textMuted,
     fontSize: typography.caption,
   },
   completionDate: {
-    color: colors.textMuted,
     fontSize: typography.caption,
     marginTop: spacing.xs,
     textAlign: 'right',
   },
   summaryDividerHorizontal: {
     height: 1,
-    backgroundColor: colors.border,
     marginBottom: spacing.md,
   },
   historySection: {
     marginBottom: spacing.xxl,
   },
   sectionTitle: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
     marginBottom: spacing.md,
@@ -1051,18 +1028,15 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: radii.full,
-    backgroundColor: colors.success,
     marginTop: 4,
     marginRight: spacing.md,
     flexShrink: 0,
   },
   historyContent: {
     flex: 1,
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.md,
     padding: spacing.md,
-    borderWidth: borderWidths.thin,
-    borderColor: colors.successSubtle,
+    borderWidth: borderWidths.thin
   },
   historyRow: {
     flexDirection: 'row',
@@ -1076,28 +1050,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   historyMonth: {
-    color: colors.textPrimary,
     fontSize: typography.bodySmall,
     fontWeight: typography.semibold,
   },
   historyAmount: {
-    color: colors.success,
     fontSize: typography.bodySmall,
     fontWeight: typography.bold,
   },
   historyDate: {
-    color: colors.textMuted,
     fontSize: typography.caption,
   },
   historyEditBtn: {
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: 8,
-    borderWidth: borderWidths.thin,
-    borderColor: colors.primary + '60',
+    borderWidth: borderWidths.thin
   },
   historyEditBtnText: {
-    color: colors.primary,
     fontSize: typography.caption,
     fontWeight: typography.semibold,
   },
@@ -1110,22 +1079,18 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.15)',
   },
   editButtonText: {
-    color: colors.primary,
     fontSize: 12,
     fontWeight: '600',
   },
   editedValue: {
-    color: colors.primary,
-  },
+},
   editorContainer: {
     marginTop: spacing.md,
     paddingTop: spacing.md,
     borderTopWidth: borderWidths.thin,
-    borderTopColor: colors.border,
     alignItems: 'center',
   },
   editorTitle: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     fontWeight: typography.medium,
     marginBottom: spacing.sm,
@@ -1133,21 +1098,17 @@ const styles = StyleSheet.create({
   contributionInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.inputBackground,
     borderWidth: borderWidths.base,
-    borderColor: colors.primary + '50',
     borderRadius: 12,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
   },
   currencyPrefix: {
-    color: colors.primary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
     marginRight: spacing.xs,
   },
   contributionInput: {
-    color: colors.textPrimary,
     fontSize: typography.h3,
     fontWeight: typography.bold,
     flex: 1,
@@ -1159,20 +1120,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   editorInfoText: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
   },
   editorHighlight: {
-    color: colors.primary,
     fontWeight: typography.semibold,
   },
   editorHint: {
-    color: colors.textMuted,
     fontSize: typography.caption,
     marginTop: spacing.xs,
   },
   confirmButton: {
-    backgroundColor: colors.primary,
     borderRadius: 10,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.xl,
@@ -1181,7 +1138,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   confirmButtonText: {
-    color: colors.background,
     fontSize: typography.body,
     fontWeight: typography.bold,
   },
@@ -1189,36 +1145,30 @@ const styles = StyleSheet.create({
   modalInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.inputBackground,
     borderRadius: 12,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     marginBottom: spacing.sm,
     borderWidth: borderWidths.thin,
-    borderColor: colors.border,
     width: '100%',
   },
   modalCurrencyPrefix: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: colors.primary,
     marginRight: spacing.sm,
   },
   modalInput: {
     flex: 1,
     fontSize: 24,
     fontWeight: 'bold',
-    color: colors.textPrimary,
     paddingVertical: 0,
   },
   modalErrorText: {
-    color: colors.error,
     fontSize: typography.caption,
     marginBottom: spacing.sm,
     alignSelf: 'flex-start',
   },
   modalHintText: {
-    color: colors.textMuted,
     fontSize: typography.caption,
     marginBottom: spacing.xl,
     alignSelf: 'flex-start',

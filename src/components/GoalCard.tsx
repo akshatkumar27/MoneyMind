@@ -7,7 +7,8 @@ import {
   ViewStyle,
 } from 'react-native';
 import {SelectableGoalCardProps} from './types';
-import {colors, typography, spacing, borderWidths} from '../constants/theme';
+import {typography, spacing, borderWidths} from '../constants/theme';
+import { useThemeColors } from "../context/ThemeContext";
 
 export const GoalCard: React.FC<SelectableGoalCardProps> = ({
   icon,
@@ -18,30 +19,31 @@ export const GoalCard: React.FC<SelectableGoalCardProps> = ({
   style,
   highlightedAmount,
 }) => {
+    const colors = useThemeColors();
   return (
     <TouchableOpacity
-      style={[styles.card, selected && styles.cardSelected, style]}
+      style={[styles.card, selected && styles.cardSelected, style, { backgroundColor: colors.cardBackground, borderColor: colors.border }, { borderColor: colors.primary, backgroundColor: colors.primary + '15' }]}
       onPress={onPress}
       activeOpacity={0.7}>
-      <View style={styles.iconContainer}>
+      <View style={[styles.iconContainer, { backgroundColor: colors.inputBackground }]}>
         <Text style={styles.icon}>{icon}</Text>
       </View>
       <View style={styles.content}>
         <View style={styles.headerRow}>
-          <Text style={[styles.title, selected && styles.titleSelected]}>
+          <Text style={[styles.title, selected && styles.titleSelected, { color: colors.textPrimary }, { color: colors.primary }]}>
             {title}
           </Text>
           {highlightedAmount && (
             <View style={styles.amountBadge}>
-              <Text style={styles.amountText}>{highlightedAmount}</Text>
+              <Text style={[styles.amountText, { color: colors.primary }]}>{highlightedAmount}</Text>
             </View>
           )}
         </View>
-        <Text style={styles.description}>{description}</Text>
+        <Text style={[styles.description, { color: colors.textSecondary }]}>{description}</Text>
       </View>
       {selected && (
-        <View style={styles.checkContainer}>
-          <Text style={styles.checkmark}>✓</Text>
+        <View style={[styles.checkContainer, { backgroundColor: colors.primary }]}>
+          <Text style={[styles.checkmark, { color: colors.textPrimary }]}>✓</Text>
         </View>
       )}
     </TouchableOpacity>
@@ -52,22 +54,17 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.cardBackground,
     borderRadius: 16,
     padding: spacing.md,
     marginBottom: spacing.md,
-    borderWidth: borderWidths.medium,
-    borderColor: colors.border,
+    borderWidth: borderWidths.medium
   },
   cardSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primary + '15',
-  },
+},
   iconContainer: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: colors.inputBackground,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
@@ -79,15 +76,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
     flex: 1,
     marginRight: spacing.sm,
   },
   titleSelected: {
-    color: colors.primary,
-  },
+},
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -103,12 +98,10 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(45, 127, 249, 0.2)',
   },
   amountText: {
-    color: colors.primary,
     fontSize: typography.bodySmall,
     fontWeight: typography.bold,
   },
   description: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     lineHeight: 20,
   },
@@ -116,13 +109,11 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: spacing.sm,
   },
   checkmark: {
-    color: colors.textPrimary,
     fontSize: 16,
     fontWeight: typography.bold,
   },

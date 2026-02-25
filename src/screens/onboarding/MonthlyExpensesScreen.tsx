@@ -22,7 +22,6 @@ import {Button} from '../../components/Button';
 import {AnimatedMascot} from '../../components/AnimatedMascot';
 import {Header} from '../../components/Header';
 import {
-  colors,
   typography,
   spacing,
   radii,
@@ -30,11 +29,13 @@ import {
 } from '../../constants/theme';
 import {globalStyles} from '../../styles/globalStyles';
 import {formatCurrency} from '../../utils/formatNumber';
+import { useThemeColors } from "../../context/ThemeContext";
 
 type NavigationProp = NativeStackNavigationProp<OnboardingStackParamList>;
 type ScreenRouteProp = RouteProp<OnboardingStackParamList, 'MonthlyExpenses'>;
 
 export const MonthlyExpensesScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<ScreenRouteProp>();
   const [amount, setAmount] = useState('');
@@ -101,7 +102,7 @@ export const MonthlyExpensesScreen: React.FC = () => {
           }>
           <View style={globalStyles.rowSpaceBetween}>
             <Text style={globalStyles.caption}>Profile Completion</Text>
-            <Text style={styles.progressPercent}>40%</Text>
+            <Text style={[styles.progressPercent, { color: colors.primary }]}>40%</Text>
           </View>
           <View style={globalStyles.progressBar}>
             <View style={[globalStyles.progressFill, {width: '40%'}]} />
@@ -120,17 +121,17 @@ export const MonthlyExpensesScreen: React.FC = () => {
           </Text>
 
           {/* Available Income Info */}
-          <Text style={styles.availableText}>
+          <Text style={[styles.availableText, { color: colors.textSecondary }]}>
             Your income: {formatCurrency(monthlyIncome, currencySymbol)}
           </Text>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.currencySymbol}>{currencySymbol}</Text>
+            <Text style={[styles.currencySymbol, { color: colors.textPrimary }]}>{currencySymbol}</Text>
             <TextInput
               style={[
-                styles.amountInput,
-                isExceedingIncome && styles.inputError,
-              ]}
+                                                                styles.amountInput,
+                                                                isExceedingIncome && styles.inputError,
+                                                              , { color: colors.textPrimary, borderBottomColor: colors.primary }, { borderBottomColor: colors.danger }]}
               value={amount}
               onChangeText={text => setAmount(formatNumberInput(text))}
               keyboardType="number-pad"
@@ -172,7 +173,6 @@ export const MonthlyExpensesScreen: React.FC = () => {
 const styles = StyleSheet.create({
   stepIndicator: {
     flex: 1,
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.medium as any,
     textAlign: 'center',
@@ -183,7 +183,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   progressPercent: {
-    color: colors.primary,
     fontSize: typography.caption,
     fontWeight: typography.medium as any,
   },
@@ -193,7 +192,6 @@ const styles = StyleSheet.create({
   },
   emoji: {fontSize: 80},
   availableText: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     textAlign: 'center',
     marginBottom: spacing.md,
@@ -205,23 +203,20 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   currencySymbol: {
-    color: colors.textPrimary,
     fontSize: 32,
     fontWeight: typography.bold as any,
     marginRight: spacing.sm,
   },
   amountInput: {
-    color: colors.textPrimary,
     fontSize: 48,
     fontWeight: typography.bold as any,
     minWidth: 20,
     maxWidth: 280,
     textAlign: 'left',
     borderBottomWidth: borderWidths.medium,
-    borderBottomColor: colors.primary,
     paddingBottom: spacing.sm,
   },
-  inputError: {borderBottomColor: colors.danger},
+  inputError: {},
   footer: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.lg,

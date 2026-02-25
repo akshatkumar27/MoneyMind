@@ -25,7 +25,6 @@ import {BackButton} from '../../components/BackButton';
 import {AnimatedMascot} from '../../components/AnimatedMascot';
 import {Header} from '../../components/Header';
 import {
-  colors,
   typography,
   spacing,
   radii,
@@ -34,8 +33,10 @@ import {
 import {ENDPOINTS} from '../../constants/endpoints';
 import {globalStyles} from '../../styles/globalStyles';
 import {STORAGE_KEYS} from '../../constants/storage';
+import { useThemeColors } from "../../context/ThemeContext";
 
 export const EditFinancialDetailsScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation<any>();
   const {currencySymbol} = useCurrency();
   const dispatch = useAppDispatch();
@@ -228,15 +229,15 @@ export const EditFinancialDetailsScreen: React.FC = () => {
         style={{flex: 1}}>
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Monthly Income</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Monthly Income</Text>
             <View
               style={[
-                styles.inputContainer,
-                !!errors.monthly_income && styles.inputError,
-              ]}>
-              <Text style={styles.currencyPrefix}>{currencySymbol}</Text>
+                                                                styles.inputContainer,
+                                                                !!errors.monthly_income && styles.inputError,
+                                                              , { backgroundColor: colors.inputBackground, borderColor: colors.border }, { borderColor: colors.danger }]}>
+              <Text style={[styles.currencyPrefix, { color: colors.textPrimary }]}>{currencySymbol}</Text>
               <TextInput
-                style={styles.inputField}
+                style={[styles.inputField, { color: colors.textPrimary }]}
                 value={form.monthly_income}
                 onChangeText={text => handleChange('monthly_income', text)}
                 keyboardType="number-pad"
@@ -245,20 +246,20 @@ export const EditFinancialDetailsScreen: React.FC = () => {
               />
             </View>
             {!!errors.monthly_income && (
-              <Text style={styles.errorText}>{errors.monthly_income}</Text>
+              <Text style={[styles.errorText, { color: colors.danger }]}>{errors.monthly_income}</Text>
             )}
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Monthly Expenses</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Monthly Expenses</Text>
             <View
               style={[
-                styles.inputContainer,
-                !!errors.monthly_expenses && styles.inputError,
-              ]}>
-              <Text style={styles.currencyPrefix}>{currencySymbol}</Text>
+                                                                styles.inputContainer,
+                                                                !!errors.monthly_expenses && styles.inputError,
+                                                              , { backgroundColor: colors.inputBackground, borderColor: colors.border }, { borderColor: colors.danger }]}>
+              <Text style={[styles.currencyPrefix, { color: colors.textPrimary }]}>{currencySymbol}</Text>
               <TextInput
-                style={styles.inputField}
+                style={[styles.inputField, { color: colors.textPrimary }]}
                 value={form.monthly_expenses}
                 onChangeText={text => handleChange('monthly_expenses', text)}
                 keyboardType="number-pad"
@@ -267,20 +268,20 @@ export const EditFinancialDetailsScreen: React.FC = () => {
               />
             </View>
             {!!errors.monthly_expenses && (
-              <Text style={styles.errorText}>{errors.monthly_expenses}</Text>
+              <Text style={[styles.errorText, { color: colors.danger }]}>{errors.monthly_expenses}</Text>
             )}
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Monthly EMI</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Monthly EMI</Text>
             <View
               style={[
-                styles.inputContainer,
-                !!errors.monthly_emi && styles.inputError,
-              ]}>
-              <Text style={styles.currencyPrefix}>{currencySymbol}</Text>
+                                                                styles.inputContainer,
+                                                                !!errors.monthly_emi && styles.inputError,
+                                                              , { backgroundColor: colors.inputBackground, borderColor: colors.border }, { borderColor: colors.danger }]}>
+              <Text style={[styles.currencyPrefix, { color: colors.textPrimary }]}>{currencySymbol}</Text>
               <TextInput
-                style={styles.inputField}
+                style={[styles.inputField, { color: colors.textPrimary }]}
                 value={form.monthly_emi}
                 onChangeText={text => handleChange('monthly_emi', text)}
                 keyboardType="number-pad"
@@ -289,16 +290,16 @@ export const EditFinancialDetailsScreen: React.FC = () => {
               />
             </View>
             {!!errors.monthly_emi && (
-              <Text style={styles.errorText}>{errors.monthly_emi}</Text>
+              <Text style={[styles.errorText, { color: colors.danger }]}>{errors.monthly_emi}</Text>
             )}
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>EMI Outstanding</Text>
-            <View style={styles.inputContainer}>
-              <Text style={styles.currencyPrefix}>{currencySymbol}</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>EMI Outstanding</Text>
+            <View style={[styles.inputContainer, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+              <Text style={[styles.currencyPrefix, { color: colors.textPrimary }]}>{currencySymbol}</Text>
               <TextInput
-                style={styles.inputField}
+                style={[styles.inputField, { color: colors.textPrimary }]}
                 value={form.emi_outstanding}
                 onChangeText={text => handleChange('emi_outstanding', text)}
                 keyboardType="number-pad"
@@ -309,15 +310,15 @@ export const EditFinancialDetailsScreen: React.FC = () => {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Monthly Investment</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Monthly Investment</Text>
             <View
               style={[
-                styles.inputContainer,
-                !!errors.monthly_investment && styles.inputError,
-              ]}>
-              <Text style={styles.currencyPrefix}>{currencySymbol}</Text>
+                                                                styles.inputContainer,
+                                                                !!errors.monthly_investment && styles.inputError,
+                                                              , { backgroundColor: colors.inputBackground, borderColor: colors.border }, { borderColor: colors.danger }]}>
+              <Text style={[styles.currencyPrefix, { color: colors.textPrimary }]}>{currencySymbol}</Text>
               <TextInput
-                style={styles.inputField}
+                style={[styles.inputField, { color: colors.textPrimary }]}
                 value={form.monthly_investment}
                 onChangeText={text => handleChange('monthly_investment', text)}
                 keyboardType="number-pad"
@@ -326,7 +327,7 @@ export const EditFinancialDetailsScreen: React.FC = () => {
               />
             </View>
             {!!errors.monthly_investment && (
-              <Text style={styles.errorText}>{errors.monthly_investment}</Text>
+              <Text style={[styles.errorText, { color: colors.danger }]}>{errors.monthly_investment}</Text>
             )}
           </View>
 
@@ -334,9 +335,9 @@ export const EditFinancialDetailsScreen: React.FC = () => {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { borderTopColor: colors.border, backgroundColor: colors.background }]}>
         <TouchableOpacity
-          style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
+          style={[styles.saveButton, isSaving && styles.saveButtonDisabled, { backgroundColor: colors.primary }]}
           onPress={handleSave}
           disabled={isSaving}>
           {isSaving ? (
@@ -359,7 +360,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   label: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     marginBottom: spacing.xs,
     fontWeight: '500',
@@ -367,42 +367,33 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.inputBackground,
     borderRadius: radii.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    borderWidth: borderWidths.thin,
-    borderColor: colors.border,
+    borderWidth: borderWidths.thin
   },
   inputError: {
-    borderColor: colors.danger,
-  },
+},
   errorText: {
-    color: colors.danger,
     fontSize: typography.caption,
     marginTop: 4,
   },
   currencyPrefix: {
-    color: colors.textPrimary,
     fontSize: typography.h3,
     fontWeight: typography.bold,
     marginRight: spacing.sm,
   },
   inputField: {
     flex: 1,
-    color: colors.textPrimary,
     fontSize: typography.h3,
     fontWeight: typography.bold,
     padding: 0,
   },
   footer: {
     padding: spacing.lg,
-    borderTopWidth: borderWidths.thin,
-    borderTopColor: colors.border,
-    backgroundColor: colors.background,
+    borderTopWidth: borderWidths.thin
   },
   saveButton: {
-    backgroundColor: colors.primary,
     borderRadius: radii.md,
     paddingVertical: spacing.md,
     alignItems: 'center',

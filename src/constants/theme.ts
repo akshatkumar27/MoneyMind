@@ -1,4 +1,6 @@
-export const colors = {
+export type ThemeMode = 'system' | 'dark' | 'light';
+
+export const darkColors = {
   // ─── Backgrounds ──────────────────────────────────────────────────────────
   background: '#0a0a14',
   cardBackground: '#12121f',
@@ -48,6 +50,60 @@ export const colors = {
   link: '#2d7ff9',
   error: '#ff4d4d',
 };
+
+export const lightColors = {
+  // ─── Backgrounds ──────────────────────────────────────────────────────────
+  background: '#f8fafc',
+  cardBackground: '#ffffff',
+  inputBackground: '#f1f5f9',
+  mascotBackground: 'rgba(255, 255, 255, 0.95)',
+  pulseCardBackground: '#eff6ff',
+  dashboardCardBackground: '#e0e7ff',
+
+  // ─── Primary ──────────────────────────────────────────────────────────────
+  primary: '#2d7ff9',
+  primaryDark: '#1a5fc7',
+  primarySubtle: 'rgba(45,127,249,0.12)',
+
+  // ─── Text ─────────────────────────────────────────────────────────────────
+  textPrimary: '#0f172a',
+  textSecondary: '#64748b',
+  textMuted: '#94a3b8',
+  white: '#ffffff',
+  black: '#000000',
+
+  // ─── Borders ──────────────────────────────────────────────────────────────
+  border: '#e2e8f0',
+  borderFocused: '#2d7ff9',
+  lightloder: '#94a3b8', // keep for backward-compat
+  pulseCardBorder: '#bfdbfe',
+
+  // ─── Semantic ─────────────────────────────────────────────────────────────
+  success: '#16a34a',
+  successSubtle: 'rgba(34,197,94,0.12)',
+  warning: '#d97706',
+  warningSubtle: 'rgba(245,158,11,0.12)',
+  info: '#2563eb',
+  infoSubtle: 'rgba(59,130,246,0.12)',
+  danger: '#dc2626',
+  dangerSubtle: 'rgba(239,68,68,0.12)',
+  notificationPurple: '#7c3aed',
+
+  // --- Transparent ------------------------------------------------------------
+  transparentWhite: 'rgba(255, 255, 255, 0.2)', // Kept for contrasts on dark elements via primary brand color
+  transparentWhite10: 'rgba(255, 255, 255, 0.1)',
+  transparentWhite15: 'rgba(255, 255, 255, 0.15)',
+  transparentWhite25: 'rgba(255, 255, 255, 0.25)',
+  transparentWhite05: 'rgba(255, 255, 255, 0.05)',
+  transparentBlack72: 'rgba(0,0,0,0.72)',
+
+  // ─── Misc (aliases kept for backward-compat) ───────────────────────────────
+  link: '#2d7ff9',
+  error: '#dc2626',
+};
+
+// Kept for backward-compat during migration
+export const colors = darkColors;
 
 export const typography = {
   // Font sizes

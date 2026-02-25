@@ -2,7 +2,8 @@ import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {Badge, BadgeVariant} from '../Badge';
 import {IconCircle} from '../IconCircle';
-import {colors, radii, typography, spacing} from '../../constants/theme';
+import {radii, typography, spacing} from '../../constants/theme';
+import { useThemeColors } from "../../context/ThemeContext";
 
 export interface AccountRowProps {
   icon: string;
@@ -25,6 +26,7 @@ export const AccountRow: React.FC<AccountRowProps> = ({
   badgeVariant,
   badgeColor,
 }) => {
+    const colors = useThemeColors();
   // Resolve variant from legacy badgeColor if badgeVariant is not provided
   const resolvedVariant: BadgeVariant | undefined =
     badgeVariant ?? resolveLegacyColor(badgeColor);
@@ -39,7 +41,7 @@ export const AccountRow: React.FC<AccountRowProps> = ({
       />
       <View style={styles.info}>
         <View style={styles.nameRow}>
-          <Text style={styles.name}>{name}</Text>
+          <Text style={[styles.name, { color: colors.textPrimary }]}>{name}</Text>
           {badge && (
             <Badge
               label={badge}
@@ -49,9 +51,9 @@ export const AccountRow: React.FC<AccountRowProps> = ({
             />
           )}
         </View>
-        {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+        {subtitle && <Text style={[styles.subtitle, { color: colors.textMuted }]}>{subtitle}</Text>}
       </View>
-      <Text style={styles.amount}>{amount}</Text>
+      <Text style={[styles.amount, { color: colors.textPrimary }]}>{amount}</Text>
     </View>
   );
 };
@@ -94,7 +96,6 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   name: {
-    color: colors.textPrimary,
     fontSize: typography.bodySmall,
     fontWeight: typography.medium,
   },
@@ -102,12 +103,10 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   subtitle: {
-    color: colors.textMuted,
     fontSize: typography.caption,
     marginTop: 2,
   },
   amount: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
   },

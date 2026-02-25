@@ -1,18 +1,72 @@
-import React, {useState, useEffect} from 'react';
-import {StatusBar, View, ActivityIndicator, StyleSheet} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { StatusBar, View, ActivityIndicator, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
-import {notificationService} from './src/services/NotificationService';
-import {CurrencyProvider} from './src/context/CurrencyContext';
-import {Provider} from 'react-redux';
-import {store} from './src/store/store';
-import {RootNavigator} from './src/navigation/RootNavigator';
-import {toastConfig} from './src/components/CustomToast';
-import {Logo} from './src/components/Logo';
-import {api} from './src/services/api';
-import {ENDPOINTS} from './src/constants/endpoints';
-import {STORAGE_KEYS} from './src/constants/storage';
+import { notificationService } from './src/services/NotificationService';
+import { CurrencyProvider } from './src/context/CurrencyContext';
+import { Provider } from 'react-redux';
+import { store } from './src/store/store';
+import { RootNavigator } from './src/navigation/RootNavigator';
+import { toastConfig } from './src/components/CustomToast';
+import { Logo } from './src/components/Logo';
+import { api } from './src/services/api';
+import { ENDPOINTS } from './src/constants/endpoints';
+import { STORAGE_KEYS } from './src/constants/storage';
+import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+
+// Create a wrapper component for the main app content to consume ThemeContext
+const RootContent = ({
+  isLoading,
+  isLoggedIn,
+  isOnboardingCompleted,
+  initialRoute,
+  initialParams,
+}: {
+  isLoading: boolean;
+  isLoggedIn: boolean;
+  isOnboardingCompleted: boolean;
+  initialRoute?: string;
+  initialParams?: any;
+}) => {
+  const { activeTheme, colors } = useTheme();
+
+  const barStyle = activeTheme === 'dark' ? 'light-content' : 'dark-content';
+
+  if (isLoading) {
+    return (
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <StatusBar barStyle={barStyle} backgroundColor={colors.background} />
+        <View style={styles.splashContent}>
+          <Logo size="large" />
+          <ActivityIndicator
+            size="small"
+            color={colors.primary}
+            style={styles.splashSpinner}
+          />
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <>
+      <StatusBar barStyle={barStyle} backgroundColor={colors.background} />
+      <RootNavigator
+        isLoggedIn={isLoggedIn}
+        isOnboardingCompleted={isOnboardingCompleted}
+        initialRouteName={initialRoute}
+        initialParams={initialParams}
+      />
+      <Toast
+        config={toastConfig}
+        position="bottom"
+        bottomOffset={40}
+        visibilityTime={4000}
+      />
+    </>
+  );
+};
 
 function App(): React.JSX.Element {
   const [isLoading, setIsLoading] = useState(true);
@@ -179,7 +233,7 @@ function App(): React.JSX.Element {
             STORAGE_KEYS.ONBOARDING_STATUS,
             STORAGE_KEYS.ONBOARDING_DRAFT,
           ]);
-          store.dispatch({type: 'financialData/clearFinancialData'});
+          store.dispatch({ type: 'financialData/clearFinancialData' });
           setIsLoggedIn(false);
           setIsOnboardingCompleted(false);
           setInitialRoute('Auth');
@@ -212,41 +266,21 @@ function App(): React.JSX.Element {
     }
   };
 
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <StatusBar barStyle="light-content" backgroundColor="#0a0a14" />
-        <View style={styles.splashContent}>
-          <Logo size="large" />
-          <ActivityIndicator
-            size="small"
-            color="#1192e9ff"
-            style={styles.splashSpinner}
-          />
-        </View>
-      </View>
-    );
-  }
-
   return (
     <Provider store={store}>
-      <CurrencyProvider initialSymbol={appCurrency}>
-        <NavigationContainer>
-          <StatusBar barStyle="light-content" backgroundColor="#0a0a14" />
-          <RootNavigator
-            isLoggedIn={isLoggedIn}
-            isOnboardingCompleted={isOnboardingCompleted}
-            initialRouteName={initialRoute}
-            initialParams={initialParams}
-          />
-          <Toast
-            config={toastConfig}
-            position="bottom"
-            bottomOffset={40}
-            visibilityTime={4000}
-          />
-        </NavigationContainer>
-      </CurrencyProvider>
+      <ThemeProvider>
+        <CurrencyProvider initialSymbol={appCurrency}>
+          <NavigationContainer>
+            <RootContent
+              isLoading={isLoading}
+              isLoggedIn={isLoggedIn}
+              isOnboardingCompleted={isOnboardingCompleted}
+              initialRoute={initialRoute}
+              initialParams={initialParams}
+            />
+          </NavigationContainer>
+        </CurrencyProvider>
+      </ThemeProvider>
     </Provider>
   );
 }
@@ -254,7 +288,6 @@ function App(): React.JSX.Element {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    backgroundColor: '#0a0a14',
   },
   splashContent: {
     flex: 1,

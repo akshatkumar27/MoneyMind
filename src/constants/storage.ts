@@ -9,4 +9,5 @@ export const STORAGE_KEYS = {
   SIGNUP_DATA: 'signupData',
   TEMP_AUTH_EMAIL: 'temp_auth_email',
   IS_FINANCIAL_PROFILE_PRESENT: 'isFinancialProfilePresent',
+  THEME_MODE: 'themeMode',
 } as const;

@@ -1,7 +1,8 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {IconCircle} from '../IconCircle';
-import {colors, radii, typography, spacing} from '../../constants/theme';
+import {radii, typography, spacing} from '../../constants/theme';
+import { useThemeColors } from "../../context/ThemeContext";
 
 export interface AssetRowProps {
   icon: string;
@@ -20,8 +21,9 @@ export const AssetRow: React.FC<AssetRowProps> = ({
   change,
   isPositive,
 }) => {
+    const colors = useThemeColors();
   return (
-    <View style={styles.row}>
+    <View style={[styles.row, { backgroundColor: colors.cardBackground }]}>
       <IconCircle
         emoji={icon}
         size={44}
@@ -29,11 +31,11 @@ export const AssetRow: React.FC<AssetRowProps> = ({
         style={styles.iconMargin}
       />
       <View style={styles.info}>
-        <Text style={styles.name}>{name}</Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
+        <Text style={[styles.name, { color: colors.textPrimary }]}>{name}</Text>
+        <Text style={[styles.subtitle, { color: colors.textMuted }]}>{subtitle}</Text>
       </View>
       <View style={styles.values}>
-        <Text style={styles.value}>{value}</Text>
+        <Text style={[styles.value, { color: colors.textPrimary }]}>{value}</Text>
         <Text
           style={[
             styles.change,
@@ -50,7 +52,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.md,
     padding: spacing.md,
     marginBottom: spacing.sm,
@@ -62,12 +63,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   name: {
-    color: colors.textPrimary,
     fontSize: typography.bodySmall,
     fontWeight: typography.medium,
   },
   subtitle: {
-    color: colors.textMuted,
     fontSize: typography.caption,
     marginTop: 2,
   },
@@ -75,7 +74,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   value: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
   },

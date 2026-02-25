@@ -22,7 +22,6 @@ import {Button} from '../../components/Button';
 import {AnimatedMascot} from '../../components/AnimatedMascot';
 import {Header} from '../../components/Header';
 import {
-  colors,
   typography,
   spacing,
   radii,
@@ -32,6 +31,7 @@ import {ENDPOINTS} from '../../constants/endpoints';
 import {api} from '../../services/api';
 import {formatCurrency} from '../../utils/formatNumber';
 import {STORAGE_KEYS} from '../../constants/storage';
+import { useThemeColors } from "../../context/ThemeContext";
 
 // Time duration options in months
 const DURATION_OPTIONS = [
@@ -43,6 +43,7 @@ const DURATION_OPTIONS = [
 ];
 
 export const AddGoalScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation();
   const route = useRoute<RouteProp<MainStackParamList, 'AddGoal'>>();
   const availableForNewGoals = route.params?.availableForNewGoals;
@@ -241,7 +242,7 @@ export const AddGoalScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
       <Header title="Add Your Goal" />
@@ -271,15 +272,15 @@ export const AddGoalScreen: React.FC = () => {
 
           {/* Available Budget Card */}
           {availableForNewGoals !== undefined && availableForNewGoals > 0 && (
-            <View style={styles.budgetCard}>
-              <View style={styles.budgetIconContainer}>
+            <View style={[styles.budgetCard, { backgroundColor: colors.cardBackground, borderColor: colors.successSubtle }]}>
+              <View style={[styles.budgetIconContainer, { backgroundColor: colors.successSubtle }]}>
                 <Text style={styles.budgetIcon}>✨</Text>
               </View>
               <View style={styles.budgetTextContainer}>
-                <Text style={styles.budgetLabel}>
+                <Text style={[styles.budgetLabel, { color: colors.textSecondary }]}>
                   Monthly Savings Available
                 </Text>
-                <Text style={styles.budgetAmount}>
+                <Text style={[styles.budgetAmount, { color: colors.success }]}>
                   {currencySymbol}
                   {formatNumber(availableForNewGoals, 1)}
                 </Text>
@@ -289,9 +290,9 @@ export const AddGoalScreen: React.FC = () => {
 
           {/* Name Input */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Name</Text>
+            <Text style={[styles.label, { color: colors.textPrimary }]}>Name</Text>
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, { backgroundColor: colors.cardBackground, borderColor: colors.border, color: colors.textPrimary }]}
               value={name}
               onChangeText={setName}
               placeholder="e.g., Emergency Fund"
@@ -301,9 +302,9 @@ export const AddGoalScreen: React.FC = () => {
 
           {/* Target Row */}
           <View style={styles.inputRow}>
-            <Text style={styles.rowLabel}>Target</Text>
-            <View style={styles.compactInput}>
-              <Text style={styles.currencyPrefix}>{currencySymbol}</Text>
+            <Text style={[styles.rowLabel, { color: colors.textPrimary }]}>Target</Text>
+            <View style={[styles.compactInput, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
+              <Text style={[styles.currencyPrefix, { color: colors.textSecondary }]}>{currencySymbol}</Text>
               <TextInput
                 style={styles.compactInputText2}
                 value={target}
@@ -317,23 +318,23 @@ export const AddGoalScreen: React.FC = () => {
 
           {/* Achieve In - Duration Options */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Achieve in</Text>
+            <Text style={[styles.label, { color: colors.textPrimary }]}>Achieve in</Text>
             <View style={styles.durationContainer}>
               {DURATION_OPTIONS.map(option => (
                 <TouchableOpacity
                   key={option.value}
                   style={[
-                    styles.durationOption,
-                    selectedDuration === option.value &&
-                      styles.durationOptionSelected,
-                  ]}
+                                                            styles.durationOption,
+                                                            selectedDuration === option.value &&
+                                                              styles.durationOptionSelected,
+                                                          , { backgroundColor: colors.cardBackground, borderColor: colors.border }, { backgroundColor: colors.primary + '20', borderColor: colors.primary }]}
                   onPress={() => handleDurationSelect(option.value)}>
                   <Text
                     style={[
-                      styles.durationText,
-                      selectedDuration === option.value &&
-                        styles.durationTextSelected,
-                    ]}>
+                                                                      styles.durationText,
+                                                                      selectedDuration === option.value &&
+                                                                        styles.durationTextSelected,
+                                                                    , { color: colors.textSecondary }, { color: colors.primary }]}>
                     {option.label}
                   </Text>
                 </TouchableOpacity>
@@ -341,17 +342,17 @@ export const AddGoalScreen: React.FC = () => {
               {/* Custom Option */}
               <TouchableOpacity
                 style={[
-                  styles.durationOption,
-                  selectedDuration === 'custom' &&
-                    styles.durationOptionSelected,
-                ]}
+                                                                          styles.durationOption,
+                                                                          selectedDuration === 'custom' &&
+                                                                            styles.durationOptionSelected,
+                                                                        , { backgroundColor: colors.cardBackground, borderColor: colors.border }, { backgroundColor: colors.primary + '20', borderColor: colors.primary }]}
                 onPress={handleCustomSelect}>
                 <Text
                   style={[
-                    styles.durationText,
-                    selectedDuration === 'custom' &&
-                      styles.durationTextSelected,
-                  ]}>
+                                                                                    styles.durationText,
+                                                                                    selectedDuration === 'custom' &&
+                                                                                      styles.durationTextSelected,
+                                                                                  , { color: colors.textSecondary }, { color: colors.primary }]}>
                   Custom
                 </Text>
               </TouchableOpacity>
@@ -361,7 +362,7 @@ export const AddGoalScreen: React.FC = () => {
             {selectedDuration === 'custom' && (
               <View style={styles.customInputContainer}>
                 <TextInput
-                  style={styles.customMonthsInput}
+                  style={[styles.customMonthsInput, { backgroundColor: colors.cardBackground, borderColor: colors.primary, color: colors.textPrimary }]}
                   value={customMonths}
                   onChangeText={handleCustomMonthsChange}
                   keyboardType="number-pad"
@@ -369,7 +370,7 @@ export const AddGoalScreen: React.FC = () => {
                   placeholderTextColor={colors.textMuted}
                   autoFocus={!customMonths}
                 />
-                <Text style={styles.customMonthsLabel}>
+                <Text style={[styles.customMonthsLabel, { color: colors.textSecondary }]}>
                   {customMonths === '1' ? 'month' : 'months'}
                 </Text>
               </View>
@@ -378,13 +379,13 @@ export const AddGoalScreen: React.FC = () => {
 
           {/* Monthly Contribution Row */}
           <View style={styles.inputRow}>
-            <Text style={styles.rowLabel}>Monthly contribution</Text>
-            <View style={[styles.compactInput, styles.highlightedInput]}>
-              <Text style={[styles.currencyPrefix, styles.highlightedText]}>
+            <Text style={[styles.rowLabel, { color: colors.textPrimary }]}>Monthly contribution</Text>
+            <View style={[styles.compactInput, styles.highlightedInput, { backgroundColor: colors.cardBackground, borderColor: colors.border }, { backgroundColor: colors.primary + '10', borderColor: colors.primary + '40' }]}>
+              <Text style={[styles.currencyPrefix, styles.highlightedText, { color: colors.textSecondary }, { color: colors.primary }]}>
                 {currencySymbol}
               </Text>
               <TextInput
-                style={[styles.compactInputText, styles.highlightedText]}
+                style={[styles.compactInputText, styles.highlightedText, { color: colors.textPrimary }, { color: colors.primary }]}
                 value={monthlyContribution}
                 onChangeText={handleContributionChange}
                 keyboardType="number-pad"
@@ -431,8 +432,7 @@ export const AddGoalScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: colors.background,
+    flex: 1
   },
   content: {
     flex: 1,
@@ -446,19 +446,15 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   label: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.medium as any,
     marginBottom: spacing.sm,
   },
   textInput: {
-    backgroundColor: colors.cardBackground,
     borderWidth: borderWidths.base,
-    borderColor: colors.border,
     borderRadius: radii.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
-    color: colors.textPrimary,
     fontSize: typography.body,
   },
   inputRow: {
@@ -469,7 +465,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   rowLabel: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.medium as any,
     flex: 1,
@@ -477,9 +472,7 @@ const styles = StyleSheet.create({
   compactInput: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.cardBackground,
     borderWidth: borderWidths.base,
-    borderColor: colors.border,
     borderRadius: radii.sm,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 2,
@@ -492,16 +485,12 @@ const styles = StyleSheet.create({
     maxWidth: 180,
   },
   currencyPrefix: {
-    color: colors.textSecondary,
     fontSize: typography.body,
     marginRight: spacing.xs,
   },
   highlightedInput: {
-    backgroundColor: colors.primary + '10',
-    borderColor: colors.primary + '40',
-  },
+},
   compactInputText: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     textAlign: 'right',
     minWidth: 60,
@@ -509,8 +498,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   highlightedText: {
-    color: colors.primary,
-  },
+},
   durationContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -520,46 +508,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: radii.full,
-    backgroundColor: colors.cardBackground,
-    borderWidth: borderWidths.base,
-    borderColor: colors.border,
+    borderWidth: borderWidths.base
   },
   durationOptionSelected: {
-    backgroundColor: colors.primary + '20',
-    borderColor: colors.primary,
-  },
+},
   durationText: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     fontWeight: typography.medium as any,
   },
   durationTextSelected: {
-    color: colors.primary,
-  },
+},
   customInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: spacing.md,
   },
   customMonthsInput: {
-    backgroundColor: colors.cardBackground,
     borderWidth: borderWidths.base,
-    borderColor: colors.primary,
     borderRadius: radii.sm,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    color: colors.textPrimary,
     fontSize: typography.body,
     width: 180,
     textAlign: 'center',
   },
   customMonthsLabel: {
-    color: colors.textSecondary,
     fontSize: typography.body,
     marginLeft: spacing.sm,
   },
   suggestionText: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     textAlign: 'center',
     marginTop: -spacing.sm,
@@ -577,19 +554,16 @@ const styles = StyleSheet.create({
   budgetCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.lg,
     padding: spacing.md,
     marginBottom: spacing.lg,
     borderWidth: borderWidths.thin,
-    borderColor: colors.successSubtle,
     marginHorizontal: spacing.lg,
   },
   budgetIconContainer: {
     width: 40,
     height: 40,
     borderRadius: radii.full,
-    backgroundColor: colors.successSubtle,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
@@ -601,12 +575,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   budgetLabel: {
-    color: colors.textSecondary,
     fontSize: typography.caption,
     marginBottom: 2,
   },
   budgetAmount: {
-    color: colors.success,
     fontSize: typography.h3,
     fontWeight: typography.bold,
   },

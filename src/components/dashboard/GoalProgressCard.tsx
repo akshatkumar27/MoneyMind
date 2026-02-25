@@ -1,8 +1,9 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {IconCircle} from '../IconCircle';
-import {ProgressBar} from './ProgressBar';
-import {colors, radii, typography, spacing} from '../../constants/theme';
+import { View, Text, StyleSheet } from 'react-native';
+import { IconCircle } from '../IconCircle';
+import { ProgressBar } from './ProgressBar';
+import { radii, typography, spacing } from '../../constants/theme';
+import { useThemeColors } from "../../context/ThemeContext";
 
 export interface GoalProgressCardProps {
   icon: string;
@@ -17,33 +18,34 @@ export const GoalProgressCard: React.FC<GoalProgressCardProps> = ({
   title,
   progress,
   subtitle,
-  color = colors.primary,
+  color,
 }) => {
+  const colors = useThemeColors();
+  const activeColor = color || colors.primary;
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
       <View style={styles.header}>
         <IconCircle
           emoji={icon}
           size={36}
           radius="sm"
-          borderColor={color}
+          borderColor={activeColor}
           backgroundColor="transparent"
           style={styles.iconMargin}
         />
         <View style={styles.info}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>{title}</Text>
+          <Text style={[styles.subtitle, { color: colors.textMuted }]}>{subtitle}</Text>
         </View>
-        <Text style={[styles.percent, {color}]}>{progress}%</Text>
+        <Text style={[styles.percent, { color: activeColor }]}>{progress}%</Text>
       </View>
-      <ProgressBar progress={progress} color={color} height={6} />
+      <ProgressBar progress={progress} color={activeColor} height={6} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.md,
     padding: spacing.md,
     marginBottom: spacing.sm,
@@ -60,12 +62,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    color: colors.textPrimary,
     fontSize: typography.bodySmall,
     fontWeight: typography.medium,
   },
   subtitle: {
-    color: colors.textMuted,
     fontSize: typography.caption,
   },
   percent: {

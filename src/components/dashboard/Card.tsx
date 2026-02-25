@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, StyleSheet, ViewStyle} from 'react-native';
-import {colors, radii, spacing} from '../../constants/theme';
+import {radii, spacing} from '../../constants/theme';
+import { useThemeColors } from "../../context/ThemeContext";
 
 export interface CardProps {
   children: React.ReactNode;
@@ -14,8 +15,9 @@ export const Card: React.FC<CardProps> = ({
   style,
   gradient = false,
 }) => {
+    const colors = useThemeColors();
   return (
-    <View style={[styles.card, gradient && styles.gradientCard, style]}>
+    <View style={[styles.card, gradient && styles.gradientCard, style, { backgroundColor: colors.cardBackground }, { backgroundColor: colors.dashboardCardBackground }]}>
       {children}
     </View>
   );
@@ -23,11 +25,9 @@ export const Card: React.FC<CardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.lg,
     padding: spacing.md,
   },
   gradientCard: {
-    backgroundColor: colors.dashboardCardBackground,
-  },
+},
 });

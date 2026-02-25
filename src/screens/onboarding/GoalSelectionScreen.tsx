@@ -19,10 +19,11 @@ import {Button} from '../../components/Button';
 import {GoalCard} from '../../components/GoalCard';
 import {AnimatedMascot} from '../../components/AnimatedMascot';
 import {Header} from '../../components/Header';
-import {colors, typography, spacing} from '../../constants/theme';
+import {typography, spacing} from '../../constants/theme';
 import {ENDPOINTS} from '../../constants/endpoints';
 import {api} from '../../services/api';
 import {STORAGE_KEYS} from '../../constants/storage';
+import { useThemeColors } from "../../context/ThemeContext";
 
 interface Insight {
   title: string;
@@ -53,6 +54,7 @@ const formatAmount = (amount: number, currency: string) => {
 type NavigationProp = NativeStackNavigationProp<OnboardingStackParamList>;
 
 export const GoalSelectionScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<ScreenRouteProp>();
   const {currencySymbol} = useCurrency();
@@ -161,7 +163,7 @@ export const GoalSelectionScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
       <Header
@@ -180,12 +182,12 @@ export const GoalSelectionScreen: React.FC = () => {
           />
         </View>
 
-        <Text style={styles.title}>Based on your financial profile</Text>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>Based on your financial profile</Text>
 
         {isLoading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={styles.loadingText}>Analyzing your finances...</Text>
+            <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Analyzing your finances...</Text>
           </View>
         ) : (
           <View style={styles.goalsContainer}>
@@ -234,12 +236,10 @@ export const GoalSelectionScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: colors.background,
+    flex: 1
   },
   stepIndicator: {
     flex: 1,
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.medium,
     textAlign: 'center',
@@ -249,7 +249,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   title: {
-    color: colors.textPrimary,
     fontSize: typography.h2,
     fontWeight: typography.bold,
     marginBottom: spacing.sm,
@@ -265,7 +264,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xxl,
   },
   loadingText: {
-    color: colors.textSecondary,
     fontSize: typography.body,
     marginTop: spacing.md,
   },

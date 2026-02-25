@@ -8,8 +8,9 @@ import {
   TextInputProps,
 } from 'react-native';
 import {InputProps} from './types';
-import {colors, typography} from '../constants/theme';
+import {typography} from '../constants/theme';
 import {globalStyles} from '../styles/globalStyles';
+import { useThemeColors } from "../context/ThemeContext";
 
 export const Input: React.FC<InputProps> = ({
   label,
@@ -18,6 +19,7 @@ export const Input: React.FC<InputProps> = ({
   error,
   ...textInputProps
 }) => {
+    const colors = useThemeColors();
   return (
     <View style={[styles.container, containerStyle]}>
       {label && <Text style={globalStyles.inputLabel}>{label}</Text>}

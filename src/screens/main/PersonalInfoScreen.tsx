@@ -21,7 +21,6 @@ import {BackButton} from '../../components/BackButton';
 import {Header} from '../../components/Header';
 import {AppModal} from '../../components/AppModal';
 import {
-  colors,
   typography,
   spacing,
   radii,
@@ -31,6 +30,7 @@ import {ENDPOINTS} from '../../constants/endpoints';
 import {globalStyles} from '../../styles/globalStyles';
 import {formatCurrency} from '../../utils/formatNumber';
 import {STORAGE_KEYS} from '../../constants/storage';
+import { useThemeColors } from "../../context/ThemeContext";
 
 interface UserData {
   name?: string;
@@ -47,6 +47,7 @@ interface OnboardingData {
 }
 
 export const PersonalInfoScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
   const [user, setUser] = useState<UserData>({});
@@ -195,23 +196,23 @@ export const PersonalInfoScreen: React.FC = () => {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Profile Section */}
         <Text style={globalStyles.sectionLabel}>Account Details</Text>
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
           {infoItems.map((item, index) => (
             <View
               key={item.label}
               style={[
-                styles.infoRow,
-                index < infoItems.length - 1 && styles.infoRowBorder,
-              ]}>
+                                                styles.infoRow,
+                                                index < infoItems.length - 1 && styles.infoRowBorder,
+                                              , { borderBottomColor: colors.border }]}>
               <View style={styles.infoLeft}>
                 <Text style={styles.infoIcon}>{item.icon}</Text>
-                <Text style={styles.infoLabel}>{item.label}</Text>
+                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>{item.label}</Text>
               </View>
               <View style={styles.valueContainer}>
-                <Text style={styles.infoValue}>{item.value}</Text>
+                <Text style={[styles.infoValue, { color: colors.textPrimary }]}>{item.value}</Text>
                 {(item as any).onEdit && (
                   <TouchableOpacity
-                    style={styles.editButtonSmall}
+                    style={[styles.editButtonSmall, { backgroundColor: colors.inputBackground }]}
                     onPress={(item as any).onEdit}
                     activeOpacity={0.7}>
                     <Text style={styles.editIconSmall}>✏️</Text>
@@ -226,26 +227,26 @@ export const PersonalInfoScreen: React.FC = () => {
         <View style={globalStyles.sectionHeader}>
           <Text style={globalStyles.sectionLabel}>Financial Details</Text>
           <TouchableOpacity onPress={handleEditFinancials}>
-            <Text style={styles.editButtonText}>Edit</Text>
+            <Text style={[styles.editButtonText, { color: colors.primary }]}>Edit</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.card}>
+        <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
           {financialItems.map((item, index) => (
             <View
               key={item.label}
               style={[
-                styles.infoRow,
-                index < financialItems.length - 1 && styles.infoRowBorder,
-              ]}>
+                                                styles.infoRow,
+                                                index < financialItems.length - 1 && styles.infoRowBorder,
+                                              , { borderBottomColor: colors.border }]}>
               <View style={styles.infoLeft}>
                 <Text style={styles.infoIcon}>{item.icon}</Text>
-                <Text style={styles.infoLabel}>{item.label}</Text>
+                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>{item.label}</Text>
               </View>
               <View style={styles.valueContainer}>
-                <Text style={styles.infoValue}>{item.value}</Text>
+                <Text style={[styles.infoValue, { color: colors.textPrimary }]}>{item.value}</Text>
                 {(item as any).onEdit && (
                   <TouchableOpacity
-                    style={styles.editButtonSmall}
+                    style={[styles.editButtonSmall, { backgroundColor: colors.inputBackground }]}
                     onPress={(item as any).onEdit}
                     activeOpacity={0.7}>
                     <Text style={styles.editIconSmall}>✏️</Text>
@@ -256,12 +257,12 @@ export const PersonalInfoScreen: React.FC = () => {
           ))}
         </View>
 
-        <Text style={styles.footerNote} />
+        <Text style={[styles.footerNote, { color: colors.textMuted }]} />
 
         <TouchableOpacity
-          style={styles.deleteButton}
+          style={[styles.deleteButton, { backgroundColor: colors.dangerSubtle, borderColor: colors.danger }]}
           onPress={handleDeleteAccount}>
-          <Text style={styles.deleteButtonText}>Delete Account</Text>
+          <Text style={[styles.deleteButtonText, { color: colors.danger }]}>Delete Account</Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -287,12 +288,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   editButtonText: {
-    color: colors.primary,
     fontSize: typography.body,
     fontWeight: '600',
   },
   card: {
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.lg,
     overflow: 'hidden',
   },
@@ -304,8 +303,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   infoRowBorder: {
-    borderBottomWidth: borderWidths.hairline,
-    borderBottomColor: colors.border,
+    borderBottomWidth: borderWidths.hairline
   },
   infoLeft: {
     flexDirection: 'row',
@@ -316,33 +314,27 @@ const styles = StyleSheet.create({
     marginRight: spacing.md,
   },
   infoLabel: {
-    color: colors.textSecondary,
     fontSize: typography.body,
   },
   infoValue: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
   },
   footerNote: {
-    color: colors.textMuted,
     fontSize: typography.caption,
     textAlign: 'center',
     marginVertical: spacing.xl,
     paddingHorizontal: spacing.lg,
   },
   deleteButton: {
-    backgroundColor: colors.dangerSubtle,
     marginHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderRadius: radii.md,
     alignItems: 'center',
     marginBottom: spacing.xxl,
-    borderWidth: borderWidths.thin,
-    borderColor: colors.danger,
+    borderWidth: borderWidths.thin
   },
   deleteButtonText: {
-    color: colors.danger,
     fontSize: typography.body,
     fontWeight: 'bold',
   },
@@ -354,7 +346,6 @@ const styles = StyleSheet.create({
   editButtonSmall: {
     marginLeft: spacing.sm,
     padding: 4,
-    backgroundColor: colors.inputBackground,
     borderRadius: radii.sm,
   },
   editIconSmall: {

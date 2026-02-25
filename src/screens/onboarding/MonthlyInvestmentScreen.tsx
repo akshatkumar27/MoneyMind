@@ -23,7 +23,6 @@ import {Button} from '../../components/Button';
 import {AnimatedMascot} from '../../components/AnimatedMascot';
 import {Header} from '../../components/Header';
 import {
-  colors,
   typography,
   spacing,
   radii,
@@ -33,11 +32,13 @@ import {ENDPOINTS} from '../../constants/endpoints';
 import {api} from '../../services/api';
 import {formatCurrency} from '../../utils/formatNumber';
 import {STORAGE_KEYS} from '../../constants/storage';
+import { useThemeColors } from "../../context/ThemeContext";
 
 type NavigationProp = NativeStackNavigationProp<OnboardingStackParamList>;
 type ScreenRouteProp = RouteProp<OnboardingStackParamList, 'MonthlyInvestment'>;
 
 export const MonthlyInvestmentScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<ScreenRouteProp>();
   const [amount, setAmount] = useState('');
@@ -124,7 +125,7 @@ export const MonthlyInvestmentScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle="light-content" backgroundColor={colors.background} />
 
       <Header title="Step 5 of 5" titleStyle={styles.stepIndicator} />
@@ -140,11 +141,11 @@ export const MonthlyInvestmentScreen: React.FC = () => {
             scrollViewRef.current?.scrollToEnd({animated: true})
           }>
           <View style={styles.progressSection}>
-            <Text style={styles.progressLabel}>Profile Completion</Text>
-            <Text style={styles.progressPercent}>100%</Text>
+            <Text style={[styles.progressLabel, { color: colors.textMuted }]}>Profile Completion</Text>
+            <Text style={[styles.progressPercent, { color: colors.primary }]}>100%</Text>
           </View>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressFill, {width: '100%'}]} />
+          <View style={[styles.progressBar, { backgroundColor: colors.border }]}>
+            <View style={[styles.progressFill, {width: '100%'}, { backgroundColor: colors.primary }]} />
           </View>
           {/* Illustration */}
           <View style={styles.illustrationContainer}>
@@ -155,21 +156,21 @@ export const MonthlyInvestmentScreen: React.FC = () => {
             </View>
           </View>
 
-          <Text style={styles.title}>How much do you save monthly?</Text>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>How much do you save monthly?</Text>
 
           {/* Available Amount Info */}
-          <Text style={styles.availableText}>
+          <Text style={[styles.availableText, { color: colors.textSecondary }]}>
             Available for savings:{' '}
             {formatCurrency(availableAmount, currencySymbol)}
           </Text>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.currencySymbol}>{currencySymbol}</Text>
+            <Text style={[styles.currencySymbol, { color: colors.textPrimary }]}>{currencySymbol}</Text>
             <TextInput
               style={[
-                styles.amountInput,
-                isExceedingAvailable && styles.inputError,
-              ]}
+                                                                styles.amountInput,
+                                                                isExceedingAvailable && styles.inputError,
+                                                              , { color: colors.textPrimary, borderBottomColor: colors.primary }, { borderBottomColor: colors.danger }]}
               value={amount}
               onChangeText={text => setAmount(formatNumberInput(text))}
               keyboardType="number-pad"
@@ -180,7 +181,7 @@ export const MonthlyInvestmentScreen: React.FC = () => {
 
           {/* Error/Warning Message */}
           {isExceedingAvailable && (
-            <Text style={styles.errorText}>
+            <Text style={[styles.errorText, { color: colors.danger }]}>
               Investment cannot exceed available amount (
               {formatCurrency(availableAmount, currencySymbol)})
             </Text>
@@ -210,12 +211,10 @@ Add monthly savings so I can track them for you."
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: colors.background,
+    flex: 1
   },
   stepIndicator: {
     flex: 1,
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.medium as any,
     textAlign: 'center',
@@ -230,23 +229,19 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   progressLabel: {
-    color: colors.textMuted,
     fontSize: typography.caption,
   },
   progressPercent: {
-    color: colors.primary,
     fontSize: typography.caption,
     fontWeight: typography.medium as any,
   },
   progressBar: {
     height: 4,
-    backgroundColor: colors.border,
     borderRadius: 2,
     marginBottom: spacing.xl,
   },
   progressFill: {
     height: '100%',
-    backgroundColor: colors.primary,
     borderRadius: 2,
   },
   illustrationContainer: {
@@ -265,7 +260,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   title: {
-    color: colors.textPrimary,
     fontSize: typography.h2,
     fontWeight: typography.bold as any,
     marginBottom: spacing.sm,
@@ -273,7 +267,6 @@ const styles = StyleSheet.create({
     lineHeight: 32,
   },
   availableText: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     textAlign: 'center',
     marginBottom: spacing.md,
@@ -285,27 +278,22 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   currencySymbol: {
-    color: colors.textPrimary,
     fontSize: 32,
     fontWeight: typography.bold as any,
     marginRight: spacing.sm,
   },
   amountInput: {
-    color: colors.textPrimary,
     fontSize: 48,
     fontWeight: typography.bold as any,
     minWidth: 20,
     maxWidth: 280,
     textAlign: 'left',
     borderBottomWidth: borderWidths.medium,
-    borderBottomColor: colors.primary,
     paddingBottom: spacing.sm,
   },
   inputError: {
-    borderBottomColor: colors.danger,
-  },
+},
   errorText: {
-    color: colors.danger,
     fontSize: typography.bodySmall,
     textAlign: 'center',
     marginBottom: spacing.md,

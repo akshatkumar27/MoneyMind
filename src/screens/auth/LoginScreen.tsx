@@ -21,10 +21,11 @@ import {Input} from '../../components/Input';
 import {Button} from '../../components/Button';
 import {FooterLinks} from '../../components/FooterLinks';
 import {AnimatedMascot} from '../../components/AnimatedMascot';
-import {colors, typography, spacing} from '../../constants/theme';
+import {typography, spacing} from '../../constants/theme';
 import {ENDPOINTS} from '../../constants/endpoints';
 import {globalStyles} from '../../styles/globalStyles';
 import {STORAGE_KEYS} from '../../constants/storage';
+import { useThemeColors } from "../../context/ThemeContext";
 
 type AuthStackParamList = {
   Login: undefined;
@@ -38,6 +39,7 @@ type LoginScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 export const LoginScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation<LoginScreenNavigationProp>();
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -147,7 +149,7 @@ export const LoginScreen: React.FC = () => {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
-                icon={<Text style={styles.inputIcon}>@</Text>}
+                icon={<Text style={[styles.inputIcon, { color: colors.textMuted }]}>@</Text>}
                 error={emailError}
               />
             </View>
@@ -160,9 +162,9 @@ export const LoginScreen: React.FC = () => {
 
             {/* Signup Link */}
             <TouchableOpacity style={styles.signupLink} onPress={handleSignup}>
-              <Text style={styles.signupText}>
+              <Text style={[styles.signupText, { color: colors.textSecondary }]}>
                 New user?{' '}
-                <Text style={styles.signupHighlight}>Sign up with Fino 🐼</Text>
+                <Text style={[styles.signupHighlight, { color: colors.primary }]}>Sign up with Fino 🐼</Text>
               </Text>
             </TouchableOpacity>
           </View>
@@ -195,7 +197,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   inputIcon: {
-    color: colors.textMuted,
     fontSize: typography.body,
   },
   mascotContainer: {
@@ -208,11 +209,9 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
   },
   signupText: {
-    color: colors.textSecondary,
     fontSize: typography.body,
   },
   signupHighlight: {
-    color: colors.primary,
     fontWeight: typography.semibold as any,
   },
 });

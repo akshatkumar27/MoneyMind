@@ -8,12 +8,13 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {useCurrency} from '../../context/CurrencyContext';
-import {BackButton} from '../../components/BackButton';
-import {Header} from '../../components/Header';
-import {colors, typography, spacing, radii} from '../../constants/theme';
-import {globalStyles} from '../../styles/globalStyles';
+import { useNavigation } from '@react-navigation/native';
+import { useCurrency } from '../../context/CurrencyContext';
+import { BackButton } from '../../components/BackButton';
+import { Header } from '../../components/Header';
+import { typography, spacing, radii } from '../../constants/theme';
+import { globalStyles } from '../../styles/globalStyles';
+import { useThemeColors } from "../../context/ThemeContext";
 
 interface NotificationItem {
   id: string;
@@ -39,7 +40,7 @@ const getNotificationIcon = (type: string) => {
   }
 };
 
-const getNotificationColor = (type: string) => {
+const getNotificationColor = (type: string, colors: any) => {
   switch (type) {
     case 'suggestion':
       return colors.warning;
@@ -55,8 +56,9 @@ const getNotificationColor = (type: string) => {
 };
 
 export const NotificationScreen: React.FC = () => {
+  const colors = useThemeColors();
   const navigation = useNavigation();
-  const {currencySymbol} = useCurrency();
+  const { currencySymbol } = useCurrency();
 
   const NOTIFICATIONS: NotificationItem[] = React.useMemo(
     () => [
@@ -136,8 +138,8 @@ export const NotificationScreen: React.FC = () => {
 
       {/* Unread Badge */}
       {unreadCount > 0 && (
-        <View style={styles.unreadBadge}>
-          <Text style={styles.unreadText}>
+        <View style={[styles.unreadBadge, { backgroundColor: colors.primarySubtle }]}>
+          <Text style={[styles.unreadText, { color: colors.primary }]}>
             {unreadCount} unread notification{unreadCount > 1 ? 's' : ''}
           </Text>
         </View>
@@ -145,7 +147,7 @@ export const NotificationScreen: React.FC = () => {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Today Section */}
-        <Text style={styles.sectionLabel}>TODAY</Text>
+        <Text style={[styles.sectionLabel, { color: colors.textMuted }]}>TODAY</Text>
         {NOTIFICATIONS.filter(n => n.time.includes('hour')).map(
           notification => (
             <TouchableOpacity
@@ -153,13 +155,13 @@ export const NotificationScreen: React.FC = () => {
               style={[
                 styles.notificationCard,
                 !notification.isRead && styles.notificationUnread,
-              ]}>
+                , { backgroundColor: colors.cardBackground }, { borderLeftColor: colors.primary }]}>
               <View
                 style={[
                   styles.iconContainer,
                   {
                     backgroundColor:
-                      getNotificationColor(notification.type) + '20',
+                      getNotificationColor(notification.type, colors) + '20',
                   },
                 ]}>
                 <Text style={styles.icon}>
@@ -171,23 +173,23 @@ export const NotificationScreen: React.FC = () => {
                   <Text
                     style={[
                       styles.notificationTitle,
-                      {color: getNotificationColor(notification.type)},
+                      { color: getNotificationColor(notification.type, colors) },
                     ]}>
                     {notification.title}
                   </Text>
-                  {!notification.isRead && <View style={styles.unreadDot} />}
+                  {!notification.isRead && <View style={[styles.unreadDot, { backgroundColor: colors.primary }]} />}
                 </View>
-                <Text style={styles.notificationDescription} numberOfLines={2}>
+                <Text style={[styles.notificationDescription, { color: colors.textSecondary }]} numberOfLines={2}>
                   {notification.description}
                 </Text>
-                <Text style={styles.notificationTime}>{notification.time}</Text>
+                <Text style={[styles.notificationTime, { color: colors.textMuted }]}>{notification.time}</Text>
               </View>
             </TouchableOpacity>
           ),
         )}
 
         {/* Earlier Section */}
-        <Text style={styles.sectionLabel}>EARLIER</Text>
+        <Text style={[styles.sectionLabel, { color: colors.textMuted }]}>EARLIER</Text>
         {NOTIFICATIONS.filter(n => !n.time.includes('hour')).map(
           notification => (
             <TouchableOpacity
@@ -195,13 +197,13 @@ export const NotificationScreen: React.FC = () => {
               style={[
                 styles.notificationCard,
                 !notification.isRead && styles.notificationUnread,
-              ]}>
+                , { backgroundColor: colors.cardBackground }, { borderLeftColor: colors.primary }]}>
               <View
                 style={[
                   styles.iconContainer,
                   {
                     backgroundColor:
-                      getNotificationColor(notification.type) + '20',
+                      getNotificationColor(notification.type, colors) + '20',
                   },
                 ]}>
                 <Text style={styles.icon}>
@@ -213,16 +215,16 @@ export const NotificationScreen: React.FC = () => {
                   <Text
                     style={[
                       styles.notificationTitle,
-                      {color: getNotificationColor(notification.type)},
+                      { color: getNotificationColor(notification.type, colors) },
                     ]}>
                     {notification.title}
                   </Text>
-                  {!notification.isRead && <View style={styles.unreadDot} />}
+                  {!notification.isRead && <View style={[styles.unreadDot, { backgroundColor: colors.primary }]} />}
                 </View>
-                <Text style={styles.notificationDescription} numberOfLines={2}>
+                <Text style={[styles.notificationDescription, { color: colors.textSecondary }]} numberOfLines={2}>
                   {notification.description}
                 </Text>
-                <Text style={styles.notificationTime}>{notification.time}</Text>
+                <Text style={[styles.notificationTime, { color: colors.textMuted }]}>{notification.time}</Text>
               </View>
             </TouchableOpacity>
           ),
@@ -238,9 +240,8 @@ const styles = StyleSheet.create({
   settingsButton: {
     paddingHorizontal: spacing.sm,
   },
-  settingsIcon: {fontSize: 24},
+  settingsIcon: { fontSize: 24 },
   unreadBadge: {
-    backgroundColor: colors.primarySubtle,
     marginHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
@@ -248,7 +249,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   unreadText: {
-    color: colors.primary,
     fontSize: typography.caption,
     fontWeight: typography.medium,
     textAlign: 'center',
@@ -258,7 +258,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   sectionLabel: {
-    color: colors.textMuted,
     fontSize: typography.caption,
     fontWeight: typography.semibold,
     letterSpacing: 0.5,
@@ -267,14 +266,12 @@ const styles = StyleSheet.create({
   },
   notificationCard: {
     flexDirection: 'row',
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.md,
     padding: spacing.md,
     marginBottom: spacing.sm,
   },
   notificationUnread: {
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary,
+    borderLeftWidth: 3
   },
   iconContainer: {
     width: 40,
@@ -284,8 +281,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: spacing.md,
   },
-  icon: {fontSize: 18},
-  notificationContent: {flex: 1},
+  icon: { fontSize: 18 },
+  notificationContent: { flex: 1 },
   notificationHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -299,18 +296,15 @@ const styles = StyleSheet.create({
   unreadDot: {
     width: 8,
     height: 8,
-    borderRadius: radii.full,
-    backgroundColor: colors.primary,
+    borderRadius: radii.full
   },
   notificationDescription: {
-    color: colors.textSecondary,
     fontSize: typography.caption,
     lineHeight: 18,
     marginBottom: 4,
   },
   notificationTime: {
-    color: colors.textMuted,
     fontSize: typography.caption - 1,
   },
-  bottomSpacing: {height: spacing.xxl},
+  bottomSpacing: { height: spacing.xxl },
 });

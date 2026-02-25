@@ -22,12 +22,14 @@ import {BackButton} from '../../components/BackButton';
 import {Button} from '../../components/Button';
 import {AnimatedMascot} from '../../components/AnimatedMascot';
 import {Header} from '../../components/Header';
-import {colors, typography, spacing, borderWidths} from '../../constants/theme';
+import {typography, spacing, borderWidths} from '../../constants/theme';
 import {globalStyles} from '../../styles/globalStyles';
+import { useThemeColors } from "../../context/ThemeContext";
 
 type NavigationProp = NativeStackNavigationProp<OnboardingStackParamList>;
 
 export const MonthlyIncomeScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation<NavigationProp>();
   const [amount, setAmount] = useState('');
   const scrollViewRef = React.useRef<ScrollView>(null);
@@ -75,7 +77,7 @@ export const MonthlyIncomeScreen: React.FC = () => {
           }>
           <View style={globalStyles.rowSpaceBetween}>
             <Text style={globalStyles.caption}>Profile Completion</Text>
-            <Text style={styles.progressPercent}>20%</Text>
+            <Text style={[styles.progressPercent, { color: colors.primary }]}>20%</Text>
           </View>
           <View style={globalStyles.progressBar}>
             <View style={[globalStyles.progressFill, {width: '20%'}]} />
@@ -94,9 +96,9 @@ export const MonthlyIncomeScreen: React.FC = () => {
           </Text>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.currencySymbol}>{currencySymbol}</Text>
+            <Text style={[styles.currencySymbol, { color: colors.textPrimary }]}>{currencySymbol}</Text>
             <TextInput
-              style={styles.amountInput}
+              style={[styles.amountInput, { color: colors.textPrimary, borderBottomColor: colors.primary }]}
               value={amount}
               onChangeText={text => setAmount(formatNumberInput(text))}
               keyboardType="number-pad"
@@ -122,7 +124,6 @@ export const MonthlyIncomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   stepIndicator: {
     flex: 1,
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.medium,
     textAlign: 'center',
@@ -133,7 +134,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   progressPercent: {
-    color: colors.primary,
     fontSize: typography.caption,
     fontWeight: typography.medium,
   },
@@ -149,20 +149,17 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   currencySymbol: {
-    color: colors.textPrimary,
     fontSize: 32,
     fontWeight: typography.bold,
     marginRight: spacing.sm,
   },
   amountInput: {
-    color: colors.textPrimary,
     fontSize: 48,
     fontWeight: typography.bold,
     minWidth: 20,
     maxWidth: 280,
     textAlign: 'left',
     borderBottomWidth: borderWidths.medium,
-    borderBottomColor: colors.primary,
     paddingBottom: spacing.sm,
   },
   footer: {

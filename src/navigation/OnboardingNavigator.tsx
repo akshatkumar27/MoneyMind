@@ -1,6 +1,5 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {colors} from '../constants/theme';
 import {MonthlyIncomeScreen} from '../screens/onboarding/MonthlyIncomeScreen';
 import {MonthlyExpensesScreen} from '../screens/onboarding/MonthlyExpensesScreen';
 import {MonthlyEMIScreen} from '../screens/onboarding/MonthlyEMIScreen';
@@ -8,6 +7,7 @@ import {EMIOutstandingScreen} from '../screens/onboarding/EMIOutstandingScreen';
 import {MonthlyInvestmentScreen} from '../screens/onboarding/MonthlyInvestmentScreen';
 import {GoalSelectionScreen} from '../screens/onboarding/GoalSelectionScreen';
 import {AddGoalScreen} from '../screens/onboarding/AddGoalScreen';
+import { useThemeColors } from "../context/ThemeContext";
 
 export type OnboardingData = {
   monthly_income?: number;
@@ -38,6 +38,7 @@ export type OnboardingStackParamList = {
 const Stack = createNativeStackNavigator<OnboardingStackParamList>();
 
 export const OnboardingNavigator: React.FC = () => {
+    const colors = useThemeColors();
   return (
     <Stack.Navigator
       initialRouteName="MonthlyIncome"

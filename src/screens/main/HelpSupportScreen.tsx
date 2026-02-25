@@ -15,9 +15,10 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {BackButton} from '../../components/BackButton';
 import {Header} from '../../components/Header';
-import {colors, typography, spacing, borderWidths} from '../../constants/theme';
+import {typography, spacing, borderWidths} from '../../constants/theme';
 import {globalStyles} from '../../styles/globalStyles';
 import {FAQS} from '../../constants/faqs';
+import { useThemeColors } from "../../context/ThemeContext";
 
 // Enable LayoutAnimation for Android
 if (
@@ -28,6 +29,7 @@ if (
 }
 
 export const HelpSupportScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation();
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -51,13 +53,13 @@ export const HelpSupportScreen: React.FC = () => {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Contact Section */}
-        <View style={styles.contactCard}>
-          <Text style={styles.contactTitle}>Need specific help?</Text>
-          <Text style={styles.contactText}>
+        <View style={[styles.contactCard, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
+          <Text style={[styles.contactTitle, { color: colors.textPrimary }]}>Need specific help?</Text>
+          <Text style={[styles.contactText, { color: colors.textSecondary }]}>
             Our support team is here to assist you with any questions or issues.
           </Text>
           <TouchableOpacity
-            style={styles.contactButton}
+            style={[styles.contactButton, { backgroundColor: colors.primary }]}
             onPress={handleContactSupport}>
             <Text style={styles.contactButtonText}>Contact Support</Text>
           </TouchableOpacity>
@@ -67,21 +69,21 @@ export const HelpSupportScreen: React.FC = () => {
         <Text style={globalStyles.sectionLabel}>
           Frequently Asked Questions
         </Text>
-        <View style={styles.faqList}>
+        <View style={[styles.faqList, { backgroundColor: colors.cardBackground }]}>
           {FAQS.map(faq => (
-            <View key={faq.id} style={styles.faqItem}>
+            <View key={faq.id} style={[styles.faqItem, { borderBottomColor: colors.border }]}>
               <TouchableOpacity
                 style={styles.faqHeader}
                 onPress={() => toggleExpand(faq.id)}
                 activeOpacity={0.7}>
-                <Text style={styles.question}>{faq.question}</Text>
-                <Text style={styles.expandIcon}>
+                <Text style={[styles.question, { color: colors.textPrimary }]}>{faq.question}</Text>
+                <Text style={[styles.expandIcon, { color: colors.primary }]}>
                   {expandedId === faq.id ? '−' : '+'}
                 </Text>
               </TouchableOpacity>
               {expandedId === faq.id && (
                 <View style={styles.answerContainer}>
-                  <Text style={styles.answer}>{faq.answer}</Text>
+                  <Text style={[styles.answer, { color: colors.textSecondary }]}>{faq.answer}</Text>
                 </View>
               )}
             </View>
@@ -89,7 +91,7 @@ export const HelpSupportScreen: React.FC = () => {
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.copyrightText}>© 2026 Finova AI</Text>
+          <Text style={[styles.copyrightText, { color: colors.textMuted }]}>© 2026 Finova AI</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -102,30 +104,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   contactCard: {
-    backgroundColor: colors.cardBackground,
     borderRadius: 16,
     padding: spacing.lg,
     marginTop: spacing.md,
     marginBottom: spacing.xl,
     alignItems: 'center',
-    borderWidth: borderWidths.thin,
-    borderColor: colors.border,
+    borderWidth: borderWidths.thin
   },
   contactTitle: {
-    color: colors.textPrimary,
     fontSize: typography.h3,
     fontWeight: typography.bold,
     marginBottom: spacing.xs,
   },
   contactText: {
-    color: colors.textSecondary,
     fontSize: typography.body,
     textAlign: 'center',
     marginBottom: spacing.lg,
     lineHeight: 22,
   },
   contactButton: {
-    backgroundColor: colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 24,
@@ -138,13 +135,11 @@ const styles = StyleSheet.create({
     fontWeight: typography.bold,
   },
   faqList: {
-    backgroundColor: colors.cardBackground,
     borderRadius: 16,
     overflow: 'hidden',
   },
   faqItem: {
-    borderBottomWidth: borderWidths.thin,
-    borderBottomColor: colors.border,
+    borderBottomWidth: borderWidths.thin
   },
   faqHeader: {
     flexDirection: 'row',
@@ -154,14 +149,12 @@ const styles = StyleSheet.create({
     minHeight: 60,
   },
   question: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.medium,
     flex: 1,
     paddingRight: spacing.md,
   },
   expandIcon: {
-    color: colors.primary,
     fontSize: 24,
     fontWeight: 'bold',
   },
@@ -170,7 +163,6 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
   },
   answer: {
-    color: colors.textSecondary,
     fontSize: typography.body,
     lineHeight: 22,
   },
@@ -179,7 +171,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xl,
   },
   copyrightText: {
-    color: colors.textMuted,
     fontSize: typography.caption,
   },
 });

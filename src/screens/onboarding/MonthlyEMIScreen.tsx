@@ -21,7 +21,6 @@ import {Button} from '../../components/Button';
 import {AnimatedMascot} from '../../components/AnimatedMascot';
 import {Header} from '../../components/Header';
 import {
-  colors,
   typography,
   spacing,
   radii,
@@ -29,11 +28,13 @@ import {
 } from '../../constants/theme';
 import {globalStyles} from '../../styles/globalStyles';
 import {formatCurrency} from '../../utils/formatNumber';
+import { useThemeColors } from "../../context/ThemeContext";
 
 type NavigationProp = NativeStackNavigationProp<OnboardingStackParamList>;
 type ScreenRouteProp = RouteProp<OnboardingStackParamList, 'MonthlyEMI'>;
 
 export const MonthlyEMIScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<ScreenRouteProp>();
   const [amount, setAmount] = useState('');
@@ -90,7 +91,7 @@ export const MonthlyEMIScreen: React.FC = () => {
           }>
           <View style={globalStyles.rowSpaceBetween}>
             <Text style={globalStyles.caption}>Profile Completion</Text>
-            <Text style={styles.progressPercent}>60%</Text>
+            <Text style={[styles.progressPercent, { color: colors.primary }]}>60%</Text>
           </View>
           <View style={globalStyles.progressBar}>
             <View style={[globalStyles.progressFill, {width: '60%'}]} />
@@ -109,18 +110,18 @@ export const MonthlyEMIScreen: React.FC = () => {
           </Text>
 
           {/* Available Amount Info */}
-          <Text style={styles.availableText}>
+          <Text style={[styles.availableText, { color: colors.textSecondary }]}>
             Available after expenses:{' '}
             {formatCurrency(availableAmount, currencySymbol)}
           </Text>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.currencySymbol}>{currencySymbol}</Text>
+            <Text style={[styles.currencySymbol, { color: colors.textPrimary }]}>{currencySymbol}</Text>
             <TextInput
               style={[
-                styles.amountInput,
-                isExceedingAvailable && styles.inputError,
-              ]}
+                                                                styles.amountInput,
+                                                                isExceedingAvailable && styles.inputError,
+                                                              , { color: colors.textPrimary, borderBottomColor: colors.primary }, { borderBottomColor: colors.danger }]}
               value={amount}
               onChangeText={text => setAmount(formatNumberInput(text))}
               keyboardType="number-pad"
@@ -145,9 +146,9 @@ export const MonthlyEMIScreen: React.FC = () => {
             </Text>
           )}
 
-          <View style={styles.noteCard}>
+          <View style={[styles.noteCard, { backgroundColor: colors.cardBackground }]}>
             <Text style={styles.noteIcon}>💡</Text>
-            <Text style={styles.noteText}>
+            <Text style={[styles.noteText, { color: colors.textSecondary }]}>
               Enter 0 if you don't have any active EMIs
             </Text>
           </View>
@@ -169,7 +170,6 @@ export const MonthlyEMIScreen: React.FC = () => {
 const styles = StyleSheet.create({
   stepIndicator: {
     flex: 1,
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.medium as any,
     textAlign: 'center',
@@ -179,7 +179,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   progressPercent: {
-    color: colors.primary,
     fontSize: typography.caption,
     fontWeight: typography.medium as any,
   },
@@ -189,7 +188,6 @@ const styles = StyleSheet.create({
   },
   emoji: {fontSize: 80},
   availableText: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     textAlign: 'center',
     marginBottom: spacing.md,
@@ -201,27 +199,23 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   currencySymbol: {
-    color: colors.textPrimary,
     fontSize: 32,
     fontWeight: typography.bold as any,
     marginRight: spacing.sm,
   },
   amountInput: {
-    color: colors.textPrimary,
     fontSize: 48,
     fontWeight: typography.bold as any,
     minWidth: 20,
     maxWidth: 280,
     textAlign: 'left',
     borderBottomWidth: borderWidths.medium,
-    borderBottomColor: colors.primary,
     paddingBottom: spacing.sm,
   },
-  inputError: {borderBottomColor: colors.danger},
+  inputError: {},
   noteCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.md,
     padding: spacing.md,
     marginTop: spacing.md,
@@ -229,7 +223,6 @@ const styles = StyleSheet.create({
   noteIcon: {fontSize: 20, marginRight: spacing.sm},
   noteText: {
     flex: 1,
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     lineHeight: 20,
   },

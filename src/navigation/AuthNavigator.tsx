@@ -1,9 +1,9 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {colors} from '../constants/theme';
 import {LoginScreen} from '../screens/auth/LoginScreen';
 import {SignupScreen} from '../screens/auth/SignupScreen';
 import {OTPVerificationScreen} from '../screens/auth/OTPVerificationScreen';
+import { useThemeColors } from "../context/ThemeContext";
 
 export type AuthStackParamList = {
   Login: undefined;
@@ -22,6 +22,7 @@ export type AuthStackParamList = {
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
 export const AuthNavigator: React.FC = () => {
+    const colors = useThemeColors();
   return (
     <Stack.Navigator
       initialRouteName="Login"

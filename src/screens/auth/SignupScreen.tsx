@@ -19,9 +19,10 @@ import {Input} from '../../components/Input';
 import {Button} from '../../components/Button';
 import {FooterLinks} from '../../components/FooterLinks';
 import {AnimatedMascot} from '../../components/AnimatedMascot';
-import {colors, typography, spacing} from '../../constants/theme';
+import {typography, spacing} from '../../constants/theme';
 import {ENDPOINTS} from '../../constants/endpoints';
 import {globalStyles} from '../../styles/globalStyles';
+import { useThemeColors } from "../../context/ThemeContext";
 
 type SignupScreenNavigationProp = NativeStackNavigationProp<
   AuthStackParamList,
@@ -29,6 +30,7 @@ type SignupScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 export const SignupScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation<SignupScreenNavigationProp>();
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
@@ -222,7 +224,7 @@ export const SignupScreen: React.FC = () => {
                 onChangeText={handleFullNameChange}
                 onBlur={() => validateFullName(fullName)}
                 autoComplete="name"
-                icon={<Text style={styles.inputIcon}>👤</Text>}
+                icon={<Text style={[styles.inputIcon, { color: colors.textMuted }]}>👤</Text>}
                 error={fullNameError}
               />
 
@@ -235,7 +237,7 @@ export const SignupScreen: React.FC = () => {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
-                icon={<Text style={styles.inputIcon}>@</Text>}
+                icon={<Text style={[styles.inputIcon, { color: colors.textMuted }]}>@</Text>}
                 error={emailError}
               />
 
@@ -246,7 +248,7 @@ export const SignupScreen: React.FC = () => {
                 onChangeText={handleAgeChange}
                 onBlur={() => validateAge(age)}
                 keyboardType="number-pad"
-                icon={<Text style={styles.inputIcon}>📅</Text>}
+                icon={<Text style={[styles.inputIcon, { color: colors.textMuted }]}>📅</Text>}
                 error={ageError}
               />
             </View>
@@ -300,7 +302,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   inputIcon: {
-    color: colors.textMuted,
     fontSize: typography.body,
   },
   footer: {

@@ -1,13 +1,15 @@
 import React, {useRef} from 'react';
 import {View, Text, TextInput, StyleSheet, Pressable} from 'react-native';
 import {OTPInputProps} from './types';
-import {colors, typography, borderWidths} from '../constants/theme';
+import {typography, borderWidths} from '../constants/theme';
+import { useThemeColors } from "../context/ThemeContext";
 
 export const OTPInput: React.FC<OTPInputProps> = ({
   value,
   onChangeText,
   length = 6,
 }) => {
+    const colors = useThemeColors();
   const inputRef = useRef<TextInput>(null);
   const digits = value.split('');
 
@@ -28,11 +30,11 @@ export const OTPInput: React.FC<OTPInputProps> = ({
           <View
             key={index}
             style={[
-              styles.box,
-              index === value.length && styles.boxActive,
-              !!digits[index] && styles.boxFilled,
-            ]}>
-            <Text style={styles.digit}>{digits[index] || ''}</Text>
+                                          styles.box,
+                                          index === value.length && styles.boxActive,
+                                          !!digits[index] && styles.boxFilled,
+                                        , { borderColor: colors.border, backgroundColor: colors.inputBackground }, { borderColor: colors.primary }, { borderColor: colors.border }]}>
+            <Text style={[styles.digit, { color: colors.textPrimary }]}>{digits[index] || ''}</Text>
           </View>
         ))}
       </View>
@@ -60,20 +62,15 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 12,
     borderWidth: borderWidths.thin,
-    borderColor: colors.border,
-    backgroundColor: colors.inputBackground,
     justifyContent: 'center',
     alignItems: 'center',
   },
   boxActive: {
-    borderColor: colors.primary,
     borderWidth: borderWidths.medium,
   },
   boxFilled: {
-    borderColor: colors.border,
-  },
+},
   digit: {
-    color: colors.textPrimary,
     fontSize: typography.h2,
     fontWeight: typography.semibold,
   },

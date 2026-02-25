@@ -10,7 +10,8 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {BackButton} from './BackButton';
 import {HeaderProps} from './types';
-import {colors, typography, spacing} from '../constants/theme';
+import {typography, spacing} from '../constants/theme';
+import { useThemeColors } from "../context/ThemeContext";
 
 export const Header: React.FC<HeaderProps> = ({
   title,
@@ -20,6 +21,7 @@ export const Header: React.FC<HeaderProps> = ({
   style,
   showBackButton = true,
 }) => {
+    const colors = useThemeColors();
   const navigation = useNavigation();
 
   const handleBack = () => {
@@ -35,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Absolute Centered Title */}
       <View style={styles.titleContainer} pointerEvents="none">
         {title && (
-          <Text style={[styles.title, titleStyle]} numberOfLines={1}>
+          <Text style={[styles.title, titleStyle, { color: colors.textPrimary }]} numberOfLines={1}>
             {title}
           </Text>
         )}
@@ -72,7 +74,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 60, // Prevent overlap with standard buttons
   },
   title: {
-    color: colors.textPrimary,
     fontSize: typography.h3,
     fontWeight: typography.semibold,
     textAlign: 'center',

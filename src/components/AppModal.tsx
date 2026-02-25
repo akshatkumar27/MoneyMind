@@ -11,12 +11,12 @@ import {
 } from 'react-native';
 import {AppModalProps} from './types';
 import {
-  colors,
   typography,
   spacing,
   radii,
   borderWidths,
 } from '../constants/theme';
+import { useThemeColors } from "../context/ThemeContext";
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -101,6 +101,7 @@ export const AppModal: React.FC<AppModalProps> = ({
   confirmLoading = false,
   children,
 }) => {
+    const colors = useThemeColors();
   const cfg = getTypeConfig(type, confirmVariant);
   const iconEmoji = customIcon ?? cfg.icon;
   const showIconRow = !children; // hide the icon section when using the form slot
@@ -115,7 +116,7 @@ export const AppModal: React.FC<AppModalProps> = ({
       <TouchableWithoutFeedback onPress={onCancel}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
-            <View style={styles.card}>
+            <View style={[styles.card, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
               {/* Icon — only shown for alert/confirm modals */}
               {showIconRow && (
                 <View
@@ -126,17 +127,17 @@ export const AppModal: React.FC<AppModalProps> = ({
 
               {/* Title */}
               <Text
-                style={[styles.title, children ? styles.titleForm : undefined]}>
+                style={[styles.title, children ? styles.titleForm : undefined, { color: colors.textPrimary }]}>
                 {title}
               </Text>
 
               {/* Subtitle (optional) */}
               {subtitle ? (
-                <Text style={styles.subtitle}>{subtitle}</Text>
+                <Text style={[styles.subtitle, { color: colors.textMuted }]}>{subtitle}</Text>
               ) : null}
 
               {/* Message (optional) */}
-              {message ? <Text style={styles.message}>{message}</Text> : null}
+              {message ? <Text style={[styles.message, { color: colors.textSecondary }]}>{message}</Text> : null}
 
               {/* Form slot */}
               {children ? (
@@ -147,10 +148,10 @@ export const AppModal: React.FC<AppModalProps> = ({
               <View style={styles.buttonRow}>
                 {showCancelButton && (
                   <TouchableOpacity
-                    style={styles.cancelButton}
+                    style={[styles.cancelButton, { backgroundColor: colors.inputBackground }]}
                     onPress={onCancel}
                     disabled={confirmLoading}>
-                    <Text style={styles.cancelText}>{cancelText}</Text>
+                    <Text style={[styles.cancelText, { color: colors.textPrimary }]}>{cancelText}</Text>
                   </TouchableOpacity>
                 )}
                 <TouchableOpacity
@@ -167,7 +168,7 @@ export const AppModal: React.FC<AppModalProps> = ({
                       color={colors.textPrimary}
                     />
                   ) : (
-                    <Text style={styles.confirmText}>{confirmText}</Text>
+                    <Text style={[styles.confirmText, { color: colors.textPrimary }]}>{confirmText}</Text>
                   )}
                 </TouchableOpacity>
               </View>
@@ -189,12 +190,10 @@ const styles = StyleSheet.create({
   },
   card: {
     width: SCREEN_WIDTH - spacing.xl * 2,
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.xl,
     padding: spacing.xl,
     alignItems: 'center',
-    borderWidth: borderWidths.thin,
-    borderColor: colors.border,
+    borderWidth: borderWidths.thin
   },
   iconContainer: {
     width: 64,
@@ -208,7 +207,6 @@ const styles = StyleSheet.create({
     fontSize: 32,
   },
   title: {
-    color: colors.textPrimary,
     fontSize: typography.h3,
     fontWeight: typography.bold,
     textAlign: 'center',
@@ -219,13 +217,11 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   subtitle: {
-    color: colors.textMuted,
     fontSize: typography.bodySmall,
     textAlign: 'center',
     marginBottom: spacing.md,
   },
   message: {
-    color: colors.textSecondary,
     fontSize: typography.body,
     textAlign: 'center',
     lineHeight: 24,
@@ -242,13 +238,11 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: colors.inputBackground,
     paddingVertical: spacing.md,
     borderRadius: radii.md,
     alignItems: 'center',
   },
   cancelText: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
   },
@@ -263,7 +257,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   confirmText: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.bold,
   },

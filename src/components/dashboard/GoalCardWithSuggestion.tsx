@@ -1,9 +1,10 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import {useCurrency} from '../../context/CurrencyContext';
-import {ProgressBar} from './ProgressBar';
-import {Button} from '../Button';
-import {colors, radii, typography, spacing} from '../../constants/theme';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useCurrency } from '../../context/CurrencyContext';
+import { ProgressBar } from './ProgressBar';
+import { Button } from '../Button';
+import { radii, typography, spacing } from '../../constants/theme';
+import { useThemeColors } from "../../context/ThemeContext";
 
 export interface GoalCardWithSuggestionProps {
   icon?: string;
@@ -25,7 +26,7 @@ export interface GoalCardWithSuggestionProps {
 export const GoalCardWithSuggestion: React.FC<GoalCardWithSuggestionProps> = ({
   title,
   progress,
-  color = colors.success,
+  color,
   suggestionTitle,
   suggestionDescription,
   achieveInMonths,
@@ -35,7 +36,9 @@ export const GoalCardWithSuggestion: React.FC<GoalCardWithSuggestionProps> = ({
   onAskAiPress,
   onCardPress,
 }) => {
-  const {currencySymbol} = useCurrency();
+  const colors = useThemeColors();
+  const activeColor = color || colors.success;
+  const { currencySymbol } = useCurrency();
 
   const formatCurrency = (amount: number): string => {
     if (amount >= 1_000_000_000) {
@@ -62,12 +65,12 @@ export const GoalCardWithSuggestion: React.FC<GoalCardWithSuggestionProps> = ({
 
   return (
     <TouchableOpacity
-      style={styles.card}
+      style={[styles.card, { backgroundColor: colors.cardBackground }]}
       onPress={onCardPress}
       activeOpacity={onCardPress ? 0.7 : 1}>
       {/* Header */}
       <View style={styles.headerRow}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>{title}</Text>
         <Button
           title="Edit"
           variant="outline"
@@ -83,7 +86,7 @@ export const GoalCardWithSuggestion: React.FC<GoalCardWithSuggestionProps> = ({
       {/* Amount & Timeline */}
       <View style={styles.amountRow}>
         {targetAmount !== undefined && (
-          <Text style={styles.amount}>
+          <Text style={[styles.amount, { color: colors.textPrimary }]}>
             {savedAmount !== undefined
               ? `${formatCurrency(savedAmount)} / `
               : ''}
@@ -91,7 +94,7 @@ export const GoalCardWithSuggestion: React.FC<GoalCardWithSuggestionProps> = ({
           </Text>
         )}
         {achieveInMonths !== undefined && (
-          <Text style={styles.achieveIn}>
+          <Text style={[styles.achieveIn, { color: colors.textSecondary }]}>
             Achieve in {achieveInMonths}{' '}
             {achieveInMonths === 1 ? 'month' : 'months'}
           </Text>
@@ -101,17 +104,17 @@ export const GoalCardWithSuggestion: React.FC<GoalCardWithSuggestionProps> = ({
       {/* Progress */}
       <View style={styles.progressRow}>
         <View style={styles.progressBarWrapper}>
-          <ProgressBar progress={progress} color={color} height={6} />
+          <ProgressBar progress={progress} color={activeColor} height={6} />
         </View>
-        <Text style={styles.progressPercent}>{progress}%</Text>
+        <Text style={[styles.progressPercent, { color: colors.textPrimary }]}>{progress}%</Text>
       </View>
 
       {/* AI Suggestion */}
       <View style={styles.suggestionSection}>
-        <Text style={styles.suggestionLabel}>
+        <Text style={[styles.suggestionLabel, { color: colors.textPrimary }]}>
           {suggestionTitle || 'AI suggestions'}
         </Text>
-        <Text style={styles.suggestionText}>
+        <Text style={[styles.suggestionText, { color: colors.textSecondary }]}>
           {suggestionDescription || 'No suggestions available at the moment.'}
         </Text>
       </View>
@@ -131,7 +134,6 @@ export const GoalCardWithSuggestion: React.FC<GoalCardWithSuggestionProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.lg,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -143,7 +145,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   title: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
     flex: 1,
@@ -161,13 +162,11 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   amount: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.bold,
     marginBottom: 2,
   },
   achieveIn: {
-    color: colors.textSecondary,
     fontSize: typography.caption,
   },
   progressRow: {
@@ -180,7 +179,6 @@ const styles = StyleSheet.create({
     marginRight: spacing.sm,
   },
   progressPercent: {
-    color: colors.textPrimary,
     fontSize: typography.bodySmall,
     fontWeight: typography.semibold,
     minWidth: 40,
@@ -190,13 +188,11 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   suggestionLabel: {
-    color: colors.textPrimary,
     fontSize: typography.bodySmall,
     fontWeight: typography.semibold,
     marginBottom: spacing.xs,
   },
   suggestionText: {
-    color: colors.textSecondary,
     fontSize: typography.caption,
     lineHeight: 18,
   },

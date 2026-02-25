@@ -1,7 +1,8 @@
 import React from 'react';
 import {TouchableOpacity, Text, StyleSheet, ViewStyle} from 'react-native';
 import {SelectOptionProps, ChipOptionProps, CounterProps} from './types';
-import {colors, typography, borderWidths} from '../constants/theme';
+import {typography, borderWidths} from '../constants/theme';
+import { useThemeColors } from "../context/ThemeContext";
 
 export const SelectOption: React.FC<SelectOptionProps> = ({
   icon,
@@ -11,17 +12,18 @@ export const SelectOption: React.FC<SelectOptionProps> = ({
   onPress,
   style,
 }) => {
+    const colors = useThemeColors();
   return (
     <TouchableOpacity
-      style={[styles.option, selected && styles.optionSelected, style]}
+      style={[styles.option, selected && styles.optionSelected, style, { backgroundColor: colors.cardBackground, borderColor: colors.border }, { borderColor: colors.primary, backgroundColor: colors.primary + '15' }]}
       onPress={onPress}
       activeOpacity={0.7}>
       {icon && <Text style={styles.icon}>{icon}</Text>}
-      <Text style={[styles.label, selected && styles.labelSelected]}>
+      <Text style={[styles.label, selected && styles.labelSelected, { color: colors.textPrimary }, { color: colors.primary }]}>
         {label}
       </Text>
-      {sublabel && <Text style={styles.sublabel}>{sublabel}</Text>}
-      {selected && <Text style={styles.checkmark}>✓</Text>}
+      {sublabel && <Text style={[styles.sublabel, { color: colors.textMuted }]}>{sublabel}</Text>}
+      {selected && <Text style={[styles.checkmark, { color: colors.primary }]}>✓</Text>}
     </TouchableOpacity>
   );
 };
@@ -31,12 +33,13 @@ export const ChipOption: React.FC<ChipOptionProps> = ({
   selected,
   onPress,
 }) => {
+    const colors = useThemeColors();
   return (
     <TouchableOpacity
-      style={[styles.chip, selected && styles.chipSelected]}
+      style={[styles.chip, selected && styles.chipSelected, { backgroundColor: colors.cardBackground, borderColor: colors.border }, { backgroundColor: colors.primary, borderColor: colors.primary }]}
       onPress={onPress}
       activeOpacity={0.7}>
-      <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>
+      <Text style={[styles.chipLabel, selected && styles.chipLabelSelected, { color: colors.textSecondary }, { color: colors.textPrimary }]}>
         {label}
       </Text>
     </TouchableOpacity>
@@ -50,26 +53,27 @@ export const Counter: React.FC<CounterProps> = ({
   min = 0,
   max = 10,
 }) => {
+    const colors = useThemeColors();
   return (
     <TouchableOpacity style={styles.counterContainer}>
       <TouchableOpacity
         style={[
-          styles.counterButton,
-          value <= min && styles.counterButtonDisabled,
-        ]}
+                                  styles.counterButton,
+                                  value <= min && styles.counterButtonDisabled,
+                                , { backgroundColor: colors.cardBackground, borderColor: colors.border }]}
         onPress={onDecrement}
         disabled={value <= min}>
-        <Text style={styles.counterButtonText}>−</Text>
+        <Text style={[styles.counterButtonText, { color: colors.textPrimary }]}>−</Text>
       </TouchableOpacity>
-      <Text style={styles.counterValue}>{value}</Text>
+      <Text style={[styles.counterValue, { color: colors.textPrimary }]}>{value}</Text>
       <TouchableOpacity
         style={[
-          styles.counterButton,
-          value >= max && styles.counterButtonDisabled,
-        ]}
+                                  styles.counterButton,
+                                  value >= max && styles.counterButtonDisabled,
+                                , { backgroundColor: colors.cardBackground, borderColor: colors.border }]}
         onPress={onIncrement}
         disabled={value >= max}>
-        <Text style={styles.counterButtonText}>+</Text>
+        <Text style={[styles.counterButtonText, { color: colors.textPrimary }]}>+</Text>
       </TouchableOpacity>
     </TouchableOpacity>
   );
@@ -79,37 +83,29 @@ const styles = StyleSheet.create({
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.cardBackground,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    borderWidth: borderWidths.thin,
-    borderColor: colors.border,
+    borderWidth: borderWidths.thin
   },
   optionSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primary + '15',
-  },
+},
   icon: {
     fontSize: 20,
     marginRight: 12,
   },
   label: {
     flex: 1,
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.medium,
   },
   labelSelected: {
-    color: colors.primary,
-  },
+},
   sublabel: {
-    color: colors.textMuted,
     fontSize: typography.caption,
     marginLeft: 8,
   },
   checkmark: {
-    color: colors.primary,
     fontSize: 18,
     fontWeight: typography.bold,
   },
@@ -117,24 +113,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 20,
-    backgroundColor: colors.cardBackground,
     borderWidth: borderWidths.thin,
-    borderColor: colors.border,
     marginRight: 8,
     marginBottom: 8,
   },
   chipSelected: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
+},
   chipLabel: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     fontWeight: typography.medium,
   },
   chipLabelSelected: {
-    color: colors.textPrimary,
-  },
+},
   counterContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -144,9 +134,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: colors.cardBackground,
     borderWidth: borderWidths.thin,
-    borderColor: colors.border,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -154,12 +142,10 @@ const styles = StyleSheet.create({
     opacity: 0.3,
   },
   counterButtonText: {
-    color: colors.textPrimary,
     fontSize: 24,
     fontWeight: '300',
   },
   counterValue: {
-    color: colors.textPrimary,
     fontSize: 48,
     fontWeight: typography.bold,
     marginHorizontal: 32,

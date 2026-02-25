@@ -20,11 +20,12 @@ import {AuthStackParamList} from '../../navigation/AuthNavigator';
 import {BackButton} from '../../components/BackButton';
 import {OTPInput} from '../../components/OTPInput';
 import {Button} from '../../components/Button';
-import {colors, typography, spacing} from '../../constants/theme';
+import {typography, spacing} from '../../constants/theme';
 import {ENDPOINTS} from '../../constants/endpoints';
 import {globalStyles} from '../../styles/globalStyles';
 import {api} from '../../services/api';
 import {STORAGE_KEYS} from '../../constants/storage';
+import { useThemeColors } from "../../context/ThemeContext";
 
 type OTPVerificationScreenRouteProp = RouteProp<
   AuthStackParamList,
@@ -32,6 +33,7 @@ type OTPVerificationScreenRouteProp = RouteProp<
 >;
 
 export const OTPVerificationScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation();
   const route = useRoute<OTPVerificationScreenRouteProp>();
   const [otp, setOtp] = useState('');
@@ -258,8 +260,8 @@ export const OTPVerificationScreen: React.FC = () => {
             We've sent a 6-digit code to
           </Text>
           <View style={styles.emailContainer}>
-            <Text style={styles.email}>{email}</Text>
-            <Text style={styles.editLink} onPress={() => navigation.goBack()}>
+            <Text style={[styles.email, { color: colors.primary }]}>{email}</Text>
+            <Text style={[styles.editLink, { color: colors.link }]} onPress={() => navigation.goBack()}>
               Edit
             </Text>
           </View>
@@ -268,15 +270,15 @@ export const OTPVerificationScreen: React.FC = () => {
           </View>
 
           <View style={styles.resendContainer}>
-            <Text style={styles.resendText}>Didn't receive the code? </Text>
+            <Text style={[styles.resendText, { color: colors.textSecondary }]}>Didn't receive the code? </Text>
             <TouchableOpacity
               onPress={handleResend}
               disabled={timer > 0 || resending}>
               <Text
                 style={[
-                  styles.resendLink,
-                  (timer > 0 || resending) && styles.resendDisabled,
-                ]}>
+                                                                          styles.resendLink,
+                                                                          (timer > 0 || resending) && styles.resendDisabled,
+                                                                        , { color: colors.link }, { color: colors.textMuted }]}>
                 {resending
                   ? 'Sending...'
                   : `Resend Code ${timer > 0 ? `(${formatTime(timer)})` : ''}`}
@@ -309,10 +311,8 @@ const styles = StyleSheet.create({
     paddingTop: spacing.lg,
   },
   email: {
-    color: colors.primary,
-  },
+},
   editLink: {
-    color: colors.link,
     textDecorationLine: 'underline',
     marginLeft: spacing.sm,
   },
@@ -334,15 +334,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   resendText: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
   },
   resendLink: {
-    color: colors.link,
     fontSize: typography.bodySmall,
     fontWeight: typography.semibold,
   },
   resendDisabled: {
-    color: colors.textMuted,
-  },
+},
 });

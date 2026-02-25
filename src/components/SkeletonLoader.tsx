@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,8 +6,8 @@ import {
   DimensionValue,
   ViewStyle,
 } from 'react-native';
-import {SkeletonLoaderProps} from './types';
-import {colors} from '../constants/theme';
+import { SkeletonLoaderProps } from './types';
+import { useThemeColors } from "../context/ThemeContext";
 
 export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
   width = '100%',
@@ -15,6 +15,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
   borderRadius = 4,
   style,
 }) => {
+  const colors = useThemeColors();
   const opacity = useRef(new Animated.Value(0.4)).current;
 
   useEffect(() => {
@@ -47,6 +48,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
           height,
           borderRadius,
           opacity,
+          backgroundColor: colors.lightloder
         },
         style,
       ]}
@@ -56,6 +58,6 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
 
 const styles = StyleSheet.create({
   skeleton: {
-    backgroundColor: colors.lightloder, // Increased visibility for skeleton loader
+    // Increased visibility for skeleton loader
   },
 });

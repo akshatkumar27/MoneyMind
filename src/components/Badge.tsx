@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, Text, StyleSheet, ViewStyle} from 'react-native';
-import {colors, radii, typography} from '../constants/theme';
+import {radii, typography} from '../constants/theme';
+import { useThemeColors } from "../context/ThemeContext";
 
 export type BadgeVariant =
   | 'success'
@@ -36,6 +37,7 @@ export const Badge: React.FC<BadgeProps> = ({
   size = 'sm',
   style,
 }) => {
+    const colors = useThemeColors();
   const {bg, text} = variantColors[variant];
   const bgColor = color ? color + '20' : bg;
   const textColor = color ?? text;

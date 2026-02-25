@@ -1,6 +1,7 @@
 import React from 'react';
-import {View, Text, StyleSheet, ViewStyle} from 'react-native';
-import {colors, radii, spacing} from '../constants/theme';
+import { View, Text, StyleSheet, ViewStyle } from 'react-native';
+import { radii, spacing } from '../constants/theme';
+import { useThemeColors } from "../context/ThemeContext";
 
 export type IconCircleSize = 32 | 36 | 40 | 44 | 48 | 56 | 60;
 export type IconCircleRadius = keyof typeof radii;
@@ -26,11 +27,13 @@ export const IconCircle: React.FC<IconCircleProps> = ({
   children,
   size = 40,
   radius = 'full',
-  backgroundColor = colors.inputBackground,
+  backgroundColor,
   fontSize,
   borderColor,
   style,
 }) => {
+  const colors = useThemeColors();
+  const activeBgColor = backgroundColor || colors.inputBackground;
   const computedFontSize = fontSize ?? Math.round(size * 0.45);
   const borderRadius = radii[radius];
 
@@ -42,14 +45,14 @@ export const IconCircle: React.FC<IconCircleProps> = ({
           width: size,
           height: size,
           borderRadius,
-          backgroundColor,
+          backgroundColor: activeBgColor,
           borderColor: borderColor ?? 'transparent',
           borderWidth: borderColor ? 2 : 0,
         },
         style,
       ]}>
       {emoji ? (
-        <Text style={{fontSize: computedFontSize}}>{emoji}</Text>
+        <Text style={{ fontSize: computedFontSize }}>{emoji}</Text>
       ) : (
         children
       )}

@@ -3,7 +3,8 @@ import {View, Text, Image, StyleSheet, Animated, Easing} from 'react-native';
 import {ImageSourcePropType, StyleProp, ViewStyle} from 'react-native';
 
 import {AnimatedMascotProps} from './types';
-import {colors, typography, borderWidths} from '../constants/theme';
+import {typography, borderWidths} from '../constants/theme';
+import { useThemeColors } from "../context/ThemeContext";
 
 export const AnimatedMascot: React.FC<AnimatedMascotProps> = ({
   text = "Hi I'm Fino. Your smart financial assistant",
@@ -13,6 +14,7 @@ export const AnimatedMascot: React.FC<AnimatedMascotProps> = ({
   arrowTopRatio = 0.4,
   customTooltipStyle,
 }) => {
+    const colors = useThemeColors();
   // Arrow vertical position: points to Fino's mouth, proportional to current mascot height
   const arrowTop = Math.round(mascotHeight * arrowTopRatio);
   const floatAnim = useRef(new Animated.Value(0)).current;
@@ -116,7 +118,7 @@ export const AnimatedMascot: React.FC<AnimatedMascotProps> = ({
         />
 
         <View style={styles.tooltipBubble}>
-          <Text style={styles.tooltipText}>{text}</Text>
+          <Text style={[styles.tooltipText, { color: colors.textPrimary || '#FFFFFF' }]}>{text}</Text>
         </View>
       </Animated.View>
     </Animated.View>
@@ -188,7 +190,6 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   tooltipText: {
-    color: colors.textPrimary || '#FFFFFF',
     fontSize: typography.body || 14,
     fontWeight: '500',
     lineHeight: 20,

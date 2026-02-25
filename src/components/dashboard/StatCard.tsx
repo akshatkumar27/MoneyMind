@@ -1,6 +1,7 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {colors, radii, typography, spacing} from '../../constants/theme';
+import { View, Text, StyleSheet } from 'react-native';
+import { radii, typography, spacing } from '../../constants/theme';
+import { useThemeColors } from "../../context/ThemeContext";
 
 export interface StatCardProps {
   label: string;
@@ -12,16 +13,18 @@ export interface StatCardProps {
 export const StatCard: React.FC<StatCardProps> = ({
   label,
   value,
-  valueColor = colors.textPrimary,
+  valueColor,
   small = false,
 }) => {
+  const colors = useThemeColors();
+  const activeValueColor = valueColor || colors.textPrimary;
   return (
-    <View style={styles.statCard}>
-      <Text style={styles.statLabel}>{label}</Text>
+    <View style={[styles.statCard, { backgroundColor: colors.inputBackground }]}>
+      <Text style={[styles.statLabel, { color: colors.textMuted }]}>{label}</Text>
       <Text
         style={[
           styles.statValue,
-          {color: valueColor, fontSize: small ? 14 : 16},
+          { color: activeValueColor, fontSize: small ? 14 : 16 },
         ]}>
         {value}
       </Text>
@@ -31,21 +34,18 @@ export const StatCard: React.FC<StatCardProps> = ({
 
 const styles = StyleSheet.create({
   statCard: {
-    backgroundColor: colors.inputBackground,
     borderRadius: radii.sm,
     padding: spacing.sm,
     alignItems: 'center',
     flex: 1,
   },
   statLabel: {
-    color: colors.textMuted,
     fontSize: 10,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
     marginBottom: 4,
   },
   statValue: {
-    color: colors.textPrimary,
     fontWeight: typography.semibold,
   },
 });

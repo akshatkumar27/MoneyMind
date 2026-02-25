@@ -22,7 +22,6 @@ import {MainStackParamList} from '../../navigation/MainTabNavigator';
 import {formatNumberInput} from '../../utils/formatNumber';
 import {useCurrency} from '../../context/CurrencyContext';
 import {
-  colors,
   typography,
   spacing,
   radii,
@@ -36,6 +35,7 @@ import {AnimatedMascot} from '../../components/AnimatedMascot';
 import {AppModal} from '../../components/AppModal';
 import {api} from '../../services/api';
 import {formatCurrency} from '../../utils/formatNumber';
+import { useThemeColors } from "../../context/ThemeContext";
 
 // Time duration options in months
 const DURATION_OPTIONS = [
@@ -50,6 +50,7 @@ type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
 type EditGoalRouteProp = RouteProp<MainStackParamList, 'EditGoal'>;
 
 export const EditGoalScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<EditGoalRouteProp>();
   const {currencySymbol} = useCurrency();
@@ -382,7 +383,7 @@ export const EditGoalScreen: React.FC = () => {
             title="Edit your goal"
             rightElement={
               <TouchableOpacity
-                style={styles.trashButton}
+                style={[styles.trashButton, { backgroundColor: colors.dangerSubtle, borderColor: colors.danger + '4d' }]}
                 onPress={handleDelete}
                 disabled={isLoading}>
                 <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
@@ -418,12 +419,12 @@ export const EditGoalScreen: React.FC = () => {
           />
 
           {/* Form Card */}
-          <View style={styles.formCard}>
+          <View style={[styles.formCard, { borderColor: colors.border }]}>
             {/* Name Field */}
             <View style={{marginBottom: spacing.lg}}>
-              <Text style={styles.fieldLabel}>Name</Text>
+              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Name</Text>
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, { borderColor: colors.border, color: colors.textPrimary }]}
                 value={name}
                 onChangeText={setName}
                 placeholderTextColor={colors.textMuted}
@@ -433,11 +434,11 @@ export const EditGoalScreen: React.FC = () => {
             {/* Target Field */}
             <View style={styles.fieldContainer}>
               <View style={styles.rowFieldContainer}>
-                <Text style={styles.fieldLabel}>Target</Text>
-                <View style={styles.compactInput}>
-                  <Text style={styles.currencyPrefix}>{currencySymbol}</Text>
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Target</Text>
+                <View style={[styles.compactInput, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
+                  <Text style={[styles.currencyPrefix, { color: colors.textSecondary }]}>{currencySymbol}</Text>
                   <TextInput
-                    style={styles.compactInputText2}
+                    style={[styles.compactInputText2, { color: colors.textPrimary }]}
                     value={target}
                     onChangeText={handleTargetChange}
                     keyboardType="number-pad"
@@ -447,29 +448,29 @@ export const EditGoalScreen: React.FC = () => {
                 </View>
               </View>
               {targetError && (
-                <Text style={styles.errorText}>{targetError}</Text>
+                <Text style={[styles.errorText, { color: colors.error }]}>{targetError}</Text>
               )}
             </View>
 
             {/* Achieve In Field */}
             <View style={styles.inputGroup}>
-              <Text style={styles.fieldLabel}>Achieve in</Text>
+              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Achieve in</Text>
               <View style={styles.durationContainer}>
                 {DURATION_OPTIONS.map(option => (
                   <TouchableOpacity
                     key={option.value}
                     style={[
-                      styles.durationOption,
-                      selectedDuration === option.value &&
-                        styles.durationOptionSelected,
-                    ]}
+                                                                  styles.durationOption,
+                                                                  selectedDuration === option.value &&
+                                                                    styles.durationOptionSelected,
+                                                                , { backgroundColor: colors.cardBackground, borderColor: colors.border }, { backgroundColor: colors.primary + '20', borderColor: colors.primary }]}
                     onPress={() => handleDurationSelect(option.value)}>
                     <Text
                       style={[
-                        styles.durationText,
-                        selectedDuration === option.value &&
-                          styles.durationTextSelected,
-                      ]}>
+                                                                            styles.durationText,
+                                                                            selectedDuration === option.value &&
+                                                                              styles.durationTextSelected,
+                                                                          , { color: colors.textSecondary }, { color: colors.primary }]}>
                       {option.label}
                     </Text>
                   </TouchableOpacity>
@@ -477,17 +478,17 @@ export const EditGoalScreen: React.FC = () => {
                 {/* Custom Option */}
                 <TouchableOpacity
                   style={[
-                    styles.durationOption,
-                    selectedDuration === 'custom' &&
-                      styles.durationOptionSelected,
-                  ]}
+                                                                                    styles.durationOption,
+                                                                                    selectedDuration === 'custom' &&
+                                                                                      styles.durationOptionSelected,
+                                                                                  , { backgroundColor: colors.cardBackground, borderColor: colors.border }, { backgroundColor: colors.primary + '20', borderColor: colors.primary }]}
                   onPress={handleCustomSelect}>
                   <Text
                     style={[
-                      styles.durationText,
-                      selectedDuration === 'custom' &&
-                        styles.durationTextSelected,
-                    ]}>
+                                                                                              styles.durationText,
+                                                                                              selectedDuration === 'custom' &&
+                                                                                                styles.durationTextSelected,
+                                                                                            , { color: colors.textSecondary }, { color: colors.primary }]}>
                     Custom
                   </Text>
                 </TouchableOpacity>
@@ -497,14 +498,14 @@ export const EditGoalScreen: React.FC = () => {
               {selectedDuration === 'custom' && (
                 <View style={styles.customInputContainer}>
                   <TextInput
-                    style={styles.customMonthsInput}
+                    style={[styles.customMonthsInput, { backgroundColor: colors.cardBackground, borderColor: colors.primary, color: colors.textPrimary }]}
                     value={customMonths}
                     onChangeText={handleCustomMonthsChange}
                     keyboardType="number-pad"
                     placeholder="Enter months"
                     placeholderTextColor={colors.textMuted}
                   />
-                  <Text style={styles.customMonthsLabel}>
+                  <Text style={[styles.customMonthsLabel, { color: colors.textSecondary }]}>
                     {customMonths === '1' ? 'month' : 'months'}
                   </Text>
                 </View>
@@ -514,13 +515,13 @@ export const EditGoalScreen: React.FC = () => {
             {/* Monthly Contribution Field */}
             <View style={styles.fieldContainer}>
               <View style={styles.rowFieldContainer}>
-                <Text style={styles.fieldLabel}>Monthly contribution</Text>
-                <View style={[styles.compactInput, styles.highlightedInput]}>
-                  <Text style={[styles.currencyPrefix, styles.highlightedText]}>
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Monthly contribution</Text>
+                <View style={[styles.compactInput, styles.highlightedInput, { backgroundColor: colors.cardBackground, borderColor: colors.border }, { backgroundColor: colors.primary + '10', borderColor: colors.primary + '40' }]}>
+                  <Text style={[styles.currencyPrefix, styles.highlightedText, { color: colors.textSecondary }, { color: colors.primary }]}>
                     {currencySymbol}
                   </Text>
                   <TextInput
-                    style={[styles.compactInputText, styles.highlightedText]}
+                    style={[styles.compactInputText, styles.highlightedText, { color: colors.textPrimary }, { color: colors.primary }]}
                     value={monthlyContribution}
                     onChangeText={handleMonthlyContributionChange}
                     keyboardType="number-pad"
@@ -529,7 +530,7 @@ export const EditGoalScreen: React.FC = () => {
                 </View>
               </View>
               {monthlyContributionError && (
-                <Text style={styles.errorText}>{monthlyContributionError}</Text>
+                <Text style={[styles.errorText, { color: colors.error }]}>{monthlyContributionError}</Text>
               )}
 
               {/* Budget Exceeded Mascot Warning */}
@@ -583,7 +584,6 @@ const styles = StyleSheet.create({
     // backgroundColor: colors.cardBackground,
     // borderRadius: 16,
     // borderWidth: borderWidths.thin,
-    borderColor: colors.border,
     // padding: spacing.lg,
     marginTop: spacing.md,
     marginHorizontal: spacing.lg,
@@ -595,18 +595,15 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   fieldLabel: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     marginBottom: spacing.sm,
   },
   textInput: {
     backgroundColor: 'transparent',
     borderWidth: borderWidths.thin,
-    borderColor: colors.border,
     borderRadius: radii.sm,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    color: colors.textPrimary,
     fontSize: typography.body,
   },
   rowFieldContainer: {
@@ -619,16 +616,13 @@ const styles = StyleSheet.create({
   compactInput: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.cardBackground,
     borderWidth: borderWidths.thin,
-    borderColor: colors.border,
     borderRadius: radii.sm,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     maxWidth: 150,
   },
   compactInputText: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     textAlign: 'right',
     minWidth: 60,
@@ -636,7 +630,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   compactInputText2: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     paddingHorizontal: spacing.md,
     paddingVertical: 0,
@@ -644,17 +637,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   currencyPrefix: {
-    color: colors.textSecondary,
     fontSize: typography.body,
     marginRight: spacing.xs,
   },
   highlightedInput: {
-    backgroundColor: colors.primary + '10',
-    borderColor: colors.primary + '40',
-  },
+},
   highlightedText: {
-    color: colors.primary,
-  },
+},
   durationContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -665,46 +654,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: radii.full,
-    backgroundColor: colors.cardBackground,
-    borderWidth: borderWidths.thin,
-    borderColor: colors.border,
+    borderWidth: borderWidths.thin
   },
   durationOptionSelected: {
-    backgroundColor: colors.primary + '20',
-    borderColor: colors.primary,
-  },
+},
   durationText: {
-    color: colors.textSecondary,
     fontSize: typography.bodySmall,
     fontWeight: typography.medium,
   },
   durationTextSelected: {
-    color: colors.primary,
-  },
+},
   customInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: spacing.xs,
   },
   customMonthsInput: {
-    backgroundColor: colors.cardBackground,
     borderWidth: borderWidths.thin,
-    borderColor: colors.primary,
     borderRadius: radii.sm,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    color: colors.textPrimary,
     fontSize: typography.body,
     width: 100,
     textAlign: 'center',
   },
   customMonthsLabel: {
-    color: colors.textSecondary,
     fontSize: typography.body,
     marginLeft: spacing.sm,
   },
   errorText: {
-    color: colors.error,
     fontSize: typography.caption,
     marginTop: 4,
     alignSelf: 'flex-end',
@@ -717,9 +695,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: radii.sm,
-    backgroundColor: colors.dangerSubtle,
     borderWidth: borderWidths.thin,
-    borderColor: colors.danger + '4d',
     justifyContent: 'center',
     alignItems: 'center',
   },

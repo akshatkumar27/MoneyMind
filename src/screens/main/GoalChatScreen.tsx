@@ -13,16 +13,18 @@ import {useNavigation, useRoute, RouteProp} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
 import {MainStackParamList} from '../../navigation/MainTabNavigator';
-import {colors, typography, spacing, borderWidths} from '../../constants/theme';
+import {typography, spacing, borderWidths} from '../../constants/theme';
 import {ENDPOINTS} from '../../constants/endpoints';
 import {globalStyles} from '../../styles/globalStyles';
 import {Header} from '../../components/Header';
 import {api} from '../../services/api';
+import { useThemeColors } from "../../context/ThemeContext";
 
 type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
 type GoalChatRouteProp = RouteProp<MainStackParamList, 'GoalChat'>;
 
 export const GoalChatScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation<NavigationProp>();
   const route = useRoute<GoalChatRouteProp>();
   const goalTitle = route.params?.goalTitle || 'Goal Chat';
@@ -81,33 +83,33 @@ export const GoalChatScreen: React.FC = () => {
 
       {/* Coming Soon Content */}
       <View style={styles.content}>
-        <View style={styles.iconContainer}>
+        <View style={[styles.iconContainer, { backgroundColor: colors.cardBackground }]}>
           <Text style={styles.icon}>🤖</Text>
         </View>
-        <Text style={styles.title}>AI Chat Coming Soon</Text>
-        <Text style={styles.subtitle}>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>AI Chat Coming Soon</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
           We're working on an intelligent AI assistant to help you achieve your
           financial goals faster.
         </Text>
         <View style={styles.featureList}>
-          <Text style={styles.featureItem}>✨ Personalized advice</Text>
-          <Text style={styles.featureItem}>📊 Smart goal tracking</Text>
-          <Text style={styles.featureItem}>💡 Investment insights</Text>
+          <Text style={[styles.featureItem, { color: colors.textSecondary }]}>✨ Personalized advice</Text>
+          <Text style={[styles.featureItem, { color: colors.textSecondary }]}>📊 Smart goal tracking</Text>
+          <Text style={[styles.featureItem, { color: colors.textSecondary }]}>💡 Investment insights</Text>
         </View>
 
         {joined ? (
-          <View style={styles.joinedContainer}>
-            <Text style={styles.joinedText}>You're on the list! 🚀</Text>
+          <View style={[styles.joinedContainer, { backgroundColor: colors.cardBackground, borderColor: colors.primary }]}>
+            <Text style={[styles.joinedText, { color: colors.primary }]}>You're on the list! 🚀</Text>
           </View>
         ) : (
           <TouchableOpacity
-            style={[styles.button, isLoading && styles.disabledButton]}
+            style={[styles.button, isLoading && styles.disabledButton, { backgroundColor: colors.primary }]}
             onPress={handleJoinWaitlist}
             disabled={isLoading}>
             {isLoading ? (
               <ActivityIndicator color={colors.textPrimary} />
             ) : (
-              <Text style={styles.buttonText}>Join Waitlist</Text>
+              <Text style={[styles.buttonText, { color: colors.textPrimary }]}>Join Waitlist</Text>
             )}
           </TouchableOpacity>
         )}
@@ -127,7 +129,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: colors.cardBackground,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: spacing.lg,
@@ -136,14 +137,12 @@ const styles = StyleSheet.create({
     fontSize: 48,
   },
   title: {
-    color: colors.textPrimary,
     fontSize: typography.h2,
     fontWeight: typography.bold,
     marginBottom: spacing.sm,
     textAlign: 'center',
   },
   subtitle: {
-    color: colors.textSecondary,
     fontSize: typography.body,
     textAlign: 'center',
     lineHeight: 24,
@@ -154,12 +153,10 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   featureItem: {
-    color: colors.textSecondary,
     fontSize: typography.body,
     marginBottom: spacing.sm,
   },
   button: {
-    backgroundColor: colors.primary,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
     borderRadius: 12,
@@ -167,22 +164,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
   },
   joinedContainer: {
-    backgroundColor: colors.cardBackground,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.xl,
     borderRadius: 12,
     width: '100%',
     alignItems: 'center',
-    borderWidth: borderWidths.thin,
-    borderColor: colors.primary,
+    borderWidth: borderWidths.thin
   },
   joinedText: {
-    color: colors.primary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
   },

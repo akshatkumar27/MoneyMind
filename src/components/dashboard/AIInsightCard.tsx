@@ -1,7 +1,8 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {IconCircle} from '../IconCircle';
-import {colors, radii, typography, spacing} from '../../constants/theme';
+import { View, Text, StyleSheet } from 'react-native';
+import { IconCircle } from '../IconCircle';
+import { radii, typography, spacing } from '../../constants/theme';
+import { useThemeColors } from "../../context/ThemeContext";
 
 export type AIInsightType = 'suggestion' | 'strategy' | 'insight';
 
@@ -12,11 +13,7 @@ export interface AIInsightCardProps {
   highlight?: string;
 }
 
-const typeColors: Record<AIInsightType, string> = {
-  suggestion: colors.warning,
-  strategy: colors.info,
-  insight: colors.success,
-};
+
 
 export const AIInsightCard: React.FC<AIInsightCardProps> = ({
   type,
@@ -24,10 +21,18 @@ export const AIInsightCard: React.FC<AIInsightCardProps> = ({
   description,
   highlight,
 }) => {
+  const colors = useThemeColors();
+
+  const typeColors: Record<AIInsightType, string> = {
+    suggestion: colors.warning,
+    strategy: colors.info,
+    insight: colors.success,
+  };
+
   const accentColor = typeColors[type];
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
       <IconCircle
         emoji="⚡"
         size={32}
@@ -37,11 +42,11 @@ export const AIInsightCard: React.FC<AIInsightCardProps> = ({
         style={styles.iconMargin}
       />
       <View style={styles.content}>
-        <Text style={[styles.title, {color: accentColor}]}>{title}</Text>
-        <Text style={styles.description}>
+        <Text style={[styles.title, { color: accentColor }]}>{title}</Text>
+        <Text style={[styles.description, { color: colors.textSecondary }]}>
           {description}
           {highlight && (
-            <Text style={[styles.highlight, {color: accentColor}]}>
+            <Text style={[styles.highlight, { color: accentColor }]}>
               {' '}
               {highlight}
             </Text>
@@ -57,7 +62,6 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.md,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -76,7 +80,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   description: {
-    color: colors.textSecondary,
     fontSize: typography.caption,
     lineHeight: 18,
   },

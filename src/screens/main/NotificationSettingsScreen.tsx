@@ -16,15 +16,16 @@ import Toast from 'react-native-toast-message';
 import {BackButton} from '../../components/BackButton';
 import {Header} from '../../components/Header';
 import {
-  colors,
   typography,
   spacing,
   radii,
   borderWidths,
 } from '../../constants/theme';
 import {globalStyles} from '../../styles/globalStyles';
+import { useThemeColors } from "../../context/ThemeContext";
 
 export const NotificationSettingsScreen: React.FC = () => {
+    const colors = useThemeColors();
   const navigation = useNavigation();
 
   // Mock settings state
@@ -60,10 +61,10 @@ export const NotificationSettingsScreen: React.FC = () => {
   }) => (
     <View style={styles.settingRow}>
       <View style={styles.rowLeft}>
-        <View style={[styles.iconContainer, disabled && styles.disabledIcon]}>
+        <View style={[styles.iconContainer, disabled && styles.disabledIcon, { backgroundColor: colors.inputBackground }, { backgroundColor: colors.background }]}>
           <Text style={styles.iconText}>{icon}</Text>
         </View>
-        <Text style={[styles.settingLabel, disabled && styles.disabledText]}>
+        <Text style={[styles.settingLabel, disabled && styles.disabledText, { color: colors.textPrimary }, { color: colors.textMuted }]}>
           {label}
         </Text>
       </View>
@@ -86,19 +87,19 @@ export const NotificationSettingsScreen: React.FC = () => {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Master Switch */}
-        <View style={[styles.card, styles.masterCard]}>
+        <View style={[styles.card, styles.masterCard, { backgroundColor: colors.cardBackground }]}>
           <View style={styles.settingRow}>
             <View style={styles.rowLeft}>
               <View
                 style={[
-                  styles.iconContainer,
-                  {backgroundColor: colors.dangerSubtle},
-                ]}>
+                                                                          styles.iconContainer,
+                                                                          {backgroundColor: colors.dangerSubtle},
+                                                                        , { backgroundColor: colors.inputBackground }]}>
                 <Text style={styles.iconText}>🔕</Text>
               </View>
               <View>
-                <Text style={styles.masterLabel}>Pause All</Text>
-                <Text style={styles.masterDescription}>
+                <Text style={[styles.masterLabel, { color: colors.textPrimary }]}>Pause All</Text>
+                <Text style={[styles.masterDescription, { color: colors.textSecondary }]}>
                   Temporarily pause notifications
                 </Text>
               </View>
@@ -115,7 +116,7 @@ export const NotificationSettingsScreen: React.FC = () => {
 
         {/* Categories */}
         <Text style={globalStyles.sectionLabel}>CATEGORIES</Text>
-        <View style={[styles.card, pauseAll && styles.disabledCard]}>
+        <View style={[styles.card, pauseAll && styles.disabledCard, { backgroundColor: colors.cardBackground }]}>
           <SettingRow
             icon="💡"
             label="Tips & Recommendations"
@@ -123,7 +124,7 @@ export const NotificationSettingsScreen: React.FC = () => {
             onValueChange={() => toggleSwitch('marketing')}
             disabled={pauseAll}
           />
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.inputBackground }]} />
           {/* <SettingRow
                         icon="💸"
                         label="Transaction Alerts"
@@ -131,7 +132,7 @@ export const NotificationSettingsScreen: React.FC = () => {
                         onValueChange={() => toggleSwitch('transaction')}
                         disabled={pauseAll}
                     /> */}
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.inputBackground }]} />
           <SettingRow
             icon="🔔"
             label="Budget Reminders"
@@ -139,7 +140,7 @@ export const NotificationSettingsScreen: React.FC = () => {
             onValueChange={() => toggleSwitch('budget')}
             disabled={pauseAll}
           />
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.inputBackground }]} />
           <SettingRow
             icon="🏆"
             label="Goal Milestones"
@@ -147,7 +148,7 @@ export const NotificationSettingsScreen: React.FC = () => {
             onValueChange={() => toggleSwitch('goals')}
             disabled={pauseAll}
           />
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.inputBackground }]} />
           <SettingRow
             icon="🛡️"
             label="Security Alerts"
@@ -157,7 +158,7 @@ export const NotificationSettingsScreen: React.FC = () => {
           />
         </View>
 
-        <Text style={styles.footerNote}>
+        <Text style={[styles.footerNote, { color: colors.textMuted }]}>
           Note: Critical security alerts may still be sent even if "Pause All"
           is enabled.
         </Text>
@@ -213,7 +214,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   card: {
-    backgroundColor: colors.cardBackground,
     borderRadius: radii.lg,
     overflow: 'hidden',
   },
@@ -240,37 +240,31 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: radii.full,
-    backgroundColor: colors.inputBackground,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
   },
-  disabledIcon: {backgroundColor: colors.background},
+  disabledIcon: {},
   iconText: {fontSize: 20},
   settingLabel: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.medium,
     flex: 1,
   },
-  disabledText: {color: colors.textMuted},
+  disabledText: {},
   masterLabel: {
-    color: colors.textPrimary,
     fontSize: typography.body,
     fontWeight: typography.bold,
   },
   masterDescription: {
-    color: colors.textSecondary,
     fontSize: typography.caption,
     marginTop: 2,
   },
   divider: {
     height: 1,
-    backgroundColor: colors.inputBackground,
     marginLeft: 70,
   },
   footerNote: {
-    color: colors.textMuted,
     fontSize: typography.caption,
     textAlign: 'center',
     marginTop: spacing.xl,
@@ -278,17 +272,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   testButton: {
-    backgroundColor: colors.inputBackground,
     marginHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     borderRadius: radii.md,
     alignItems: 'center',
     marginBottom: spacing.xxl,
-    borderWidth: borderWidths.thin,
-    borderColor: colors.border,
+    borderWidth: borderWidths.thin
   },
   testButtonText: {
-    color: colors.primary,
     fontSize: typography.body,
     fontWeight: typography.semibold,
   },

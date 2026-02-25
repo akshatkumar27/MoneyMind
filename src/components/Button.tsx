@@ -8,12 +8,12 @@ import {
   StyleSheet,
 } from 'react-native';
 import {
-  colors,
   radii,
   typography,
   spacing,
   borderWidths,
 } from '../constants/theme';
+import { useThemeColors } from "../context/ThemeContext";
 
 export type ButtonVariant = 'primary' | 'outline' | 'ghost';
 
@@ -38,6 +38,7 @@ export const Button: React.FC<ButtonProps> = ({
   textStyle,
   showArrow = true,
 }) => {
+    const colors = useThemeColors();
   return (
     <TouchableOpacity
       style={[
@@ -74,12 +75,9 @@ const styles = StyleSheet.create({
   },
   // ─── Variants ─────────────────────────────────────────────────────────────
   primary: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
+},
   outline: {
-    backgroundColor: 'transparent',
-    borderColor: colors.border,
+    backgroundColor: 'transparent'
   },
   ghost: {
     backgroundColor: 'transparent',
@@ -92,14 +90,11 @@ const styles = StyleSheet.create({
     fontWeight: typography.semibold,
   },
   primaryText: {
-    color: colors.textPrimary,
-  },
+},
   outlineText: {
-    color: colors.textPrimary,
-  },
+},
   ghostText: {
-    color: colors.primary,
-  },
+},
   // ─── State ────────────────────────────────────────────────────────────────
   disabled: {
     opacity: 0.5,

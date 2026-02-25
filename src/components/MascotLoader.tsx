@@ -1,9 +1,10 @@
 import React, {useEffect, useRef} from 'react';
 import {View, Image, StyleSheet, Animated, Easing} from 'react-native';
 import {MascotLoaderProps} from './types';
-import {colors} from '../constants/theme';
+import { useThemeColors } from "../context/ThemeContext";
 
 export const MascotLoader: React.FC<MascotLoaderProps> = ({size = 120}) => {
+    const colors = useThemeColors();
   const floatAnim = useRef(new Animated.Value(0)).current;
 
   // Scale for shadow to make it shrink as mascot floats up
@@ -48,14 +49,14 @@ export const MascotLoader: React.FC<MascotLoaderProps> = ({size = 120}) => {
       </Animated.View>
       <Animated.View
         style={[
-          styles.shadow,
-          {
-            width: size * 0.6,
-            height: size * 0.15,
-            opacity: shadowOpacityAnim,
-            transform: [{scale: shadowScaleAnim}],
-          },
-        ]}
+                                  styles.shadow,
+                                  {
+                                    width: size * 0.6,
+                                    height: size * 0.15,
+                                    opacity: shadowOpacityAnim,
+                                    transform: [{scale: shadowScaleAnim}],
+                                  },
+                                , { backgroundColor: colors.primary }]}
       />
     </View>
   );
@@ -71,7 +72,6 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   shadow: {
-    backgroundColor: colors.primary,
     borderRadius: 100,
     marginTop: 10,
     zIndex: 1,
