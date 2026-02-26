@@ -31,6 +31,7 @@ export type MainStackParamList = {
         monthlyContribution?: number;
         savedAmount?: number;
         availableForNewGoals?: number;
+        contributionDay?: number;
     };
     GoalChat: {
         goalTitle?: string;

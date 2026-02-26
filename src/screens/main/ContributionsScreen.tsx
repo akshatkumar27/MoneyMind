@@ -3,7 +3,6 @@ import {
     View,
     Text,
     StyleSheet,
-    SafeAreaView,
     StatusBar,
     ScrollView,
     TouchableOpacity,
@@ -12,6 +11,7 @@ import {
     Modal,
     DeviceEventEmitter,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -528,7 +528,7 @@ export const ContributionsScreen: React.FC = () => {
                                 <View style={styles.pulseLeftCol}>
                                     <View style={[styles.timerBadge, { backgroundColor: 'rgba(34, 197, 94, 0.2)', marginBottom: 8 }]}>
                                         <Text style={styles.timerIcon}>✅</Text>
-                                        <Text style={[styles.timerText, { color: '#22c55e' }]}>Paid</Text>
+                                        <Text style={[styles.timerText, { color: '#22c55e' }]}>Contributed</Text>
                                     </View>
                                     <Text style={styles.pulseTitle}>Last Payment</Text>
                                     <Text style={styles.pulseSubtitle}>

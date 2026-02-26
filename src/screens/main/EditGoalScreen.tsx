@@ -3,7 +3,6 @@ import {
     View,
     Text,
     StyleSheet,
-    SafeAreaView,
     StatusBar,
     TouchableOpacity,
     TextInput,
@@ -14,6 +13,7 @@ import {
     Modal,
     DeviceEventEmitter,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -66,6 +66,7 @@ export const EditGoalScreen: React.FC = () => {
     const [targetError, setTargetError] = useState<string | null>(null);
     const [monthlyContributionError, setMonthlyContributionError] = useState<string | null>(null);
     const [isContributionManuallyEdited, setIsContributionManuallyEdited] = useState(false);
+    const [contributionDay, setContributionDay] = useState(route.params?.contributionDay || 1);
 
     const goalId = route.params?.goalId;
     const savedAmount = route.params?.savedAmount || 0;
@@ -77,6 +78,7 @@ export const EditGoalScreen: React.FC = () => {
     const initialTarget = useRef(sanitizeInitialValue(route.params?.target, '5000'));
     const initialContribution = useRef(sanitizeInitialValue(route.params?.monthlyContribution, '500'));
     const initialAchieveIn = useRef(parseInt(route.params?.achieveIn?.toString() || '0'));
+    const initialContributionDay = useRef(route.params?.contributionDay || 1);
 
     // Derived achieveInMonths
     const achieveInMonths = selectedDuration === 'custom'
@@ -95,7 +97,8 @@ export const EditGoalScreen: React.FC = () => {
         name !== initialName.current ||
         target !== initialTarget.current ||
         monthlyContribution !== initialContribution.current ||
-        achieveInMonths !== initialAchieveIn.current;
+        achieveInMonths !== initialAchieveIn.current ||
+        contributionDay !== initialContributionDay.current;
 
     const isSaveDisabled = isLoading || !!targetError || !!monthlyContributionError || isBudgetExceeded || !hasChanges;
 
@@ -232,6 +235,7 @@ export const EditGoalScreen: React.FC = () => {
                 target_amount: targetAmount,
                 achieve_in_months: achieveInMonths,
                 monthly_contribution: contributionAmount,
+                contribution_day: contributionDay,
             };
 
             const response = await api.put(`/api/goals/${goalId}`, payload);
@@ -443,6 +447,34 @@ export const EditGoalScreen: React.FC = () => {
                                     />
                                 </View>
                             )}
+                        </View>
+
+                        {/* Contribution Day Picker */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.fieldLabel}>Contribution day of month</Text>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.dayPickerScroll}>
+                                <View style={styles.dayPickerContainer}>
+                                    {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                                        <TouchableOpacity
+                                            key={day}
+                                            style={[
+                                                styles.dayOption,
+                                                contributionDay === day && styles.dayOptionSelected,
+                                            ]}
+                                            onPress={() => setContributionDay(day)}
+                                        >
+                                            <Text
+                                                style={[
+                                                    styles.dayText,
+                                                    contributionDay === day && styles.dayTextSelected,
+                                                ]}
+                                            >
+                                                {day}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </ScrollView>
                         </View>
 
                         {/* Save Button */}
@@ -727,6 +759,36 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: typography.body,
         fontWeight: typography.semibold as any,
+    },
+    dayPickerScroll: {
+        marginTop: spacing.sm,
+    },
+    dayPickerContainer: {
+        flexDirection: 'row',
+        gap: spacing.xs,
+    },
+    dayOption: {
+        width: 42,
+        height: 42,
+        borderRadius: 21,
+        backgroundColor: colors.cardBackground,
+        borderWidth: 1,
+        borderColor: colors.border,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    dayOptionSelected: {
+        backgroundColor: colors.primary + '20',
+        borderColor: colors.primary,
+    },
+    dayText: {
+        color: colors.textSecondary,
+        fontSize: typography.bodySmall,
+        fontWeight: typography.medium as any,
+    },
+    dayTextSelected: {
+        color: colors.primary,
+        fontWeight: typography.bold as any,
     },
 });
 

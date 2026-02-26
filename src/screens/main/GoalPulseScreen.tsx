@@ -3,7 +3,6 @@ import {
     View,
     Text,
     StyleSheet,
-    SafeAreaView,
     StatusBar,
     ScrollView,
     TouchableOpacity,
@@ -11,6 +10,7 @@ import {
     Image,
     RefreshControl,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Svg, { Circle } from 'react-native-svg';
@@ -347,7 +347,7 @@ export const GoalPulseScreen: React.FC = () => {
                                                     '🌱 Start your journey!'}
                                     </Text>
 
-                                    {availableBudget > 0 && (
+                                    {(
                                         <View style={{ marginTop: spacing.xs }}>
                                             <Text style={[styles.budgetBadge, { fontSize: typography.bodySmall, paddingVertical: 6, paddingHorizontal: spacing.md, textAlign: 'center', alignSelf: 'stretch' }]}>
                                                 {currencySymbol}{formatNumber(availableBudget, 1)} available to invest

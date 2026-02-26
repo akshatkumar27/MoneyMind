@@ -3,7 +3,6 @@ import {
     View,
     Text,
     StyleSheet,
-    SafeAreaView,
     StatusBar,
     ScrollView,
     TextInput,
@@ -11,6 +10,7 @@ import {
     TouchableOpacity,
     KeyboardAvoidingView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -54,6 +54,7 @@ export const AddGoalScreen: React.FC = () => {
         suggestionMonths && !isPreset ? String(suggestionMonths) : ''
     );
     const [monthlyContribution, setMonthlyContribution] = useState('');
+    const [contributionDay, setContributionDay] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
     const [isContributionManuallyEdited, setIsContributionManuallyEdited] = useState(false);
     const scrollViewRef = useRef<ScrollView>(null);
@@ -168,6 +169,7 @@ export const AddGoalScreen: React.FC = () => {
                 target_amount: targetAmount,
                 achieve_in_months: achieveInMonths,
                 monthly_contribution: contributionAmount,
+                contribution_day: contributionDay,
             };
 
             console.log('Creating goal:', payload);
@@ -357,12 +359,33 @@ export const AddGoalScreen: React.FC = () => {
                         </View>
                     </View>
 
-                    {/* Suggested contribution hint */}
-                    {/* {target && achieveInMonths > 0 && (
-                        <Text style={styles.suggestionText}>
-                            💡 Suggested: {currencySymbol}{Math.ceil(parseInt(target) / achieveInMonths).toLocaleString('en-IN')}/month
-                        </Text>
-                    )} */}
+                    {/* Contribution Day Picker */}
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Contribution day of month</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.dayPickerScroll}>
+                            <View style={styles.dayPickerContainer}>
+                                {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                                    <TouchableOpacity
+                                        key={day}
+                                        style={[
+                                            styles.dayOption,
+                                            contributionDay === day && styles.dayOptionSelected,
+                                        ]}
+                                        onPress={() => setContributionDay(day)}
+                                    >
+                                        <Text
+                                            style={[
+                                                styles.dayText,
+                                                contributionDay === day && styles.dayTextSelected,
+                                            ]}
+                                        >
+                                            {day}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        </ScrollView>
+                    </View>
                 </ScrollView>
 
                 {/* Budget warning mascot — only shown when suggestion mascot is not visible */}
@@ -591,5 +614,35 @@ const styles = StyleSheet.create({
         color: '#22c55e',
         fontSize: typography.h3,
         fontWeight: typography.bold,
+    },
+    dayPickerScroll: {
+        marginTop: spacing.sm,
+    },
+    dayPickerContainer: {
+        flexDirection: 'row',
+        gap: spacing.xs,
+    },
+    dayOption: {
+        width: 42,
+        height: 42,
+        borderRadius: 21,
+        backgroundColor: colors.cardBackground,
+        borderWidth: 1.5,
+        borderColor: colors.border,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    dayOptionSelected: {
+        backgroundColor: colors.primary + '20',
+        borderColor: colors.primary,
+    },
+    dayText: {
+        color: colors.textSecondary,
+        fontSize: typography.bodySmall,
+        fontWeight: typography.medium as any,
+    },
+    dayTextSelected: {
+        color: colors.primary,
+        fontWeight: typography.bold as any,
     },
 });

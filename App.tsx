@@ -145,6 +145,12 @@ function App(): React.JSX.Element {
             }
           } catch (profileErr) {
             console.error('Failed to fetch financial profile:', profileErr);
+          //   await AsyncStorage.multiRemove(['authToken', 'user', 'onboardingStatus', 'onboarding_draft']);
+          // store.dispatch({ type: 'financialData/clearFinancialData' });
+          // setIsLoggedIn(false);
+          // setIsOnboardingCompleted(false);
+          // setInitialRoute('Auth');
+          // return;
           }
         } else {
           store.dispatch({ type: 'financialData/setFinancialProfilePresent', payload: false });
