@@ -3,7 +3,6 @@ import {
     View,
     Text,
     StyleSheet,
-    SafeAreaView,
     StatusBar,
     ScrollView,
     TextInput,
@@ -11,6 +10,7 @@ import {
     Platform,
     ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
         paddingVertical: spacing.md,
     },
     stepIndicator: {
-        flex: 1,
+        // flex: 1,
         color: colors.textPrimary,
         fontSize: typography.body,
         fontWeight: typography.medium as any,

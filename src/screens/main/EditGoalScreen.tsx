@@ -762,6 +762,7 @@ const styles = StyleSheet.create({
     },
     dayPickerScroll: {
         marginTop: spacing.sm,
+        marginRight: -spacing.md,
     },
     dayPickerContainer: {
         flexDirection: 'row',

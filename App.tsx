@@ -132,16 +132,16 @@ function App(): React.JSX.Element {
               };
               await AsyncStorage.setItem('onboardingData', JSON.stringify(payload));
 
-              // store.dispatch({
-              //   type: 'financialData/setFinancialData',
-              //   payload: {
-              //     monthlyIncome: profileData.monthly_income || 0,
-              //     monthlyExpenses: profileData.monthly_expenses || 0,
-              //     monthlyEmi: profileData.monthly_emi || 0,
-              //     emiOutstanding: profileData.emi_outstanding || 0,
-              //     monthlyInvestment: profileData.monthly_investment || 0,
-              //   }
-              // });
+              store.dispatch({
+                type: 'financialData/setFinancialData',
+                payload: {
+                  monthlyIncome: profileData.monthly_income || 0,
+                  monthlyExpenses: profileData.monthly_expenses || 0,
+                  monthlyEmi: profileData.monthly_emi || 0,
+                  emiOutstanding: profileData.emi_outstanding || 0,
+                  monthlyInvestment: profileData.monthly_investment || 0,
+                }
+              });
             }
           } catch (profileErr) {
             console.error('Failed to fetch financial profile:', profileErr);
@@ -157,7 +157,7 @@ function App(): React.JSX.Element {
         }
       } catch (err: any) {
         const status = err?.response?.status;
-        if (status === 401) {
+        if (status === 401 ) {
           // Token expired — clear everything and go to Auth
           await AsyncStorage.multiRemove(['authToken', 'user', 'onboardingStatus', 'onboarding_draft']);
           store.dispatch({ type: 'financialData/clearFinancialData' });
