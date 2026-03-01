@@ -40,11 +40,11 @@ export const EditFinancialDetailsScreen: React.FC = () => {
     };
 
     const [form, setForm] = useState({
-        monthly_income: initialData.monthly_income?.toString() || '',
-        monthly_expenses: initialData.monthly_expenses?.toString() || '',
-        monthly_emi: initialData.monthly_emi?.toString() || '',
-        emi_outstanding: initialData.emi_outstanding?.toString() || '',
-        monthly_investment: initialData.monthly_investment?.toString() || '',
+        monthly_income: formatNumberInput(initialData.monthly_income?.toString() || ''),
+        monthly_expenses: formatNumberInput(initialData.monthly_expenses?.toString() || ''),
+        monthly_emi: formatNumberInput(initialData.monthly_emi?.toString() || ''),
+        emi_outstanding: formatNumberInput(initialData.emi_outstanding?.toString() || ''),
+        monthly_investment: formatNumberInput(initialData.monthly_investment?.toString() || ''),
     });
 
     const [errors, setErrors] = useState({
@@ -96,6 +96,8 @@ export const EditFinancialDetailsScreen: React.FC = () => {
         setErrors(newErrors);
         setIsValid(valid && income > 0);
     }, [form]);
+
+    const hasErrors = !isValid || Object.values(errors).some(e => e !== '');
 
     // Detect if form has changed from initial prefilled values
     const hasChanges =
@@ -286,6 +288,14 @@ export const EditFinancialDetailsScreen: React.FC = () => {
             </KeyboardAvoidingView>
 
             <View style={styles.footer}>
+                { (
+                    <AnimatedMascot
+                        text="Updating your financials may affect your existing goals. Please revisit them after saving to keep things on track."
+                        mascotWidth={50}
+                        mascotHeight={100}
+                        arrowTopRatio={0.35}
+                    />
+                )}
                 <TouchableOpacity
                     style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
                     onPress={handleSave}
@@ -369,7 +379,7 @@ const styles = StyleSheet.create({
     },
     footer: {
         padding: spacing.lg,
-        borderTopWidth: 1,
+        // borderTopWidth: 1,
         borderTopColor: colors.border,
         backgroundColor: colors.background,
     },

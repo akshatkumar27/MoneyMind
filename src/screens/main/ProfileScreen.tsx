@@ -163,14 +163,14 @@ export const ProfileScreen: React.FC = () => {
                         <Text style={styles.menuArrow}>›</Text>
                     </TouchableOpacity> */}
 
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         style={styles.menuItem}
                         onPress={() => navigation.navigate('NotificationSettings' as never)}
                     >
                         <Text style={styles.menuIcon}>⚙️</Text>
                         <Text style={styles.menuText}>Notification Settings</Text>
                         <Text style={styles.menuArrow}>›</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
                     <TouchableOpacity
                         style={styles.menuItem}
@@ -199,7 +199,7 @@ export const ProfileScreen: React.FC = () => {
                     <Text style={styles.logoutText}>Log Out</Text>
                 </TouchableOpacity>
 
-                <Text style={styles.version}>Finova AI v1.0.0</Text>
+                <Text style={styles.version}>Finova AI v1.0</Text>
             </ScrollView>
         </SafeAreaView>
     );
@@ -291,6 +291,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ef4444',
         marginBottom: spacing.lg,
+        marginTop: spacing.xxl,
     },
     logoutText: {
         color: '#ef4444',

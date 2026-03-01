@@ -26,7 +26,7 @@ import { colors, typography, spacing } from '../../constants';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import Toast from 'react-native-toast-message';
 import { api } from '../../services';
-import { formatNumber } from '../../utils/formatNumber';
+import { formatNumber, formatCompactNumber } from '../../utils/formatNumber';
 import { useCurrency } from '../../context/CurrencyContext';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setFinancialData } from '../../store/slices/financialDataSlice';
@@ -42,6 +42,8 @@ interface Goal {
     target_amount: number;
     achieve_in_months: number;
     monthly_contribution: number;
+    contribution_day: number;
+    contribution_start_date?: string;
     created_at: string;
     updated_at: string;
     saved_amount: number;
@@ -350,7 +352,7 @@ export const GoalPulseScreen: React.FC = () => {
                                     {(
                                         <View style={{ marginTop: spacing.xs }}>
                                             <Text style={[styles.budgetBadge, { fontSize: typography.bodySmall, paddingVertical: 6, paddingHorizontal: spacing.md, textAlign: 'center', alignSelf: 'stretch' }]}>
-                                                {currencySymbol}{formatNumber(availableBudget, 1)} available to invest
+                                                {currencySymbol}{formatCompactNumber(availableBudget)} available to invest
                                             </Text>
                                         </View>
                                     )}
@@ -366,7 +368,7 @@ export const GoalPulseScreen: React.FC = () => {
                                 <Text style={styles.sectionTitle}>✨ AI Suggested Goals</Text>
                                 {goals.length === 0 && (
                                     <Text style={styles.budgetBadge}>
-                                        {currencySymbol}{formatNumber(availableBudget, 1)} available for goals
+                                        {currencySymbol}{formatCompactNumber(availableBudget)} available for goals
                                     </Text>
                                 )}
                             </View>
@@ -449,6 +451,7 @@ export const GoalPulseScreen: React.FC = () => {
                                         monthlyContribution: goal.monthly_contribution,
                                         achieveInMonths: goal.achieve_in_months,
                                         goalCreatedAt: goal.created_at,
+                                        contributionDay: goal.contribution_start_date,
                                     })}
                                     onEditPress={() => navigation.navigate('EditGoal', {
                                         goalId: goal.id,
@@ -458,6 +461,7 @@ export const GoalPulseScreen: React.FC = () => {
                                         monthlyContribution: goal.monthly_contribution,
                                         savedAmount: goal.saved_amount,
                                         availableForNewGoals: goalBudget?.availableForNewGoals,
+                                        contributionDay: goal.contribution_start_date,
                                     })}
                                     onAskAiPress={() => navigation.navigate('GoalChat', {
                                         goalTitle: goal.name,

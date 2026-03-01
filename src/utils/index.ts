@@ -1,1 +1,1 @@
-export { formatNumber, formatCurrency, formatFullNumber } from './formatNumber';
+export { formatNumber, formatCurrency, formatFullNumber, formatCompactCurrency } from './formatNumber';

@@ -19,7 +19,7 @@ import { colors, typography, spacing } from '../../constants';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import { BackButton, ConfirmationModal, SkeletonLoader, AnimatedMascot, Header } from '../../components';
 import api from '../../services/api';
-import { formatCurrency } from '../../utils';
+import { formatCompactCurrency } from '../../utils';
 import { useCurrency } from '../../context/CurrencyContext';
 
 type NavigationProp = NativeStackNavigationProp<MainStackParamList>;
@@ -52,10 +52,24 @@ export const ContributionsScreen: React.FC = () => {
 
     const goalId = route.params?.goalId || '';
     const goalName = route.params?.goalName || 'Goal';
-    const monthlyContribution = route.params?.monthlyContribution || 0;
+    const monthlyContribution = Math.floor(route.params?.monthlyContribution || 0);
     const targetAmount = route.params?.targetAmount || 0;
     const achieveInMonths = route.params?.achieveInMonths || 12;
     const goalCreatedAt = route.params?.goalCreatedAt || '';
+    const contributionStartDate = (() => {
+        const dateStr = route.params?.contributionDay;
+        if (dateStr) {
+            const d = new Date(dateStr);
+            return isNaN(d.getTime()) ? null : d;
+        }
+        return null;
+    })();
+    const contributionDay = (() => {
+        if (contributionStartDate) {
+            return contributionStartDate.getDate();
+        }
+        return 1;
+    })();
 
     const [isSaving, setIsSaving] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -212,55 +226,144 @@ export const ContributionsScreen: React.FC = () => {
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
-    // Calculate days until next payment based on goal creation date
-    const calculateDaysUntilPayment = (): number => {
-        const today = new Date();
-
-        // Parse goal creation date
-        const createdDate = goalCreatedAt ? new Date(goalCreatedAt) : new Date();
-        const paymentDay = createdDate.getDate(); // Day of month when goal was created
-
-        // Find next payment date (same day next month)
-        let nextPaymentDate = new Date(today.getFullYear(), today.getMonth(), paymentDay);
-
-        // If today is past the payment day this month, move to next month
-        if (today.getDate() >= paymentDay) {
-            nextPaymentDate.setMonth(nextPaymentDate.getMonth() + 1);
-        }
-
-        // Calculate difference in days
-        const diffTime = nextPaymentDate.getTime() - today.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return Math.max(0, diffDays);
+    // Helper: get the last day of a given month/year
+    const getLastDayOfMonth = (year: number, month: number): number => {
+        return new Date(year, month + 1, 0).getDate();
     };
 
-    // Check if payment is enabled (on payment day or if missed this month)
-    const getPaymentStatus = (): { enabled: boolean; hasPaidThisMonth: boolean } => {
+    // Helper: get the effective contribution day for a given month/year.
+    // Clamps contributionDay to the last day if the month has fewer days.
+    // Examples:
+    //   contributionDay=31, Feb 2026 (28 days) → 28
+    //   contributionDay=31, Feb 2028 (leap, 29 days) → 29
+    //   contributionDay=31, Apr (30 days) → 30
+    //   contributionDay=31, Jan (31 days) → 31
+    //   contributionDay=30, Feb → 28/29
+    const getEffectiveDay = (year: number, month: number): number => {
+        return Math.min(contributionDay, getLastDayOfMonth(year, month));
+    };
+
+    // Core helper: find the earliest due date that hasn't been paid.
+    // Walks month-by-month from the contribution start date, checking
+    // the paid contributions array for each month. This ensures missed
+    // payments from earlier months are never skipped.
+    const getNextUnpaidDueDate = (): Date => {
         const today = new Date();
-        const createdDate = goalCreatedAt ? new Date(goalCreatedAt) : new Date();
-        const paymentDay = createdDate.getDate();
+        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-        // Check if today is on or after the payment day for this month
-        const isOnOrAfterPaymentDay = today.getDate() >= paymentDay;
+        // If start date is in the future, that's the next due date
+        if (contributionStartDate) {
+            const startDateOnly = new Date(
+                contributionStartDate.getFullYear(),
+                contributionStartDate.getMonth(),
+                contributionStartDate.getDate(),
+            );
+            if (startDateOnly > todayStart) {
+                return startDateOnly;
+            }
+        }
 
-        // Check if payment was already made this month using rawDate
-        const currentMonth = today.getMonth();
-        const currentYear = today.getFullYear();
+        // Determine the starting month to check
+        let startYear: number, startMonth: number;
+        if (contributionStartDate) {
+            startYear = contributionStartDate.getFullYear();
+            startMonth = contributionStartDate.getMonth();
+        } else if (goalCreatedAt) {
+            const created = new Date(goalCreatedAt);
+            startYear = created.getFullYear();
+            startMonth = created.getMonth();
+        } else {
+            startYear = today.getFullYear();
+            startMonth = today.getMonth();
+        }
+
         const paidContributions = contributions.filter(c => c.status === 'paid');
 
-        const hasPaidThisMonth = paidContributions.some(c => {
-            if (!c.rawDate) return false;
-            const paidDate = new Date(c.rawDate);
-            return paidDate.getMonth() === currentMonth && paidDate.getFullYear() === currentYear;
-        });
+        let year = startYear;
+        let month = startMonth;
 
-        // Button is enabled if we're on/after payment day AND haven't paid this month
-        return { enabled: isOnOrAfterPaymentDay && !hasPaidThisMonth, hasPaidThisMonth };
+        // Walk month-by-month and find the first unpaid month
+        // Safety limit to avoid infinite loop
+        for (let i = 0; i < achieveInMonths + 12; i++) {
+            const effectiveDay = getEffectiveDay(year, month);
+            const dueDate = new Date(year, month, effectiveDay);
+
+            // Check if there's a paid contribution for this month
+            const isPaidForMonth = paidContributions.some(c => {
+                if (!c.rawDate) return false;
+                const paidDate = new Date(c.rawDate);
+                return paidDate.getMonth() === month && paidDate.getFullYear() === year;
+            });
+
+            if (!isPaidForMonth) {
+                return dueDate;
+            }
+
+            // Move to next month
+            month += 1;
+            if (month > 11) {
+                month = 0;
+                year += 1;
+            }
+        }
+
+        // Fallback: return the next month's due date
+        const effectiveDay = getEffectiveDay(year, month);
+        return new Date(year, month, effectiveDay);
+    };
+
+    // Calculate days until the next unpaid due date
+    const calculateDaysUntilPayment = (): number => {
+        const today = new Date();
+        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const nextDue = getNextUnpaidDueDate();
+        const nextDueStart = new Date(nextDue.getFullYear(), nextDue.getMonth(), nextDue.getDate());
+
+        // If due date is today or in the past, return 0 (it's already due/overdue)
+        if (nextDueStart <= todayStart) {
+            return 0;
+        }
+
+        const diffTime = nextDueStart.getTime() - todayStart.getTime();
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    };
+
+    // Check payment status based on the next unpaid due date
+    const getPaymentStatus = (): { enabled: boolean; hasPaidThisMonth: boolean } => {
+        const today = new Date();
+        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        const nextDue = getNextUnpaidDueDate();
+        const nextDueStart = new Date(nextDue.getFullYear(), nextDue.getMonth(), nextDue.getDate());
+
+        const paidContributions = contributions.filter(c => c.status === 'paid');
+
+        // If the next unpaid due date is in the future, payment is not due yet
+        if (nextDueStart > todayStart) {
+            // If there are paid contributions, user is "up to date" (show Contributed ✅)
+            // If no contributions yet (new goal, start date in future), show Upcoming ⏰
+            const isUpToDate = paidContributions.length > 0;
+            return { enabled: false, hasPaidThisMonth: isUpToDate };
+        }
+
+        // Due date is today or in the past → payment is due/overdue
+        return { enabled: true, hasPaidThisMonth: false };
     };
 
     const upcomingPayment = contributions.find(c => c.status === 'pending') || contributions.find(c => c.status === 'upcoming');
     const daysUntilPayment = calculateDaysUntilPayment();
     const { enabled: paymentEnabled, hasPaidThisMonth } = getPaymentStatus();
+
+    // Format the overdue/due date (the next unpaid due date)
+    const getMissedDateFormatted = (): string => {
+        const nextDue = getNextUnpaidDueDate();
+        return nextDue.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    // Format the next upcoming due date
+    const getNextUpcomingDateFormatted = (): string => {
+        const nextDue = getNextUnpaidDueDate();
+        return nextDue.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
 
     const isCurrentMonth = (dateString?: string) => {
         if (!dateString) return false;
@@ -271,7 +374,7 @@ export const ContributionsScreen: React.FC = () => {
 
     const handleOpenEditModal = (item: ContributionItem) => {
         setSelectedContribution(item);
-        setEditModalValue(item.amount.toString());
+        setEditModalValue(Math.floor(item.amount).toString());
         setEditError('');
         setEditModalVisible(true);
     };
@@ -297,7 +400,7 @@ export const ContributionsScreen: React.FC = () => {
 
 
         if (newAmount > monthlyContribution) {
-            setEditError(`Cannot exceed monthly contribution of ${formatCurrency(monthlyContribution, currencySymbol)}`);
+            setEditError(`Cannot exceed monthly contribution of ${formatCompactCurrency(monthlyContribution, currencySymbol)}`);
             return;
         }
 
@@ -360,7 +463,7 @@ export const ContributionsScreen: React.FC = () => {
             visible: true,
             type: 'warning',
             title: 'Confirm Savings',
-            message: `Are you sure you want to save ${formatCurrency(editedContribution, currencySymbol)} towards your "${goalName}" goal?`,
+            message: `Are you sure you want to save ${formatCompactCurrency(editedContribution, currencySymbol)} towards your "${goalName}" goal?`,
             showCancelButton: true,
             onConfirm: saveContribution,
         });
@@ -456,7 +559,7 @@ export const ContributionsScreen: React.FC = () => {
                         ) : null}
 
                         <Text style={styles.modalHintText}>
-                            Max allowed: {formatCurrency(monthlyContribution, currencySymbol)}
+                            Max allowed: {formatCompactCurrency(monthlyContribution, currencySymbol)}
                         </Text>
 
                         <View style={styles.modalButtons}>
@@ -530,18 +633,18 @@ export const ContributionsScreen: React.FC = () => {
                                         <Text style={styles.timerIcon}>✅</Text>
                                         <Text style={[styles.timerText, { color: '#22c55e' }]}>Contributed</Text>
                                     </View>
-                                    <Text style={styles.pulseTitle}>Last Payment</Text>
+                                    <Text style={styles.pulseTitle}>Next Due</Text>
                                     <Text style={styles.pulseSubtitle}>
-                                        {contributions.filter(c => c.status === 'paid').slice(-1)[0]?.date || ''}
+                                        {getNextUpcomingDateFormatted()}
                                     </Text>
                                 </View>
                                 <View style={styles.pulseRightCol}>
                                     <Text style={styles.pulseAmount}>
-                                        {formatCurrency(contributions.filter(c => c.status === 'paid').slice(-1)[0]?.amount || editedContribution, currencySymbol)}
+                                        {formatCompactCurrency(contributions.filter(c => c.status === 'paid').slice(-1)[0]?.amount || editedContribution, currencySymbol)}
                                     </Text>
                                     {upcomingPayment && (
                                         <Text style={styles.pulseNextDueText}>
-                                            Next: {formatCurrency(editedContribution, currencySymbol)} on {upcomingPayment.date}
+                                            Next: {formatCompactCurrency(editedContribution, currencySymbol)} on {upcomingPayment.date}
                                         </Text>
                                     )}
                                 </View>
@@ -550,17 +653,24 @@ export const ContributionsScreen: React.FC = () => {
                             <View>
                                 <View style={styles.pulseRow}>
                                     <View style={styles.pulseLeftCol}>
-                                        <View style={[styles.timerBadge, { marginBottom: 8 }]}>
-                                            <Text style={styles.timerIcon}>⏰</Text>
-                                            <Text style={styles.timerText}>{daysUntilPayment} days left</Text>
-                                        </View>
-                                        <Text style={styles.pulseTitle}>Upcoming Due</Text>
-                                        <Text style={styles.pulseSubtitle}>{upcomingPayment?.date}</Text>
+                                        {paymentEnabled ? (
+                                            <View style={[styles.timerBadge, { backgroundColor: 'rgba(245, 158, 11, 0.2)', marginBottom: 8 }]}>
+                                                <Text style={styles.timerIcon}>⚠️</Text>
+                                                <Text style={[styles.timerText, { color: '#f59e0b' }]}>Pending</Text>
+                                            </View>
+                                        ) : (
+                                            <View style={[styles.timerBadge, { marginBottom: 8 }]}>
+                                                <Text style={styles.timerIcon}>⏰</Text>
+                                                <Text style={styles.timerText}>{daysUntilPayment} {daysUntilPayment === 1 ? 'day' : 'days'} left</Text>
+                                            </View>
+                                        )}
+                                        <Text style={styles.pulseTitle}>{paymentEnabled ? 'Payment Due' : 'Upcoming Due'}</Text>
+                                        <Text style={styles.pulseSubtitle}>{paymentEnabled ? getMissedDateFormatted() : getNextUpcomingDateFormatted()}</Text>
                                     </View>
 
                                     <View style={styles.pulseRightCol}>
                                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                            <Text style={styles.pulseAmount}>{formatCurrency(editedContribution, currencySymbol)}</Text>
+                                            <Text style={styles.pulseAmount}>{formatCompactCurrency(editedContribution, currencySymbol)}</Text>
                                             <TouchableOpacity onPress={() => setIsEditing(!isEditing)} activeOpacity={0.7} style={{ marginLeft: 8, marginTop: -4 }}>
                                                 <Text style={styles.editIconBtn}>✎</Text>
                                             </TouchableOpacity>
@@ -637,8 +747,8 @@ export const ContributionsScreen: React.FC = () => {
                                 />
                             </View>
                             <View style={styles.progressAmounts}>
-                                <Text style={styles.progressSaved}>{formatCurrency(totalPaid, currencySymbol)} saved</Text>
-                                <Text style={styles.progressTarget}>Goal: {formatCurrency(targetAmount, currencySymbol)}</Text>
+                                <Text style={styles.progressSaved}>{formatCompactCurrency(totalPaid, currencySymbol)} saved</Text>
+                                <Text style={styles.progressTarget}>Goal: {formatCompactCurrency(targetAmount, currencySymbol)}</Text>
                             </View>
                         </View>
 
@@ -651,7 +761,7 @@ export const ContributionsScreen: React.FC = () => {
                                 <Text style={styles.summaryLabel}>Completion</Text>
                             </View>
                             <View style={styles.summaryGlassItem}>
-                                <Text style={styles.summaryValue}>{formatCurrency(targetAmount, currencySymbol)}</Text>
+                                <Text style={styles.summaryValue}>{formatCompactCurrency(targetAmount, currencySymbol)}</Text>
                                 <Text style={styles.summaryLabel}>Target</Text>
                             </View>
                             <View style={styles.summaryGlassItem}>
@@ -662,12 +772,13 @@ export const ContributionsScreen: React.FC = () => {
                             </View>
                             <View style={styles.summaryGlassItem}>
                                 <Text style={[styles.summaryValue, editedContribution !== monthlyContribution && styles.editedValue]}>
-                                    {formatCurrency(editedContribution, currencySymbol)}
+                                    {formatCompactCurrency(editedContribution, currencySymbol)}
                                 </Text>
                                 <Text style={styles.summaryLabel}>Monthly</Text>
                             </View>
                         </View>
                     </View>
+
 
                     {/* Contribution History */}
                     {paidHistory.length > 0 && (
@@ -683,7 +794,7 @@ export const ContributionsScreen: React.FC = () => {
                                         <View style={styles.historyContent}>
                                             <View style={styles.historyRow}>
                                                 <Text style={styles.historyMonth}>{item.monthKey}</Text>
-                                                <Text style={styles.historyAmount}>{formatCurrency(item.amount, currencySymbol)}</Text>
+                                                <Text style={styles.historyAmount}>{formatCompactCurrency(item.amount, currencySymbol)}</Text>
                                             </View>
                                             <View style={styles.historyRowSub}>
                                                 <Text style={styles.historyDate}>{item.date}</Text>

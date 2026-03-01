@@ -64,6 +64,64 @@ export const formatFullNumber = (num: number): string => {
 };
 
 /**
+ * Format a number in compact style:
+ *   - Up to 5 digits (≤ 99,999): show full number with commas
+ *   - 6+ digits (≥ 100,000): show with K/M/B suffix
+ * Examples:
+ *   500 => "500"
+ *   12000 => "12,000"
+ *   99999 => "99,999"
+ *   123456 => "123.46K"
+ *   1500000 => "1.5M"
+ *   2000000000 => "2B"
+ *
+ * @param num - The number to format
+ * @returns Formatted string
+ */
+export const formatCompactNumber = (num: number): string => {
+    if (num === 0) return '0';
+
+    const absNum = Math.abs(num);
+    const sign = num < 0 ? '-' : '';
+
+    if (absNum >= 1_000_000_000) {
+        const value = absNum / 1_000_000_000;
+        return sign + parseFloat(value.toFixed(2)) + 'B';
+    }
+
+    if (absNum >= 1_000_000) {
+        const value = absNum / 1_000_000;
+        return sign + parseFloat(value.toFixed(2)) + 'M';
+    }
+
+    if (absNum >= 1_00_000) {
+        const value = absNum / 1_000;
+        return sign + parseFloat(value.toFixed(2)) + 'K';
+    }
+
+    return sign + absNum.toLocaleString('en-IN');
+};
+
+/**
+ * Format a number as currency with compact style:
+ *   - Up to 5 digits (≤ 99,999): show full number with commas
+ *   - 6+ digits (≥ 100,000): show with K/M/B suffix
+ * Examples:
+ *   500 => "₹500"
+ *   12000 => "₹12,000"
+ *   99999 => "₹99,999"
+ *   123456 => "₹123.46K"
+ *   1500000 => "₹1.5M"
+ *
+ * @param num - The number to format
+ * @param currency - Currency symbol (default: "₹")
+ * @returns Formatted currency string
+ */
+export const formatCompactCurrency = (num: number, currency: string = '₹'): string => {
+    return currency + formatCompactNumber(num);
+};
+
+/**
  * Format a number input string with commas
  * Examples:
  *   "10000" => "10,000"

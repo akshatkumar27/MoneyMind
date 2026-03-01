@@ -9,6 +9,7 @@ import {
     Platform,
     TouchableOpacity,
     KeyboardAvoidingView,
+    Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -18,8 +19,8 @@ import { BackButton, Button, AnimatedMascot, Header } from '../../components';
 import { MainStackParamList } from '../../navigation/MainTabNavigator';
 import { colors, typography, spacing } from '../../constants';
 import { api } from '../../services';
-import { formatCurrency } from '../../utils';
-import { formatNumberInput, formatNumber } from '../../utils/formatNumber';
+import { formatCompactCurrency } from '../../utils';
+import { formatNumberInput, formatCompactNumber } from '../../utils/formatNumber';
 import { useCurrency } from '../../context/CurrencyContext';
 
 // Time duration options in months
@@ -54,7 +55,12 @@ export const AddGoalScreen: React.FC = () => {
         suggestionMonths && !isPreset ? String(suggestionMonths) : ''
     );
     const [monthlyContribution, setMonthlyContribution] = useState('');
-    const [contributionDay, setContributionDay] = useState(1);
+    const [contributionDay, setContributionDay] = useState(new Date().getDate());
+    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [calendarVisible, setCalendarVisible] = useState(false);
+    const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth());
+    const [calendarYear, setCalendarYear] = useState(new Date().getFullYear());
     const [isLoading, setIsLoading] = useState(false);
     const [isContributionManuallyEdited, setIsContributionManuallyEdited] = useState(false);
     const scrollViewRef = useRef<ScrollView>(null);
@@ -124,6 +130,120 @@ export const AddGoalScreen: React.FC = () => {
         setIsContributionManuallyEdited(false);
     };
 
+    // Calendar helpers
+    const today = new Date();
+    const todayDate = today.getDate();
+    const todayMonth = today.getMonth();
+    const todayYear = today.getFullYear();
+
+    const maxMonth = todayMonth + 1 > 11 ? 0 : todayMonth + 1;
+    const maxYear = todayMonth + 1 > 11 ? todayYear + 1 : todayYear;
+
+    const canGoNext = !(calendarMonth === maxMonth && calendarYear === maxYear);
+    const canGoPrev = !(calendarMonth === todayMonth && calendarYear === todayYear);
+
+    const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    const getCalendarDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
+    const getFirstDayOfMonth = (year: number, month: number) => new Date(year, month, 1).getDay();
+
+    const isDateDisabled = (day: number, month: number, year: number): boolean => {
+        const d = new Date(year, month, day);
+        const t = new Date(todayYear, todayMonth, todayDate);
+        return d < t;
+    };
+
+    const handleCalendarPrev = () => {
+        if (!canGoPrev) return;
+        if (calendarMonth === 0) {
+            setCalendarMonth(11);
+            setCalendarYear(calendarYear - 1);
+        } else {
+            setCalendarMonth(calendarMonth - 1);
+        }
+    };
+
+    const handleCalendarNext = () => {
+        if (!canGoNext) return;
+        if (calendarMonth === 11) {
+            setCalendarMonth(0);
+            setCalendarYear(calendarYear + 1);
+        } else {
+            setCalendarMonth(calendarMonth + 1);
+        }
+    };
+
+    const handleDateSelect = (day: number) => {
+        setContributionDay(day);
+        setSelectedMonth(calendarMonth);
+        setSelectedYear(calendarYear);
+        setCalendarVisible(false);
+    };
+
+    const renderCalendarGrid = () => {
+        const daysInMonth = getCalendarDaysInMonth(calendarYear, calendarMonth);
+        const firstDay = getFirstDayOfMonth(calendarYear, calendarMonth);
+        const rows: React.ReactNode[] = [];
+
+        // Weekday header
+        rows.push(
+            <View key="weekdays" style={calendarStyles.weekRow}>
+                {WEEKDAYS.map(d => (
+                    <Text key={d} style={calendarStyles.weekDayText}>{d}</Text>
+                ))}
+            </View>
+        );
+
+        let cells: React.ReactNode[] = [];
+        for (let i = 0; i < firstDay; i++) {
+            cells.push(<View key={`empty-${i}`} style={calendarStyles.dayCell} />);
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const disabled = isDateDisabled(day, calendarMonth, calendarYear);
+            const isSelected = day === contributionDay && calendarMonth === selectedMonth && calendarYear === selectedYear;
+
+            cells.push(
+                <TouchableOpacity
+                    key={day}
+                    style={[
+                        calendarStyles.dayCell,
+                        isSelected && calendarStyles.dayCellSelected,
+                        disabled && calendarStyles.dayCellDisabled,
+                    ]}
+                    onPress={() => !disabled && handleDateSelect(day)}
+                    disabled={disabled}
+                    activeOpacity={0.6}
+                >
+                    <Text
+                        style={[
+                            calendarStyles.dayText,
+                            isSelected && calendarStyles.dayTextSelected,
+                            disabled && calendarStyles.dayTextDisabled,
+                        ]}
+                    >
+                        {day}
+                    </Text>
+                </TouchableOpacity>
+            );
+
+            if ((firstDay + day) % 7 === 0 || day === daysInMonth) {
+                while (cells.length < 7) {
+                    cells.push(<View key={`pad-${cells.length}`} style={calendarStyles.dayCell} />);
+                }
+                rows.push(
+                    <View key={`row-${day}`} style={calendarStyles.weekRow}>
+                        {cells}
+                    </View>
+                );
+                cells = [];
+            }
+        }
+
+        return rows;
+    };
+
     const handleSaveGoal = async () => {
         const contributionAmount = parseFloat(monthlyContribution.replace(/,/g, '')) || 0;
 
@@ -157,19 +277,29 @@ export const AddGoalScreen: React.FC = () => {
             Toast.show({
                 type: 'error',
                 text1: 'Excessive Contribution',
-                text2: `Your contribution cannot exceed your available monthly savings (${currencySymbol}${formatCurrency(availableForNewGoals)}).`,
+                text2: `Your contribution cannot exceed your available monthly savings (${formatCompactCurrency(availableForNewGoals, currencySymbol)}).`,
             });
             return;
         }
 
         setIsLoading(true);
         try {
+            // Build contribution start date from selected calendar day
+            const startDate = new Date(selectedYear, selectedMonth, contributionDay);
+            const yyyy = startDate.getFullYear();
+            const mm = String(startDate.getMonth() + 1).padStart(2, '0');
+            const dd = String(startDate.getDate()).padStart(2, '0');
+            const contributionStartDate = `${yyyy}-${mm}-${dd}`;
+
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
             const payload = {
                 name: name.trim(),
                 target_amount: targetAmount,
                 achieve_in_months: achieveInMonths,
                 monthly_contribution: contributionAmount,
-                contribution_day: contributionDay,
+                contribution_start_date: contributionStartDate,
+                timezone,
             };
 
             console.log('Creating goal:', payload);
@@ -250,7 +380,7 @@ export const AddGoalScreen: React.FC = () => {
                             <View style={styles.budgetTextContainer}>
                                 <Text style={styles.budgetLabel}>Monthly Savings Available</Text>
                                 <Text style={styles.budgetAmount}>
-                                    {currencySymbol}{formatNumber(availableForNewGoals, 1)}
+                                    {currencySymbol}{formatCompactNumber(availableForNewGoals)}
                                 </Text>
                             </View>
                         </View>
@@ -362,37 +492,95 @@ export const AddGoalScreen: React.FC = () => {
                     {/* Contribution Day Picker */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Contribution day of month</Text>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.dayPickerScroll}>
-                            <View style={styles.dayPickerContainer}>
-                                {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-                                    <TouchableOpacity
-                                        key={day}
-                                        style={[
-                                            styles.dayOption,
-                                            contributionDay === day && styles.dayOptionSelected,
-                                        ]}
-                                        onPress={() => setContributionDay(day)}
-                                    >
-                                        <Text
-                                            style={[
-                                                styles.dayText,
-                                                contributionDay === day && styles.dayTextSelected,
-                                            ]}
-                                        >
-                                            {day}
+                        <TouchableOpacity
+                            style={calendarStyles.dayPickerCard}
+                            onPress={() => {
+                                setCalendarMonth(todayMonth);
+                                setCalendarYear(todayYear);
+                                setCalendarVisible(true);
+                            }}
+                            activeOpacity={0.7}
+                        >
+                            <View style={calendarStyles.dayPickerLeft}>
+                                <View style={calendarStyles.dateCircle}>
+                                    <Text style={calendarStyles.dateCircleText}>{contributionDay}</Text>
+                                    <View style={calendarStyles.ordinalBadge}>
+                                        <Text style={calendarStyles.ordinalText}>
+                                            {contributionDay === 1 ? 'st' : contributionDay === 2 ? 'nd' : contributionDay === 3 ? 'rd' : 'th'}
                                         </Text>
-                                    </TouchableOpacity>
-                                ))}
+                                    </View>
+                                </View>
+                                <View style={calendarStyles.dayPickerTextContainer}>
+                                    <Text style={calendarStyles.dayPickerValue}>Of every month</Text>
+                                    <Text style={calendarStyles.dayPickerHint}>Tap to change</Text>
+                                </View>
                             </View>
-                        </ScrollView>
+                            <Text style={calendarStyles.changeText}>›</Text>
+                        </TouchableOpacity>
+                        <View style={calendarStyles.noteContainer}>
+                            <Text style={calendarStyles.noteIcon}>Note: </Text>
+                            <Text style={calendarStyles.noteText}>
+                                Your first contribution starts on{' '}
+                                <Text style={calendarStyles.noteHighlight}>
+                                    {contributionDay} {MONTH_NAMES[selectedMonth]} {selectedYear}
+                                </Text>
+                            </Text>
+                        </View>
                     </View>
+
+                    {/* Calendar Modal */}
+                    <Modal
+                        visible={calendarVisible}
+                        transparent
+                        animationType="fade"
+                        onRequestClose={() => setCalendarVisible(false)}
+                    >
+                        <View style={calendarStyles.modalOverlay}>
+                            <View style={calendarStyles.modalContent}>
+                                <Text style={calendarStyles.modalTitle}>Select Contribution Day</Text>
+                                <Text style={calendarStyles.modalSubtitle}>Pick a future date for your monthly contribution</Text>
+
+                                {/* Month navigation */}
+                                <View style={calendarStyles.monthNav}>
+                                    <TouchableOpacity
+                                        onPress={handleCalendarPrev}
+                                        style={[calendarStyles.navBtn, !canGoPrev && calendarStyles.navBtnDisabled]}
+                                        disabled={!canGoPrev}
+                                    >
+                                        <Text style={[calendarStyles.navBtnText, !canGoPrev && calendarStyles.navBtnTextDisabled]}>‹</Text>
+                                    </TouchableOpacity>
+                                    <Text style={calendarStyles.monthLabel}>
+                                        {MONTH_NAMES[calendarMonth]} {calendarYear}
+                                    </Text>
+                                    <TouchableOpacity
+                                        onPress={handleCalendarNext}
+                                        style={[calendarStyles.navBtn, !canGoNext && calendarStyles.navBtnDisabled]}
+                                        disabled={!canGoNext}
+                                    >
+                                        <Text style={[calendarStyles.navBtnText, !canGoNext && calendarStyles.navBtnTextDisabled]}>›</Text>
+                                    </TouchableOpacity>
+                                </View>
+
+                                {/* Calendar grid */}
+                                {renderCalendarGrid()}
+
+                                {/* Close button */}
+                                <TouchableOpacity
+                                    style={calendarStyles.closeBtn}
+                                    onPress={() => setCalendarVisible(false)}
+                                >
+                                    <Text style={calendarStyles.closeBtnText}>Cancel</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
                 </ScrollView>
 
                 {/* Budget warning mascot — only shown when suggestion mascot is not visible */}
                 {!suggestionDescription && availableForNewGoals !== undefined && contributionAmount > availableForNewGoals && (
                     <View style={styles.mascotContainer}>
                         <AnimatedMascot
-                            text={`You only have ${formatCurrency(availableForNewGoals ?? 0, currencySymbol)} available for new goals!`}
+                            text={`You only have ${formatCompactCurrency(availableForNewGoals ?? 0, currencySymbol)} available for new goals!`}
                         />
                     </View>
                 )}
@@ -618,31 +806,210 @@ const styles = StyleSheet.create({
     dayPickerScroll: {
         marginTop: spacing.sm,
     },
-    dayPickerContainer: {
+});
+
+const calendarStyles = StyleSheet.create({
+    dayPickerCard: {
         flexDirection: 'row',
-        gap: spacing.xs,
-    },
-    dayOption: {
-        width: 42,
-        height: 42,
-        borderRadius: 21,
+        alignItems: 'center',
+        justifyContent: 'space-between',
         backgroundColor: colors.cardBackground,
+        borderRadius: 16,
+        padding: spacing.md,
         borderWidth: 1.5,
-        borderColor: colors.border,
+        borderColor: colors.primary + '25',
+        marginTop: spacing.sm,
+    },
+    dayPickerLeft: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+    },
+    dateCircle: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: colors.primary + '18',
+        borderWidth: 1.5,
+        borderColor: colors.primary + '50',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: spacing.md,
+    },
+    dateCircleText: {
+        color: colors.primary,
+        fontSize: 20,
+        fontWeight: typography.bold as any,
+        lineHeight: 24,
+    },
+    ordinalBadge: {
+        position: 'absolute',
+        top: -4,
+        right: -4,
+        backgroundColor: colors.primary,
+        borderRadius: 8,
+        paddingHorizontal: 4,
+        paddingVertical: 1,
+        minWidth: 18,
+        alignItems: 'center',
+    },
+    ordinalText: {
+        color: '#fff',
+        fontSize: 9,
+        fontWeight: typography.bold as any,
+    },
+    dayPickerTextContainer: {
+        flex: 1,
+    },
+    dayPickerLabel: {
+        color: colors.textSecondary,
+        fontSize: typography.caption,
+        marginBottom: 2,
+    },
+    dayPickerValue: {
+        color: colors.textPrimary,
+        fontSize: typography.bodySmall,
+        fontWeight: typography.medium as any,
+    },
+    dayPickerHint: {
+        color: colors.textMuted,
+        fontSize: typography.caption - 1,
+        marginTop: 3,
+    },
+    changeText: {
+        color: colors.primary,
+        fontSize: 22,
+        fontWeight: typography.bold as any,
+        marginLeft: spacing.sm,
+    },
+    noteContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: spacing.sm + 2,
+        paddingHorizontal: spacing.xs,
+    },
+    noteIcon: {
+        fontSize: 13,
+        marginRight: spacing.xs,
+    },
+    noteText: {
+        color: colors.textMuted,
+        fontSize: typography.caption - 1,
+        flex: 1,
+    },
+    noteHighlight: {
+        color: colors.primary,
+        fontWeight: typography.semibold as any,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: spacing.lg,
+    },
+    modalContent: {
+        backgroundColor: '#1a1a2e',
+        borderRadius: 20,
+        padding: spacing.lg,
+        width: '100%',
+        borderWidth: 1,
+        borderColor: '#2a2a4a',
+    },
+    modalTitle: {
+        color: colors.textPrimary,
+        fontSize: typography.h3,
+        fontWeight: typography.bold as any,
+        textAlign: 'center',
+        marginBottom: spacing.xs,
+    },
+    modalSubtitle: {
+        color: colors.textMuted,
+        fontSize: typography.caption,
+        textAlign: 'center',
+        marginBottom: spacing.lg,
+    },
+    monthNav: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: spacing.md,
+    },
+    navBtn: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: colors.cardBackground,
         alignItems: 'center',
         justifyContent: 'center',
     },
-    dayOptionSelected: {
-        backgroundColor: colors.primary + '20',
+    navBtnDisabled: {
+        opacity: 0.3,
+    },
+    navBtnText: {
+        color: colors.textPrimary,
+        fontSize: 24,
+        fontWeight: typography.bold as any,
+        lineHeight: 28,
+    },
+    navBtnTextDisabled: {
+        color: colors.textMuted,
+    },
+    monthLabel: {
+        color: colors.textPrimary,
+        fontSize: typography.body,
+        fontWeight: typography.semibold as any,
+    },
+    weekRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: spacing.xs,
+    },
+    weekDayText: {
+        color: colors.textMuted,
+        fontSize: typography.caption,
+        fontWeight: typography.semibold as any,
+        width: 40,
+        textAlign: 'center',
+    },
+    dayCell: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 2,
+    },
+    dayCellSelected: {
+        backgroundColor: colors.primary + '30',
+        borderWidth: 1.5,
         borderColor: colors.primary,
     },
+    dayCellDisabled: {
+        opacity: 0.25,
+    },
     dayText: {
-        color: colors.textSecondary,
+        color: colors.textPrimary,
         fontSize: typography.bodySmall,
         fontWeight: typography.medium as any,
     },
     dayTextSelected: {
         color: colors.primary,
         fontWeight: typography.bold as any,
+    },
+    dayTextDisabled: {
+        color: colors.textMuted,
+    },
+    closeBtn: {
+        marginTop: spacing.lg,
+        paddingVertical: spacing.md,
+        borderRadius: 12,
+        backgroundColor: colors.cardBackground,
+        alignItems: 'center',
+    },
+    closeBtnText: {
+        color: colors.textSecondary,
+        fontSize: typography.body,
+        fontWeight: typography.semibold as any,
     },
 });
